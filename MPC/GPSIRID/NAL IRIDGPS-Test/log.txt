@@ -1,0 +1,115 @@
+
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC 010000 018627 = DA513567
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 1 SEC
+SQ = 5
+IRIDIUM READY
+CALLING LAND 0088160000519
+CONNECTED ATD0088160000519
+ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+*******POWER OFF IRIDIUM/GPS UNIT*******
+
+
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC 010000 01861F = FC8F1984
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 1 SEC
+SQ = 5
+IRIDIUM READY
+CALLING LAND 0088160000519
+CONNECTED ATD0088160000519
+ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:CUser(G1R90)ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ
+cmdLength:4163
+crchex:6700
+newhex:e79b
+msg:µ
+cmdLength:-19200
+crchex:ff8c
+newhex:0
+msg:ä
+cmdLength:-7168
+crchex:4026
+newhex:0
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC 010000 018615 = 2C2BFE3E
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 1 SEC
+SQ = 5
+IRIDIUM READY
+CALLING LAND 0088160000519
+CONNECTED ATD0088160000519
+ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:CUser(G1R90)ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ
+cmdLength:4163
+crchex:6700
+newhex:153e
+msg:
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:
+cmdLength:16
+crchex:ffe4
+newhex:26e4

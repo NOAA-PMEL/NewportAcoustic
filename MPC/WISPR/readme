@@ -1,0 +1,12 @@
+WISPR CF2 File for MPC Rev3 Daq board.
+Version 3.1
+
+Improvements:
+-Multi-wispr min free space handling
+-Control more parameters on WISPR including detection algorithms and start scripts.
+
+
+Version 3.2 7/25/2016 -AT 
+To match implementation of MPC_Settings3.2 for user controllable menu structure.
+This WISPR3.2 will better serve as a manual diagnostics interface with the system
+user.

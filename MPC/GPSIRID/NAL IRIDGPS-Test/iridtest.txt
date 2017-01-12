@@ -1,0 +1,369 @@
+ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,ACKNOWLEDGED
+
+FILE SIZE: 384
+# OF BLKS: 1
+SENDING BLK #1 389BYTES
+
+CHECKING IF ANY BAD BLOCKS
+
+hbuf:cmdTX COMPLETED
+Prepare to receive a command
+
+CMDS:1Receive Command
+
+msg:ser(G1R90)
+cmdLength:4163
+crchex:6700
+newhex:6a3c
+msg:User(G2R90)
+cmdLength:16
+crchex:ffb5
+newhex:8cb5
+msg:User(G3R90)
+cmdLength:16
+crchex:ffe4
+newhex:26e4
+
+----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018627 = DA513567GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Command*******POWER OFF IRIDIUM/GPS UNIT*******----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 01861F = FC8F1984GIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:e79bmsg:µcmdLength:-19200crchex:ff8cnewhex:0msg:äcmdLength:-7168crchex:4026newhex:0----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>----------------------------------------------------------------  Persistor CF21M   SN 13002    PicoDOS V4.03r1      PBM V4.03   (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com----------------------------------------------------------------C:\>###MX Load: CRC 010000 018615 = 2C2BFE3EGIRIDIUM ANTENNA ONWARMING UP GPS/IRID UNIT FOR 1 SECSQ = 5IRIDIUM READYCALLING LAND 0088160000519CONNECTED ATD0088160000519ACKNOWLEDGEDFILE SIZE: 384# OF BLKS: 1SENDING BLK #1 389BYTESCHECKING IF ANY BAD BLOCKShbuf:cmdTX COMPLETEDPrepare to receive a commandCMDS:1Receive Commandmsg:CUser(G1R90)cmdLength:4163crchex:6700newhex:153emsg:cmdLength:16crchex:ffb5newhex:8cb5msg:cmdLength:16crchex:ffe4newhex:26e4
+
+
+
+
+= 26696733
+GIRIDIUM ANTENNA ON
+WARMING UP GPS/IRID UNIT FOR 10 SEC
+Chars is not NULL, A, 1
+Chars is not NULL, :, 1ReturnlineATS0=2 OK
+Chars is not NULL, :, 1Returnline:000 OK
+Chars is not NULL, =, 1Returnline: SIM PIN
+Chars is not NULL, :, 1Returnline="1111" OK
+chars is not NULL, :, 1Returnline:4 OK
+Chars is not NULL, :, 1Returnline:4 OK
+SQ = 5
+hars is not NULL, A, 1Returnline:5 OK
+Chars is not NULL, C, 1Retur
+nlineATD 0088160000519
+ReturnlineCONNECT 19200
+hars is not NULL,
