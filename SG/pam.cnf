@@ -1,0 +1,13 @@
+name=PAM
+prefix=pa
+timeout=2000
+powerup-timeout=2000
+baud=9600
+warmup=2000
+voltage=10
+current=0.111
+cmdprefix=$PA_
+prompt=>
+start=%i
+status=%r%n%5%5+++%D,%d,%t,%T,%V,%W%r
+download="%r%n%5%5cat %f%m%r"

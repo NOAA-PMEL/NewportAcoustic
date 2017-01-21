@@ -1,0 +1,14 @@
+# general
+*.exe
+# codewar
+*.AHX
+*.AMP
+*.APP
+*.MAP
+*.RHX
+*.RMP
+*.RUN
+*.bin
+Resource.frk
+bin
+*_Data
