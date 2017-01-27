@@ -11,16 +11,17 @@ void CTD_SyncMode();
 void GetCTDSettings();
 void OpenTUPort_CTD(bool);
 float CTD_CalculateVelocity();
-float CTD_AverageDepth(int, float*);
-extern TUPort* CTDPort;
-#define  BAUD        9600L
+float CTD_AverageDepth(int, float *);
+extern TUPort *CTDPort;
+#define BAUD 9600L
 
-typedef struct
-{
+typedef struct {
 
-	short UPLOAD;		//A boolean 1 or 0 to decide whether to upload CTD data at surface.
-//	short POLLED;		//1 for polled sampling ("TS") or 0 for autnomous sampling defined by SAMPINT schedule
-//	short DELAY;		//Delay in seconds between polled samples
-//	short SAMPINT;		//Autonomous sampling interval. 
+  short UPLOAD; // A boolean 1 or 0 to decide whether to upload CTD data at
+                // surface.
+  //	short POLLED;		//1 for polled sampling ("TS") or 0 for autnomous
+  //sampling defined by SAMPINT schedule
+  //	short DELAY;		//Delay in seconds between polled samples
+  //	short SAMPINT;		//Autonomous sampling interval.
 
 } CTDParameters;

@@ -1,22 +1,21 @@
 #include <stdio.h>
-//WISPR HEADER FILE
+// WISPR HEADER FILE
 
-//WISPR Control Structure
-      
-typedef struct
-{
-short    GAIN;    //-g 0-3
-//short    MODE;   //-M 1-5 in WISPR Start Script
-short    NUM;     //Depends on the number of WISPR Boards installed
-short    DETMAX;  //Maximum Number of Detections to return
-short    DETNUM;  //Number of detections per one call to initiate #REALTIME call to land.
-short    DUTYCYCL;//Duty cycle of recorder during one detection interval
-//short    ON;      //Power to the WISPR 1=on 0=off
-}  WISPRParameters;
+// WISPR Control Structure
 
+typedef struct {
+  short GAIN; //-g 0-3
+  // short    MODE;   //-M 1-5 in WISPR Start Script
+  short NUM;    // Depends on the number of WISPR Boards installed
+  short DETMAX; // Maximum Number of Detections to return
+  short DETNUM; // Number of detections per one call to initiate #REALTIME call
+                // to land.
+  short DUTYCYCL; // Duty cycle of recorder during one detection interval
+  // short    ON;      //Power to the WISPR 1=on 0=off
+} WISPRParameters;
 
-//extern bool Wispr_On;
-extern TUPort* PAMPort;
+// extern bool Wispr_On;
+extern TUPort *PAMPort;
 
 short WISPR_Data();
 void WISPRPower(bool);
@@ -38,14 +37,15 @@ void WISPRGPS();
 void OpenTUPort_WISPR(bool);
 bool WISPRExpectedReturn(short, bool);
 
-#define  WISPRONE       29
-#define  WISPRTWO       30
-#define  WISPRTHREE     24
-#define  WISPRFOUR      25
+#define WISPRONE 29
+#define WISPRTWO 30
+#define WISPRTHREE 24
+#define WISPRFOUR 25
 
-#define WISPR_PWR_ON    37
-#define WISPR_PWR_OFF   42
-   
-//TUPort Baud Rates
-#define  BAUD        9600L
-//This baud rate works with only the new wispr_053116 killerwhale file at the moment. 060116- AT
+#define WISPR_PWR_ON 37
+#define WISPR_PWR_OFF 42
+
+// TUPort Baud Rates
+#define BAUD 9600L
+// This baud rate works with only the new wispr_053116 killerwhale file at the
+// moment. 060116- AT
