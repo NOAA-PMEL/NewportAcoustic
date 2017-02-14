@@ -1,3 +1,6 @@
+#include <cfxpico.h> // Persistor PicoDOS Definitions
+#include <cfxbios.h> // Persistor BIOS and I/O Definitions
+
 #include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
 #include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
 #include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
@@ -10,9 +13,6 @@
 #include <string.h>
 #include <termios.h> // PicoDOS POSIX-like Terminal I/O Definitions
 #include <unistd.h>  // PicoDOS POSIX-like UNIX Function Definitions
-
-#include <cfxbios.h> // Persistor BIOS and I/O Definitions
-#include <cfxpico.h> // Persistor PicoDOS Definitions
 
 #include <MPC_Global.h>
 #include <PLATFORM.h>
