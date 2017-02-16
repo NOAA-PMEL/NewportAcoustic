@@ -1,3 +1,4 @@
+#define DBG_CTD
 #include <MPC_Global.h>
 #include <PLATFORM.h>
 #include <cfxbios.h> // Persistor BIOS and I/O Definitions
@@ -404,6 +405,9 @@ bool CTD_Data() {
       i++;
     }
   }
+#ifdef DBG_CTD
+  cprintf( "'%s'\n", stringin );
+#endif
 
   if (strchr(stringin, '#') != NULL) {
     log = true;
