@@ -1,7 +1,8 @@
-#include <MPC_Global.h>
-#include <PLATFORM.h>
 #include <cfxbios.h> // Persistor BIOS and I/O Definitions
 #include <cfxpico.h> // Persistor PicoDOS Definitions
+#include <MPC_Global.h>
+#include <PLATFORM.h>
+
 //#include <Winch.h>
 #include <CTD.h>
 
@@ -403,7 +404,12 @@ bool CTD_Data() {
       stringin[i] = charin;
       i++;
     }
+    // blk 170221 save a second, loop ends at 2nd line end
+    if (i>4 && charin=='\n') break;
   }
+
+  // blk 170221 we shouldn't have timeouts
+  if (count>0) flogf("\nWarning CTD_Data(): timeout 250ms reading CTD");
 
   if (strchr(stringin, '#') != NULL) {
     log = true;
@@ -690,3 +696,4 @@ float CTD_CalculateVelocity() {
 END NEVER-ENDING WHILE LOOP
 ===========================
 +++++++++++++++++++++++++*/
+
