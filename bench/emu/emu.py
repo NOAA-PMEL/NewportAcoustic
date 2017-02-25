@@ -11,10 +11,10 @@ depth = depthMax = 30
 phase=1
 
 # phase=
-# 1. Recording WISPR, locked to winch
-# 2. Up. Watch for currents. Beware ice at surface. Keep tension.
-# 3. iridium. Call into Satellite
-# 4. Down. 
+# 1. Recording, locked to winch. <- depth = depthMax
+# 2. Up. <- amod up command
+# 3. iridium. <- depth = 0 or amod stop command
+# 4. Down. <- amod down command
 
 # init
 syncmode=0
@@ -25,15 +25,17 @@ def main():
     global phase, syncmode, phaseStarted
 
     while true:
-        # CTD  
+        # CTD. syncmode, sample, settings
         if ctdSer.in_waiting:
             # note: syncmode is special, a trigger not a command
             if syncmode: 
-                c = ctdSer.read()
+                c = ctdSer.read(999)
                 if '\x00' in c: 
                     # break
+                    print "ctd> break"
                     syncmode=0
                 else: 
+                    print "ctd> %s" % c
                     ctdOut()
                     # flush
                     ctdSer.read(999)
@@ -42,22 +44,33 @@ def main():
                 l = ctdSer.getline().upper()
                 if 'TS' in l: ctdOut()
                 elif 'SYNCMODE=Y' in l: syncmode=1
+                else: pass
 
-        # iridium radio
+        # iridium radio. TBD
         if iridSer.in_waiting:
             l = iridSer.getline()
 
-        # acoustic modem
+        # acoustic modem. up, stop, down.
         if amodSer.in_waiting:
             l = amodSer.getline()
             # up command
             if '#R,01,03' in l:
                 phase=2
                 phaseStarted=time.time()
+            # stop command
+            elif '#S,01,00' in l:
+                phase=3
+                phaseStarted=time.time()
             # down command
             elif '#F,01,00' in l:
                 phase=4
                 phaseStarted=time.time()
+            else:
+                errOut("amod: unexpected '%s'" % l)
+
+
+def errOut(s="unexpected err"):
+    print "Err: %s" % s
         
 
 
@@ -77,14 +90,30 @@ def ctdOut():
     ctdSer.putline("\r\n# %f, %f, %f, %f, %s %s\r\n" %
         20.1, 0.01, depth, 0.06, date, time)
 
+
 def winch():
     "update (global) depth due to winch activity"
     global phaseStarted, phase, depth
     # 2do:  add complexity to match observed data
     #       add option for current
-    #       add winch autostop for surface
     if phase=2:
-        d = time.time() - phaseStarted) * 
+        # up, simple linear
+        d = .331 * (time.time() - phaseStarted) 
+        depth += d
+        if depth>0: 
+            # at surface
+            depth=0
+            phase=3
+            phaseStarted=time.time()
+    if phase=4:
+        # down, simple linear
+        d = -0.2 * (time.time() - phaseStarted) 
+        depth += d
+        if depth>depthMax: 
+            # docked in winch
+            depth=depthMax
+            phase=1
+            phaseStarted=time.time()
 
 
 # Notes:
