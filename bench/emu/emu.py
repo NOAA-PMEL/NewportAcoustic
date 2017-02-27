@@ -1,13 +1,12 @@
-import laraSer
+import sys
 import time
+import laraSer
 
 # serial ports
-ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600,timeout=0)
-iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200,timeout=0)
-amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800,timeout=0)
 
 # program parameters
 depth = depthMax = 30
+syncmode=0
 phase=1
 
 # phase=
@@ -16,15 +15,26 @@ phase=1
 # 3. iridium. <- depth = 0 or amod stop command
 # 4. Down. <- amod down command
 
-# init
-syncmode=0
-programStarted = phaseStarted = time.time()
+def init():
+    "set initial values, open serials"
+    global phase, phaseStarted, programStarted
+    global ctdSer, iridSer, amodSer
+    ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600,timeout=0.3)
+    ctdSer.name = 'ctd'
+    iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200,timeout=0.3)
+    iridSer.name = 'irid'
+    amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800,timeout=0.3)
+    amodSer.name = 'amod'
+    programStarted = phaseStarted = time.time()
 
 def main():
     "main loop, check all ports and respond"
-    global phase, syncmode, phaseStarted
+    global phase, phaseStarted, depth, depthMax, syncmode
+    global ctdSer, iridSer, amodSer
 
-    while true:
+    init()
+
+    while 1:
         # CTD. syncmode, sample, settings
         if ctdSer.in_waiting:
             # note: syncmode is special, a trigger not a command
@@ -34,6 +44,7 @@ def main():
                     # break
                     print "ctd> break"
                     syncmode=0
+                    print "syncmode=n"
                 else: 
                     print "ctd> %s" % c
                     ctdOut()
@@ -43,7 +54,9 @@ def main():
                 # upper case is standard for commands, but optional
                 l = ctdSer.getline().upper()
                 if 'TS' in l: ctdOut()
-                elif 'SYNCMODE=Y' in l: syncmode=1
+                elif 'SYNCMODE=Y' in l: 
+                    syncmode=1
+                    print "syncmode=y"
                 else: pass
 
         # iridium radio. TBD
@@ -56,17 +69,21 @@ def main():
             # up command
             if '#R,01,03' in l:
                 phase=2
+                print "phase=2, up"
                 phaseStarted=time.time()
             # stop command
             elif '#S,01,00' in l:
                 phase=3
+                print "phase=3, iridium"
                 phaseStarted=time.time()
             # down command
             elif '#F,01,00' in l:
                 phase=4
+                print "phase=4, down"
                 phaseStarted=time.time()
             else:
-                errOut("amod: unexpected '%s'" % l)
+                errOut("amod: unexpected %r" % l)
+                errOut("amod: buff %r" % amodSer.buff)
 
 
 def errOut(s="unexpected err"):
@@ -84,11 +101,11 @@ def ctdOut():
     # adjust depth
     winch()
     ###
-    date="01 Aug 2016"
-    time="12:16:50"
+    d="01 Aug 2016"
+    t="12:16:50"
     # note: modify temp for ice
     ctdSer.putline("\r\n# %f, %f, %f, %f, %s %s\r\n" %
-        20.1, 0.01, depth, 0.06, date, time)
+        (20.1, 0.01, depth, 0.06, d, t))
 
 
 def winch():
@@ -96,7 +113,7 @@ def winch():
     global phaseStarted, phase, depth
     # 2do:  add complexity to match observed data
     #       add option for current
-    if phase=2:
+    if phase==2:
         # up, simple linear
         d = .331 * (time.time() - phaseStarted) 
         depth += d
@@ -105,7 +122,7 @@ def winch():
             depth=0
             phase=3
             phaseStarted=time.time()
-    if phase=4:
+    if phase==4:
         # down, simple linear
         d = -0.2 * (time.time() - phaseStarted) 
         depth += d
@@ -114,6 +131,26 @@ def winch():
             depth=depthMax
             phase=1
             phaseStarted=time.time()
+
+
+# start
+arg = sys.argv[1:]
+while arg:
+    if '-s' in arg[0]: 
+        syncmode=1
+        print "syncmode on"
+        arg = arg[1:]
+    elif '-p' in arg[0]:
+        phase=arg[1]
+        print "phase %s" % phase
+        arg = arg[2:]
+    elif '-d' in arg[0]:
+        depth=arg[1]
+        print "depth %s" % depth
+        arg = arg[2:]
+    else: arg = arg[1:]
+
+main()
 
 
 # Notes:

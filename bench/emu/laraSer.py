@@ -7,7 +7,7 @@ class Serial(serial.Serial):
         super(Serial, self).__init__(*args, **kwargs)
 
     def getline(self, eol='\n'):
-        "Get full lines from serial, record.
+        "Get full lines from serial, record. \
             Empty q -> None, no full line -> '', eol -> line"
         if self.in_waiting:
             # read chars
