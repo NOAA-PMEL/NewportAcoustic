@@ -5,7 +5,7 @@ import laraSer
 # serial ports
 
 # program parameters
-depth = depthMax = 30
+depth = depthMax = -30
 syncmode=0
 phase=1
 
@@ -23,7 +23,7 @@ def init():
     ctdSer.name = 'ctd'
     iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200,timeout=0.3)
     iridSer.name = 'irid'
-    amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800,timeout=0.3)
+    amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800,timeout=0.6)
     amodSer.name = 'amod'
     programStarted = phaseStarted = time.time()
 
@@ -113,6 +113,7 @@ def winch():
     global phaseStarted, phase, depth
     # 2do:  add complexity to match observed data
     #       add option for current
+    #       phase 1=docked, 2=up, 3=stopped, 4=down
     if phase==2:
         # up, simple linear
         d = .331 * (time.time() - phaseStarted) 
@@ -126,7 +127,7 @@ def winch():
         # down, simple linear
         d = -0.2 * (time.time() - phaseStarted) 
         depth += d
-        if depth>depthMax: 
+        if depth<depthMax: 
             # docked in winch
             depth=depthMax
             phase=1
@@ -141,12 +142,16 @@ while arg:
         print "syncmode on"
         arg = arg[1:]
     elif '-p' in arg[0]:
-        phase=arg[1]
+        phase=int(arg[1])
         print "phase %s" % phase
         arg = arg[2:]
     elif '-d' in arg[0]:
-        depth=arg[1]
+        depth=float(arg[1])
         print "depth %s" % depth
+        arg = arg[2:]
+    elif '-m' in arg[0]:
+        maxDepth=float(arg[1])
+        print "maxDepth %s" % depth
         arg = arg[2:]
     else: arg = arg[1:]
 

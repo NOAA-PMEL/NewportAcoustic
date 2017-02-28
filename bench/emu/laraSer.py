@@ -4,6 +4,7 @@ class Serial(serial.Serial):
     def __init__(self, *args, **kwargs):
         # buff is for input not consumed by getline
         self.buff=''
+        self.log=1
         super(Serial, self).__init__(*args, **kwargs)
 
     def getline(self, eol='\n'):
@@ -17,7 +18,8 @@ class Serial(serial.Serial):
                 l = b[:i]
                 self.buff = b[i:]
                 # record
-                print "%s> %s" % (self.name, l)
+                if self.log:
+                    print "%s> %s" % (self.name, l)
                 return l
             else: 
                 self.buff = b
@@ -27,4 +29,5 @@ class Serial(serial.Serial):
         "put to serial, record"
         self.write("%s\r\n" % s)
         # record
-        print "%s< %s" % (self.name, s)
+        if self.log:
+            print "%s< %s" % (self.name, s)
