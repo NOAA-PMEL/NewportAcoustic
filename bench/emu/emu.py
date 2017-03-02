@@ -17,13 +17,14 @@ phase=1
 
 def init():
     "set initial values, open serials"
-    global phase, winchUpdate, programStarted
+    global syncmode, phase, depth
+    global winchUpdate, programStarted
     global ctdSer, iridSer, amodSer
-    ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600,timeout=0.3)
+    ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600)
     ctdSer.name = 'ctd'
-    iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200,timeout=0.3)
+    iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200)
     iridSer.name = 'irid'
-    amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800,timeout=0.6)
+    amodSer = laraSer.Serial(port='/dev/ttyS9',baudrate=4800)
     amodSer.name = 'amod'
     programStarted = winchUpdate = time.time()
     # arguments
@@ -31,7 +32,7 @@ def init():
     while arg:
         a=arg[0]
         if '-?' in a:
-            print "usage: -syncmode -phase # -depth # -max #" + \
+            print "usage: -syncmode -phase # -depth # -mooring #" + \
                 " -no [ctd|irid|amod] -?"
         if '-s' in a: 
             syncmode=1
@@ -46,8 +47,8 @@ def init():
             print "depth %s" % depth
             arg = arg[2:]
         elif '-m' in a:
-            maxDepth=float(arg[1])
-            print "maxDepth %s" % depth
+            mooring=float(arg[1])
+            print "mooring %s" % depth
             arg = arg[2:]
         elif '-n' in a:
             if 'ctd' in arg[1]: 
@@ -67,16 +68,12 @@ def main():
     global phase, winchUpdate, depth, depthMax, syncmode
     global ctdSer, iridSer, amodSer
 
-    init()
-
     while 1:
         # CTD. syncmode, sample, settings
         if ctdSer.in_waiting:
             # syncmode is special, a trigger not a command, eol not required
             if syncmode: 
-                time.sleep(.1)
-                c = ctdSer.read(999)
-                print "ctd> %r" % c
+                c = ctdSer.get()
                 if '\x00' in c: 
                     # break
                     print "ctd: break ignored"
@@ -94,11 +91,11 @@ def main():
                 elif 'SYNCMODE=Y' in l: 
                     syncmode=1
                 else: pass
-                ctdSer.write('S>')
+                ctdSer.put('S>')
 
         # iridium radio. TBD
         if iridSer.in_waiting:
-            l = iridSer.getline()
+            l = iridSer.getline(eol='\r')
 
         # acoustic modem. up, stop, down.
         if amodSer.in_waiting:
@@ -162,14 +159,14 @@ def winch():
     if phase==4:
         # down, simple linear
         depth += -0.2 * (t - winchUpdate) 
-        if depth<depthMax: 
+        if depth<mooring: 
             # docked in winch
-            depth=depthMax
+            depth=mooring
             phase=1
     winchUpdate = t
 
 
-main()
+if __name__=='__main__': init(); main()
 
 
 # Notes:

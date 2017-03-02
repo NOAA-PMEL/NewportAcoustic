@@ -4,9 +4,24 @@ import sys
 class Serial(serial.Serial):
     def __init__(self, *args, **kwargs):
         # buff is for input not consumed by getline
+        super(Serial, self).__init__(*args, **kwargs)
         self.buff=''
         self.log=1
-        super(Serial, self).__init__(*args, **kwargs)
+        self.timeout = ( 1 / self.baudrate ) * 3
+
+    def get(self):
+        "Get some chars"
+        b = self.buff
+        self.buff = ''
+        while 1:
+            c = self.read()
+            if not c: break
+            b += c
+        # record
+        if self.log:
+            # \r in case of partial 
+            print "\r%s> %r" % (self.name, b)
+        return b
 
     def getline(self, eol='\n'):
         "Get full lines from serial, record. \
@@ -16,25 +31,27 @@ class Serial(serial.Serial):
             b = self.buff + self.read(self.in_waiting)
             if eol in b:
                 i = b.find(eol) + len(eol)
-                l = b[:i]
+                r = b[:i]
                 self.buff = b[i:]
-                # record
-                if self.log:
-                    # \r in case of partial (below)
-                    print "\r%s> %r" % (self.name, l)
-                return l
             else: 
                 # partial
                 self.buff = b
-                # record
-                if self.log:
-                    # if not a full line, \r to column 0
-                    sys.stdout.write( "\r%s..%s" % (self.name, b))
-                return ''
+                r = ''
+            # record
+            if self.log:
+                print "%s> %r" % (self.name, r)
+            return r
 
     def putline(self, s):
         "put to serial, record"
         self.write("%s\r\n" % s)
         # record
         if self.log:
-            print "%s< %r" % (self.name, s)
+            print "%s< '%s\\r\\n'" % (self.name, s)
+
+    def put(self,s):
+        "put to serial, record"
+        self.write("%s" % s)
+        # record
+        if self.log:
+            print "%s< '%s'" % (self.name, s)
