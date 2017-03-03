@@ -1,0 +1,26 @@
+=== Iridium a3la-rg
+'AT+PD\r'
+'\r\nUTC Date=01-01-2017 Satellites Used=17\r\n'
+
+AT+PD
+UTC Date=01-01-2017 
+Satellites Used=17
+
+AT+PT
+UTC Time=22:22:22.222 
+Satellites Used=22
+
+AT+PL
+Latitude=90:59.9999 N
+Longitude=180:59.9999 E
+Altitude=-0.1 meters
+Satellites Used=99
+
+AT+CPIN="1111"
+
+AT+CPAS
++CPAS:004
+
+AT*P
+
+

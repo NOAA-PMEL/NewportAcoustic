@@ -5,7 +5,7 @@ import laraSer
 # serial ports
 
 # program parameters
-depth = depthMax = -30
+depth = mooring = 30
 syncmode=0
 phase=1
 
@@ -17,7 +17,7 @@ phase=1
 
 def init():
     "set initial values, open serials"
-    global syncmode, phase, depth
+    global syncmode, phase, depth, mooring
     global winchUpdate, programStarted
     global ctdSer, iridSer, amodSer
     ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600)
@@ -96,6 +96,42 @@ def main():
         # iridium radio. TBD
         if iridSer.in_waiting:
             l = iridSer.getline(eol='\r')
+            if '+PD' in l: 
+                iridSer.put( 
+                    ( '\r\n' 
+                    + 'UTC Date=%02d-%02d-%04d'
+                    + ' Satellites Used=%2d' 
+                    + '\r\n' 
+                    ) % (1, 1, 2017, 11) 
+                )
+            elif '+PT' in l: 
+                iridSer.put( 
+                    ( '\r\n' 
+                    + 'UTC Time=%02d:%02d:%02d.%03d'
+                    + ' Satellites Used=%2d' 
+                    + '\r\n' 
+                    ) % (1, 1, 1, 1, 11) 
+                )
+            elif '+PL' in l: 
+                iridSer.put( 
+                    ( '\r\n' 
+                    + 'Latitude=%02d:%02d.%04d%s'
+                    + ' Longitude=%03d:%02d.%04d%s'
+                    + ' Altitude=%.1f meters'
+                    + ' Satellites Used=%2d' 
+                    + '\r\n' 
+                    ) % (1, 1, 1, 'N', 1, 1, 1, 'E', -0.1, 11) 
+                )
+            elif '+CPAS' in l: 
+                iridSer.put(
+                    ( '\r\n' 
+                    + '+CPAS:%03d'
+                    + ' Satellites Used=%2d' 
+                    + '\r\n' ) 
+                    % (1, 11)
+                )
+            elif l: pass
+                    
 
         # acoustic modem. up, stop, down.
         if amodSer.in_waiting:
@@ -144,22 +180,22 @@ def ctdOut():
 
 def winch():
     "update (global) depth due to winch activity"
-    global winchUpdate, phase, depth
+    global winchUpdate, phase, depth, mooring
     # 2do:  add complexity to match observed data
     #       add option for current
     #       phase 1=docked, 2=up, 3=stopped, 4=down
     t = time.time()
     if phase==2:
         # up, simple linear
-        depth += .331 * (t - winchUpdate) 
-        if depth>0: 
+        depth -= .331 * (t - winchUpdate) 
+        if depth<0: 
             # at surface
             depth=0
             phase=3
     if phase==4:
         # down, simple linear
-        depth += -0.2 * (t - winchUpdate) 
-        if depth<mooring: 
+        depth += 0.2 * (t - winchUpdate) 
+        if depth>mooring: 
             # docked in winch
             depth=mooring
             phase=1
