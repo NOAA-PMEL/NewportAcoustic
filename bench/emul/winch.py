@@ -80,20 +80,20 @@ def amodInput():
     # rise
     if riseCmd in l:
         motor(-1)
-        sleep(amodDelay)
         ser.log( "up at depth %s" % depth() )
+        sleep(amodDelay)
         ser.putline(riseRsp)
     # stop
     elif stopCmd in l:
         motor(0)
-        sleep(amodDelay)
         ser.log( "stop at depth %s" % depth() )
+        sleep(amodDelay)
         ser.putline(stopRsp)
     # fall
     elif fallCmd in l:
         motor(1)
-        sleep(amodDelay)
         ser.log( "down at depth %s" % depth() )
+        sleep(amodDelay)
         ser.putline(fallRsp)
     # buoy responds to stop after dock or slack
     elif buoyAck in l:
