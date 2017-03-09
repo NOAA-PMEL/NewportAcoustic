@@ -1,19 +1,20 @@
 import sys, time
 import laraSer, winch, buoy
-from shared import logSafe
+from shared import *
 
 
 # program parameters
-winchArgs = buoyArgs = radioArgs = {}
-syncmode = 0
-
+mooring = 30
+syncmode=0
+phase=1
 
 def init():
     "set initial values, open serials"
-    global syncmode, phase, depth
-    global ctdSer, iridSer, amodSer
-    global winchArgs, buoyArgs, radioArgs
+    global iridSer
 
+    winchArgs = {}
+    buoyArgs = {}
+    radioArgs = {}
     # arguments
     for a in sys.argv[1:]:
         f = a.find('=')+1
@@ -22,7 +23,7 @@ def init():
             print "usage: -syncmode=y -cable=# -mooring=#" + \
                 " -amodRate=# -notUsed=[ctd|irid|amod] -?"
         if '-s' in a: 
-            syncmode=1
+            buoyArgs['syncmode'] = 1
             print "syncmode on"
         elif '-c' in a:
             winchArgs['cableLen']=float(arg)
@@ -45,20 +46,20 @@ def init():
                 winchArgs['no'] = 1
 
     # initialize objects
-    ctdSer = laraSer.Serial(port='/dev/ttyS7',baudrate=9600)
-    ctdSer.name = 'ctd'
     iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200)
     iridSer.name = 'irid'
-    if 'no' in buoyArgs.keys():
-        ctdSer.close()
+    if not 'no' in buoyArgs.keys():
+        buoy.turnOn(**buoyArgs)
     if 'no' in radioArgs.keys():
         iridSer.close()
-    winch.turnOn(**winchArgs)
+    if not 'no' in winchArgs.keys():
+        winch.turnOn(**winchArgs)
 
 
 def shut():
     "close down"
     winch.turnOff()
+    buoy.turnOff()
 
 # phase=
 # 1. Recording, locked to winch. <- depth = depthMax
@@ -69,34 +70,9 @@ def shut():
 
 def main():
     "main loop, check all ports and respond"
-    global phase, winchUpdate, depth, depthMax, syncmode
-    global ctdSer, iridSer, amodSer
+    global iridSer
 
     while 1:
-        # CTD. syncmode, sample, settings
-        if ctdSer.in_waiting:
-            # syncmode is special, a trigger not a command, eol not required
-            if syncmode: 
-                c = ctdSer.get()
-                if '\x00' in c: 
-                    # break
-                    logSafe( "ctd: break ignored" )
-                    # syncmode=0
-                    # log "syncmode=n"
-                if '\x00' != c:
-                    ctdOut()
-                    # flush
-                    ctdSer.reset_input_buffer
-            # command line. note: we don't do timeout
-            else:
-                # upper case is standard for commands, but optional
-                l = ctdSer.getline().upper()
-                if 'TS' in l: ctdOut()
-                elif 'SYNCMODE=Y' in l: 
-                    syncmode=1
-                else: pass
-                ctdSer.put('S>')
-
         # iridium radio. TBD
         if iridSer.in_waiting:
             l = iridSer.getline(eol='\r')
@@ -135,24 +111,6 @@ def main():
                     % (1, 11)
                 )
             elif l: pass
-
-
-
-def ctdOut():
-    "instrument sample"
-    # "# 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50"
-    # "\r\n# t.t,  c.c,  d.d,  s.s,  dd Mmm yyyy hh:mm:ss\r\n"
-
-    # ctd delay to process, nominal 3.5 sec. Add variance?
-    time.sleep(3.5)
-    # adjust depth
-    depth = winch.mooring - winch.cable()
-    ###
-    d="01 Aug 2016"
-    t="12:16:50"
-    # note: modify temp for ice
-    ctdSer.putline("\r\n# %f, %f, %f, %f, %s %s\r\n" %
-        (20.1, 0.01, depth, 0.06, d, t))
 
 
 

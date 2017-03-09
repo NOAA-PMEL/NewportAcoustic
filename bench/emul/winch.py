@@ -56,24 +56,24 @@ def run():
         # acoustic modem. up, stop, down.
         if ser.in_waiting:
             l = ser.getline('\r\n')
-            sleep(amodRate * (len(l)+2)
+            sleep(amodRate * (len(l)+2))
             # up command
-            if "#R,%s,03" % winchID in l:
+            if ("#R,%s,03" % winchID) in l:
                 motor(-1)
                 ser.log( "phase=2, up" )
                 amodSend("%%R,%s,00" % buoyID)
             # stop command
-            elif "#S,%s,00" % winchID in l:
+            elif ("#S,%s,00" % winchID) in l:
                 motor(0)
                 ser.log( "phase=3, surface" )
                 amodSend("%%S,%s,00" % buoyID)
             # down command
-            elif "#F,%s,00" % winchID in l:
+            elif ("#F,%s,00" % winchID) in l:
                 motor(1)
                 ser.log( "phase=4, down" )
                 amodSend("%%F,%s,00" % buoyID)
             # buoy responds to stop from dock or slack
-            elif "%%S,%s,00" % buoyID in l:
+            elif ("%%S,%s,00" % buoyID) in l:
                 ser.log( "buoy response %s" % l )
             # something strange
             elif l:
