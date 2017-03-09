@@ -1,31 +1,43 @@
 import serial
-from shared import logSafe
+from threading import Lock
 
 class Serial(serial.Serial):
     "extra methods to handle our serial ports"
 
-    def __init__(self, eol='\n', *args, **kwargs):
+    def __init__(self, eol='\n', name=None, *args, **kwargs):
         # buff is for input not consumed by getline
         super(Serial, self).__init__(*args, **kwargs)
+        # getline() buffers partial line input
         self.buff=''
-        self.logLevel=1
+        # putQ() buffers output, to emulate slow comm
+        self.logLevel=2
         self.eol=eol
         self.timeout = ( 1 / self.baudrate ) * 3
+        if name: self.name = name
+
+    # serial may not be thread safe, use lock in class var
+    ioLock = Lock()
+
+    def logSafe(self,s):
+        "Log to stdout, thread safe"
+        Serial.ioLock.acquire()
+        print s
+        Serial.ioLock.release()
 
     def logIn(self,s):
         "Log to stdout, thread safe"
         if self.logLevel>0:
-            logSafe( "%s< %r" % (self.name, s) )
+            self.logSafe( "%s<< %r" % (self.name, s) )
 
     def logOut(self,s):
         "Log to stdout, thread safe"
         if self.logLevel>0:
-            logSafe( "%s> %r" % (self.name, s) )
+            self.logSafe( "%s>> %r" % (self.name, s) )
 
     def log(self,s):
         "Log to stdout, thread safe"
-        if self.logLevel>0:
-            logSafe( "%s: log: %s" % (self.name, s) )
+        if self.logLevel>1:
+            self.logSafe( "%s: %s" % (self.name, s) )
 
     def get(self):
         "Get some chars"

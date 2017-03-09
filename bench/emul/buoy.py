@@ -10,19 +10,17 @@ from threading import Thread, Event
 go = ser = None
 
 #
-# these defaults may be changed by a dict passed to init
+# these defaults may be changed by a dict passed to modGlobals
 #
-# amodRate measured about 6.5 sec for 8 chars
 name = 'ctd'
+eol = '\r\n'
 port = '/dev/ttyS7'
 baudrate = 9600
 syncmode = 0
-# eol = '\r\n'
 
-def turnOn(**kwargs):
-    "reset defaults from kwargs, start serial and reader thread"
-    # change any of defaults, most likely mooring, cableLen
-    global ser, go
+def modGlobals(**kwargs):
+    "change defaults from command line"
+    # change any of module globals, most likely mooring or cableLen
     if kwargs:
         # update module globals
         glob = globals()
@@ -31,20 +29,22 @@ def turnOn(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-    ser = Serial(port=port,baudrate=baudrate)
-    ser.name = name
-    if kwargs: ser.log( logmsg )
-    # thread to watch serial
+def open():
+    "start serial and reader thread"
+    global ser, go
+    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
+    # threads run while go is set
     go = Event()
     go.set()
-    thread = Thread(target=run)
-    thread.start()
+    Thread(target=serThread).start()
 
-def turnOff():
-    "stops thread, unset loop condition"
+def shut():
+    "stop threads, close serial"
     go.clear()
+    ser.close()
 
-def run():
+
+def serThread():
     "thread: loop looks for serial input; to stop set sergo=0"
     global go, ser, syncmode
     while go.isSet():

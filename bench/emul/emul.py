@@ -4,24 +4,22 @@ from shared import *
 
 
 # program parameters
-mooring = 30
-syncmode=0
-phase=1
+buoyArgs = {}
+winchArgs = {}
+radioArgs = {}
+iridSer = None
 
 def init():
-    "set initial values, open serials"
+    "set initial values"
     global iridSer
-
-    winchArgs = {}
-    buoyArgs = {}
-    radioArgs = {}
+    global winchArgs, buoyArgs, radioArgs
     # arguments
     for a in sys.argv[1:]:
         f = a.find('=')+1
         arg = a[f:]
         if '-?' in a:
             print "usage: -syncmode=y -cable=# -mooring=#" + \
-                " -amodRate=# -notUsed=[ctd|irid|amod] -?"
+                " -amodDelay=# -?"
         if '-s' in a: 
             buoyArgs['syncmode'] = 1
             print "syncmode on"
@@ -32,41 +30,24 @@ def init():
             winchArgs['mooring']=int(arg)
             print "mooring %s" % arg
         elif '-a' in a:
-            winchArgs['amodRate'] = float(arg)
-            print "amodem rate %s" % arg
-        elif '-n' in a:
-            if 'ctd' in arg: 
-                print "no ctd"
-                buoyArgs['no'] = 1
-            if 'irid' in arg: 
-                print "no irid"
-                radioArgs['no'] = 1
-            if 'amod' in arg: 
-                print "no amod"
-                winchArgs['no'] = 1
+            winchArgs['amodDelay'] = float(arg)
+            print "amodem delay %s" % arg
 
     # initialize objects
     iridSer = laraSer.Serial(port='/dev/ttyS8',baudrate=19200)
     iridSer.name = 'irid'
-    if not 'no' in buoyArgs.keys():
-        buoy.turnOn(**buoyArgs)
-    if 'no' in radioArgs.keys():
-        iridSer.close()
-    if not 'no' in winchArgs.keys():
-        winch.turnOn(**winchArgs)
+    if buoyArgs: buoy.modGlobals(**buoyArgs)
+    if winchArgs: winch.modGlobals(**winchArgs)
 
+def open():
+    "start up"
+    buoy.open()
+    winch.open()
 
 def shut():
     "close down"
-    winch.turnOff()
-    buoy.turnOff()
-
-# phase=
-# 1. Recording, locked to winch. <- depth = depthMax
-# 2. Up. <- amod up command
-# 3. iridium. <- depth = 0 or amod stop command
-# 4. Down. <- amod down command
-
+    winch.shut()
+    buoy.shut()
 
 def main():
     "main loop, check all ports and respond"
@@ -114,7 +95,7 @@ def main():
 
 
 
-if __name__=='__main__': init(); main(); shut()
+if __name__=='__main__': init(); open(); main(); shut()
 
 
 # Notes:
