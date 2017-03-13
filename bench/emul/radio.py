@@ -28,7 +28,7 @@ def modGlobals(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-def open():
+def run():
     "start serial and reader thread"
     global ser, go
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
@@ -37,7 +37,7 @@ def open():
     go.set()
     Thread(target=serThread).start()
 
-def shut():
+def stop():
     "stop threads, close serial"
     go.clear()
     ser.close()
@@ -83,6 +83,18 @@ def serThread():
                     + ' Satellites Used=%2d'
                     + '\r\n' )
                     % (1, 11)
+                )
+            elif '+CPIN="1111"' in l:
+                ser.put(
+                    ( '\r\n'
+                    + 'CPIN=1111'
+                    + '\r\n' ) 
+                )
+                sleep( 2 )
+                ser.put(
+                    ( '\r\n'
+                    + 'OK'
+                    + '\r\n' ) 
                 )
             elif l: pass
 

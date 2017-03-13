@@ -10,7 +10,6 @@ radioArgs = {}
 
 def init():
     "set initial values"
-    global iridSer
     global winchArgs, buoyArgs, radioArgs
     # arguments
     for a in sys.argv[1:]:
@@ -37,21 +36,21 @@ def init():
     if winchArgs: winch.modGlobals(**winchArgs)
     if radioArgs: radio.modGlobals(**winchArgs)
 
-def open():
+def run():
     "start up"
-    buoy.open()
-    radio.open()
-    winch.open()
+    buoy.run()
+    radio.run()
+    winch.run()
 
-def shut():
+def stop():
     "close down"
-    buoy.shut()
-    radio.shut()
-    winch.shut()
+    buoy.stop()
+    radio.stop()
+    winch.stop()
 
 
 
-if __name__=='__main__': init(); open()
+if __name__=='__main__': init(); run()
 
 
 # Notes:

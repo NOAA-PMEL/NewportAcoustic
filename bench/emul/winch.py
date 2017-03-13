@@ -25,7 +25,7 @@ name = 'winch'
 eol = '\r\n'
 port = '/dev/ttyS9'
 baudrate = 4800
-amodDelay = 6.5
+amodDelay = 5.5
 
 def modGlobals(**kwargs):
     "change defaults from command line"
@@ -38,7 +38,7 @@ def modGlobals(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-def open():
+def run():
     "start serial and reader thread"
     global ser, go, motorOn
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
@@ -50,7 +50,7 @@ def open():
     motorOn.clear()
     Thread(target=motorThread).start()
 
-def shut():
+def stop():
     "stop threads, close serial"
     go.clear()
     motorOn.set()

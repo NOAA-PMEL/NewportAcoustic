@@ -1,0 +1,601 @@
+
+
+C:\>set
+MPC.PROGNAME=RAOS
+MPC.PROJID=QUEH
+MPC.PLTFRMID=RA01
+MPC.LONG=125:00.00W
+MPC.LAT=45:00.00N
+MPC.LOCATION=Location
+MPC.MINVOLT=11.5
+IRID.ANTSWT=0
+IRID.PHONE=0088160000519
+IRID.WARMUP=27
+IRID.MAXUPL=30000
+IRID.REST=30
+IRID.MAXCALLS=4
+IRID.MINSIGQ=3
+AMDM.MAXUPL=4000
+AMDM.OFFSET=6
+AMDM.BLKSIZE=1000
+BT.ON=1
+IRID.OFFSET=1
+MPC.BATLOG=1
+MPC.BATCAP= -92.44
+WISP.NUM=1
+WISP.DETMAX=10
+WISP.DETNUM=0
+WISP.GAIN=0
+WISP.DUTYCYCL=100
+IRID.CALLMODE=1
+MPC.DETINT=30
+MPC.STARTMAX=50
+IRID.CALLHOUR=2
+ADS.MINVOLT=11.5
+ADS.BATCAP=12000.0
+ADS.BATLOG=0
+CTD.UPLOAD=1
+MPC.DATAXINT=30
+NIGK.RECOVERY=0
+MPC.STARTUPS=48
+NIGK.PROFILES=16
+MPC.FILENUM=00000188
+
+C:\>app
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.20,  Build: Feb 16 2017 13:32:08
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 189
+Program start time: 03/13/2017  10:22:28.383 [ctime: 1489400548]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..9..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=48 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=16 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 48
+Program Start time: 03/13/2017 10:22:31
+	|FreeDiskSpace 990688kB
+	|WriteFile(c:00000188.dat)
+	|WriteFile: c:00000188.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 188
+Starts:48 of 50
+WriteTime:03/13/2017 10:22:33
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000188.pwr)
+	|PowerMonitor: ADSFile Closed
+
+03/13/2017 10:22:34|ADS(c:00000189.pwr)
+	|Writing every 104.4Seconds
+03/13/2017 10:22:34|COMDos() del c:00000188.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+	|Append_Files() C:WISPRFRS.DAT opened
+	|Append_Files C:WISPRFRS.DAT Size: 20 Bytes
+	|AppendFiles: bytes read: 20
+	|AppendFiles: bytes written: 21
+	|AppendFiles() C:WISPRFRS.DAT Closed
+03/13/2017 10:22:36|COMDos() del c:00000188.dtx
+1 file(s) erased
+
+	|WriteFile:188 ctd file: c:00000188.ctd
+	|Append_Files() c:00000188.ctd opened
+	|Append_Files c:00000188.ctd Size: 457 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 201
+	|AppendFiles: bytes written: 202
+	|AppendFiles() c:00000188.ctd Closed
+03/13/2017 10:22:37|COMDos() copy c:00000188.CTD c:CTD\00000188.CTD
+00000188.CTD
+
+       1 file(s) copied
+
+03/13/2017 10:22:38|COMDos() del c:00000188.CTD
+1 file(s) erased
+
+	|WriteFile: 188 log file: 00000189.log
+	|Append_Files() 00000189.log opened
+	|Append_Files 00000189.log Size: 1547 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 11
+	|AppendFiles: bytes written: 12
+	|AppendFiles() 00000189.log Closed
+03/13/2017 10:22:41|COMDos() copy c:00000188.LOG c:LOG\00000188.LOG
+00000188.LOG
+
+       1 file(s) copied
+
+03/13/2017 10:22:41|COMDos() del c:00000188.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 11.98V
+	|Open CTD TUPort
+	|Close CTD TUPort
+	|Open CTD TUPort
+CTD_DateTime(): 02132017102302
+
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+03/13/2017 10:23:05|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:23:9
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:23:14
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:23:18
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:23:23
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:23:28
+
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+03/13/2017 10:23:30|CheckCallTime():
+	|Time to check 208 
+hour now 10 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000189.dtx opened
+	|create_dtx_file(): c:00000189.dtx closed
+	|Open WISPR1 TUPort
+03/13/2017 10:23:32|WISPR: ON
+	|PHASE ONE
+03/13/2017 10:23:32|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 10
+	|Hours: 15Minutes: 37
+	|Time until call: 937 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18
+	|POWER: 0.508A, 12.11V
+	|POWER: 0.547A, 12.13VIncoming Char: p
+	|CHANGE OF PHASE #? Phase: 2
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:16
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:21
+
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|PHASE TWO: Target Depth:10
+	|Open NIGK Winch TUPort
+LARA: 0020
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:10
+AVG.VEL: 0.00
+CTDSAMPLES:7
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:33
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:38
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:42
+
+DepthChange: 0.000000 over 2 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+03/13/2017 10:26:45|Winch_Ascend():
+03/13/2017 10:26:45|WaitForWinch(): ExpectedBuoyMode: 1
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:26:47
+
+	|Response: R,00,00
+
+
+Log: #20.1000,26.400536,0.060000, 13.3.17 10:27:1
+
+	|CTD_VertVel: No previous recent measurements, reinitialize
+Log: #20.1000,24.761125,0.060000, 13.3.17 10:27:6
+, -0.33 m/s
+Log: #20.1000,23.142401,0.060000, 13.3.17 10:27:11
+, -0.32 m/s
+Log: #20.1000,21.518505,0.060000, 13.3.17 10:27:16
+, -0.32 m/s
+Log: #20.1000,19.894609,0.060000, 13.3.17 10:27:21
+, -0.32 m/s
+Log: #20.1000,18.270713,0.060000, 13.3.17 10:27:26
+, -0.32 m/s
+Log: #20.1000,16.651988,0.060000, 13.3.17 10:27:30
+, -0.40 m/s
+Log: #20.1000,15.038436,0.060000, 13.3.17 10:27:35
+, -0.32 m/s
+Log: #20.1000,13.414540,0.060000, 13.3.17 10:27:40
+, -0.32 m/s
+Log: #20.1000,11.795816,0.060000, 13.3.17 10:27:45
+, -0.32 m/s
+	|POWER: 0.547A, 12.11V
+Log: #20.1000,10.171919,0.060000, 13.3.17 10:27:50
+, -0.32 m/s
+Log: #20.1000,8.548023,0.060000, 13.3.17 10:27:55
+, -0.32 m/s
+	|REACHED TARGETDPETH!
+03/13/2017 10:27:57|Winch_Stop():
+03/13/2017 10:27:58|WaitForWinch(): ExpectedBuoyMode: 0
+Log: #20.1000,6.924127,0.060000, 13.3.17 10:28:0
+, -0.32 m/s
+SummedVel: -3.98, samples: 12
+	|CTD_CalculatedVelocity(): -0.33
+	|Rate of Ascent: -18.97Meters/Minute
+	|Calculated Cable Payout:  -0.2Meters
+	|Time for Ascent: 73
+LARA: 0121
+MOORDEPTH:30.00
+CURRENTDEPTH: 6.92
+TOPDEPTH: 6.92
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:24
+
+	|Close NIGK Winch TUPort
+	|File Number: 00000189
+	|WriteFile(c:00000189.dat)
+	|WriteFile: c:00000189.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 189
+Starts:49 of 50
+WriteTime:03/13/2017 10:28:12
+Seconds:341
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 169
+	|Winch_Monitor():
+
+BytesWritten: 120
+LARA: 0131
+MOORDEPTH:30.00
+CURRENTDEPTH: 6.92
+TOPDEPTH: 6.92
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:24
+
+BytesWritten: 105
+	|POWER: 0.547A, 12.11V
+	|POWERMonitor(c:00000189.pwr)
+	|PowerMonitor: ADSFile Closed
+
+03/13/2017 10:28:14|ADS(c:00000190.pwr)
+	|Writing every 104.4Seconds
+03/13/2017 10:28:14|COMDos() del c:00000189.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+	|Append_Files() C:WISPRFRS.DAT opened
+	|Append_Files C:WISPRFRS.DAT Size: 20 Bytes
+	|AppendFiles: bytes read: 20
+	|AppendFiles: bytes written: 21
+	|AppendFiles() C:WISPRFRS.DAT Closed
+03/13/2017 10:28:16|COMDos() del c:00000189.dtx
+1 file(s) erased
+
+	|WriteFile:189 ctd file: c:00000189.ctd
+	|Append_Files() c:00000189.ctd opened
+	|Append_Files c:00000189.ctd Size: 1098 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 74
+	|AppendFiles: bytes written: 75
+	|AppendFiles() c:00000189.ctd Closed
+03/13/2017 10:28:18|COMDos() copy c:00000189.CTD c:CTD\00000189.CTD
+00000189.CTD
+
+       1 file(s) copied
+
+03/13/2017 10:28:19|COMDos() del c:00000189.CTD
+1 file(s) erased
+
+03/13/2017 10:28:19|COMDos() copy c:00000189.LOG c:LOG\00000189.LOG
+00000189.LOG
+
+       1 file(s) copied
+
+03/13/2017 10:28:20|COMDos() del c:00000189.LOG
+1 file(s) erased
+
+	|PHASE THREE
+	|Close CTD TUPort
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+03/13/2017 10:28:33|WISPR: OFF
+	|Close WISPR1 TUPort
+03/13/2017 10:28:35|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 41 bytes
+	|first string: 
+	|Sat num: 11
+	|SendString(AT+PD)
+Grabbing 41 bytes
+	|first string: 01-01-2017
+03/13/2017 10:29:11|TimeNow
+	|SendString(AT+PT)
+Grabbing 43 bytes
+	|first string: 01:01:01.001
+03/13/2017 10:29:11|GetUTCSeconds(): 01-01-2017|01:01:01.001
+	|Time Difference: 6168489
+	|Failed gathering GPS Time
+	|SendString(AT+PL)
+Grabbing 78 bytes
+	|first string: 01:01.0001N Long|001:01.0001E Alt
+	|Coords: 01:01.0001N Long 001:01.0001E Alt
+Lat: 01:01.0001N Long, MPC.LAT: 45:00.00N
+	|1:1.00 - 45:0.00
+	|Lat diff: 44:1.00
+Long: 001:01.0001E Alt, MPC.LONG: 125:00.00W
+	|1:1.00 - 125:0.00
+	|Long diff: 124:1.00
+	|GPS Change greater than max: 1.000000
+	|SendString(AT+PL)
+Grabbing 78 bytes
+	|first string: 01:01.0001N Long|001:01.0001E Alt
+	|Coords: 01:01.0001N Long|001:01.0001E Alt
+Lat: 01:01.0001N Long, MPC.LAT: 45
+	|1:1.00 - 45:0.00
+	|Lat diff: 44:1.00
+Long: 001:01.0001E Alt, MPC.LONG: 125
+	|1:1.00 - 125:0.00
+	|Long diff: 124:1.00
+	|GPS Change greater than max: 1.000000
+	|LAT: 01:01.0001N Long, LONG: 001:01.0001E Alt
+	|Write to file: c:00000189.dat
+	|GetGPS_SyncRTC() c:00000189.dat Opened
+	|Coordinate bytes written: 33
+	|GetGPS_SyncRTC: File Closed
+03/13/2017 10:29:13|Connect_SendFile_RecCmd()
+	|PhonePin()
+	|SendString(AT+CPIN="1111")
+	|GetIRIDInput(CPIN=, )
+Got 18 bytes
+GetIRIDInput: 
+
+CPIN=1111
+
+
+
+OK
+
+
+03/13/2017 10:29:15|Found CPIN=
+	|GetIRIDInput(OK, )
+ERROR  |SIM PIN unsuccessful...
+03/13/2017 10:29:26|Modem Initialization
+	|PhoneStatus()
+	|SendString(AT+CPAS)
+	|GetIRIDInput(:00, OK)
+Got 31 bytes
+GetIRIDInput: 
+
++CPAS:001 Satellites Used=11
+
+
+03/13/2017 10:29:26|Found :001
+	|GetIRID() Buf: :001PAS:0
+	|StringSearch(Count: 3 of 3)
+	|StringSearch(Count: 0 of 2): Unavailable
+03/13/2017 10:29:26|Modem Initialization
+	|PhoneStatus()
+	|SendString(AT+CPAS)
+	|GetIRIDInput(:00, OK)
+Got 31 bytes
+GetIRIDInput: 
+
++CPAS:001 Satellites Used=11
+
+
+03/13/2017 10:29:27|Found :001
+	|GetIRID() Buf: :001PAS:0
+	|StringSearch(Count: 3 of 3)
+	|StringSearch(Count: 0 of 2): Unavailable
+03/13/2017 10:29:27|Modem Initialization
+	|PhoneStatus()
+	|SendString(AT+CPAS)
+	|GetIRIDInput(:00, OK)
+Got 31 bytes
+GetIRIDInput: 
+
++CPAS:001 Satellites Used=11
+
+
+03/13/2017 10:29:28|Found :001
+	|GetIRID() Buf: :001PAS:0
+	|StringSearch(Count: 3 of 3)
+	|StringSearch(Count: 0 of 2): Unavailable
+03/13/2017 10:29:28|Modem Initialization
+	|PhoneStatus()
+	|SendString(AT+CPAS)
+	|GetIRIDInput(:00, OK)
+Got 31 bytes
+GetIRIDInput: 
+
++CPAS:001 Satellites Used=11
+
+
+03/13/2017 10:29:28|Found :001
+	|GetIRID() Buf: :001PAS:0
+	|StringSearch(Count: 3 of 3)
+	|StringSearch(Count: 0 of 2): Unavailable
+03/13/2017 10:29:29|Modem Initialization
+	|PhoneStatus()
+	|SendString(AT+CPAS)
+	|GetIRIDInput(:00, OK)
+Got 31 bytes
+GetIRIDInput: 
+
++CPAS:001 Satellites Used=11
+
+
+03/13/2017 10:29:29|Found :001
+	|GetIRID() Buf: :001PAS:0
+	|StringSearch(Count: 3 of 3)
+	|StringSearch(Count: 0 of 2): Unavailable
+	|Restart while loop due to: Max Number of Iridium Calls.
+LOST CARRIER
+03/13/2017 10:29:29|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+	|PhaseThree(): Failed Iridium Transfer
+	|create_dtx_file() c:00000190.dtx opened
+	|create_dtx_file(): c:00000190.dtx closed
+	|Open CTD TUPort
+	|Open WISPR1 TUPort
+03/13/2017 10:29:44|WISPR: ON
+	|Close CTD TUPort
+	|Open CTD TUPort
+CTD_DateTime(): 02132017103004
+
+03/13/2017 10:30:06|Phase_Four():
+	|Open NIGK Winch TUPort
+LARA: 0041
+MOORDEPTH:30.00
+CURRENTDEPTH: 6.92
+TOPDEPTH: 6.92
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:24
+
+03/13/2017 10:30:12|Winch_Stop():
+03/13/2017 10:30:12|WaitForWinch(): ExpectedBuoyMode: 0
+	|POWER: 0.547A, 12.10V
+Log: #20.1000,5.910485,0.060000, 13.3.17 10:30:29
+, -0.01 m/s
+Log: #20.1000,5.910485,0.060000, 13.3.17 10:30:34
+, 0.00 m/s
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at  5.91 at  0.00m/sample
+03/13/2017 10:30:35|Winch_Descend():
+03/13/2017 10:30:36|WaitForWinch(): ExpectedBuoyMode: 2
+	|Response: S,00,00
+
+
+SummedVel: -0.01, samples: 2
+	|CTD_CalculatedVelocity(): -0.00
+	|Calculated Descent Velocity: -0.00m/s
+	|Rate of Descent: 0.000000Meters/Minute
+	|User calculated Cable Payout: -4485.450000Meters
+	|Time for Descent: -29903
+LARA: 0040
+MOORDEPTH: 5.91
+CURRENTDEPTH: 5.91
+TOPDEPTH: 5.91
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:26
+
+	|Close NIGK Winch TUPort
+	|PHASE ONE
+03/13/2017 10:30:52|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 10
+	|Hours: 15Minutes: 30
+	|Time until call: 930 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18
+	|POWER: 0.547A, 12.12V
+ERROR|CTD_Data(): Date incorrect. flush tuport 
+	|POWER: 0.547A, 12.12VIncoming Char: 1
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:33:58
+
+Log: #20.1000,30.000000,0.060000, 13.3.17 10:34:3
+
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+03/13/2017 10:34:17|WISPR: OFF
+03/13/2017 10:34:18|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+03/13/2017 10:34:21|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
