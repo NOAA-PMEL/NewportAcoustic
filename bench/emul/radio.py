@@ -39,8 +39,8 @@ def run():
 
 def stop():
     "stop threads, close serial"
-    go.clear()
-    ser.close()
+    if go: go.clear()
+    if ser: ser.close()
 
 
 def serThread():
@@ -90,7 +90,13 @@ def serThread():
                     + 'CPIN=1111'
                     + '\r\n' ) 
                 )
-                sleep( 2 )
+                sleep( 4 )
+                ser.put(
+                    ( '\r\n'
+                    + 'OK'
+                    + '\r\n' ) 
+                )
+            elif '*P' in l:
                 ser.put(
                     ( '\r\n'
                     + 'OK'

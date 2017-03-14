@@ -37,9 +37,7 @@ class Serial(serial.Serial):
     def log(self,s):
         "Log to stdout, thread safe"
         if self.logLevel>1:
-            # time seconds sss.sss
-            stamp = "%.3f" % (time.time()%1000)
-            self.logSafe( "%s: %s %s" % (self.name, stamp, s) )
+            self.logSafe( "%s: %s" % (self.name, s) )
 
     def get(self):
         "Get some chars"

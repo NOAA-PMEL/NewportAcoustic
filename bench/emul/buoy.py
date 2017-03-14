@@ -41,8 +41,8 @@ def run():
 
 def stop():
     "stop threads, close serial"
-    go.clear()
-    ser.close()
+    if go: go.clear()
+    if ser: ser.close()
 
 
 def serThread():
@@ -69,7 +69,6 @@ def serThread():
                 l = ser.getline().upper()
                 if 'TS' in l: 
                     ctdOut()
-                    ser.put('S>')
                 elif 'DATE' in l:
                     dt = l[l.find('=')+1:]
                     setDateTime(dt)
@@ -77,11 +76,10 @@ def serThread():
                 elif 'SYNCMODE=Y' in l:
                     syncMode=1
                     ser.log( "syncMode pending (when ctd sleeps)")
-                    ser.put('S>')
                 elif 'QS' in l:
                     sleepMode = 1
                     ser.log("ctd sleepMode")
-                else: 
+                if sleepmode != 1: 
                     ser.put('S>')
 
 def setDateTime(dt):
