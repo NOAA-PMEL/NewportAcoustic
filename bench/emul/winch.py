@@ -52,9 +52,12 @@ def run():
 
 def stop():
     "stop threads, close serial"
-    go.clear()
-    motorOn.set()
-    ser.close()
+    if go: go.clear()
+    if ser: ser.close()
+    if motorOn: 
+        # release waiting motor thread
+        motorOn.set()
+        motorOn.clear()
 
 
 def serThread():
