@@ -1,5 +1,6 @@
 # emulate buoy
 
+#from laraSer import Serial
 from laraSer import Serial
 from shared import *
 from winch import depth
