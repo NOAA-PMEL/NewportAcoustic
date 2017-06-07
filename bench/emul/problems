@@ -1,0 +1,33 @@
+Mon, Mar 13, 2017  4:12:38 PM
+
+.1 radio timeout
+CPIN sleep2 OK is too fast
+.2 radio dead
+stays on surface and loops iridium attempts
+.3 radio fail
+Restart while loop due to: Max Number of Iridium Calls.
+LOST CARRIER
+.. sends stop, why?
+.. doesn't see stop response. 
+is it too soon? no.
+winch>> '%S,00,00'
+ctd<< 'pulse\r\n'
+ctd>> '\r\n# 20.100000, 0.010000, 6.161445, 0.060000, 13 Feb 2017 15:10:28\r\n'
+ctd<< 'pulse\r\n'
+ctd>> '\r\n# 20.100000, 0.010000, 6.161445, 0.060000, 13 Feb 2017 15:10:32\r\n'
+winch<< '#F,01,00'
+ but
+03/13/2017 15:10:11|Winch_Stop():
+03/13/2017 15:10:11|WaitForWinch(): ExpectedBuoyMode: 0
+	|POWER: 0.547A, 12.10V
+Log: #20.1000,6.161445,0.060000, 13.3.17 15:10:28
+, -0.01 m/s
+Log: #20.1000,6.161445,0.060000, 13.3.17 15:10:32
+, 0.00 m/s
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at  6.16 at  0.00m/sample
+03/13/2017 15:10:35|Winch_Descend():
+03/13/2017 15:10:35|WaitForWinch(): ExpectedBuoyMode: 2
+	|Response: S,00,00
+.. doesn't watch descent
+... with longer 4s delay, sees stop response, watches descent
