@@ -136,7 +136,7 @@ void main() {
   ulong PwrOn, PwrOff;
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
-  // uploadfile.
+  // uploadfile. Never released.
   WriteBuffer = (char *)calloc(256, sizeof(char));
 
   // Platform Specific Initialization Function. PwrOn is the start time of
@@ -169,8 +169,12 @@ void main() {
     case 3:
       Time(&PwrOff);
       PwrOff -= PwrOn;
+      // global: static char uploadfile[] = "c:00000000.dat
+      // VEEPROM: SystemParameters MPC;
       sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
       cprintf("\n\t|File Number: %08ld", MPC.FILENUM);
+      // writefile 1) MPC 2) Winch Info 3) Winch Status
+      // v
       WriteFile(PwrOff);
       // Init New LogFile
       Time(&PwrOn);
@@ -550,8 +554,8 @@ void PhaseTwo() {
 } //____ PhaseTwo ____//
 /****************************************************************************\
 ** Phase Three
-** Testing iridium/gps connection. If failed, release winch cable another meter
-or two.
+** Testing iridium/gps connection. 
+** If failed, release winch cable another meter or two.
 ** repeat to minimum CTD depth.
 \****************************************************************************/
 void PhaseThree() {
@@ -566,40 +570,48 @@ void PhaseThree() {
   char filenum[9] = "00000000";
   flogf("\n\t|PHASE THREE");
 
+  // close ctd, turn off wispr, close wispr
   OpenTUPort_CTD(false);
   if (WISPR_Status()) {
     WISPRSafeShutdown();
   }
   OpenTUPort_WISPR(false);
 
-  while (result <= 0) {
-    result = IRIDGPS(GlobalRestart); //-1=false gps, -2=false irid, 1=success 2=
-                                     //fake cmds 3 = real cmds
+  while (result <= 0) { 
+    // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
+    result = IRIDGPS(GlobalRestart); 
+    // GlobalRestart set in InitializeLARA if mpc.startups>0
 
-    // IRIDIUM Succe>=ful
     if (result >= 1 || attempts > 2) {
+      // IRIDIUM Successful success/fake/real/3rd, next phase
       LARA.PHASE = 4;
-      if (result == 1 || result == 2) { // Upload Success, Fake Commands
+      if (result == 1 || result == 2) { 
+        // Upload Success / Fake Commands
         IridiumCalls++;
         flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
         if (IridiumCalls > 3) {
-          ParseStartupParams(
-              true); // Load default parameters in "default.cfg" file
+          // calls > 3 implies ?? 
+          // Load default parameters in "default.cfg" file
+          ParseStartupParams(true); 
+          // checked here because ??
           if (NIGK.RECOVERY) {
+            // set ??
             if (MPC.DATAXINT != 30) {
+              // 
               MPC.DATAXINT = 30;
               VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-            }
+            } //dataxint
             LARA.PHASE = 1;
             break;
-          }
-        }
-        if (GlobalRestart)
-          ParseStartupParams(
-              true); // Added 9.28.2016 after first deployment Lake W.
-      }
-
-      else if (result == 3) { // Real Commands
+          } // recovery
+        } // calls>3
+        if (GlobalRestart) { 
+          // Added 9.28.2016 after first deployment Lake W.
+          ParseStartupParams(true); 
+        } // restart
+      } // Upload Success / Fake Commands
+      else if (result == 3) { 
+        // Real Commands
         ParseStartupParams(false);
         IridiumCalls = 0;
         flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
@@ -607,22 +619,24 @@ void PhaseThree() {
           if (MPC.DATAXINT != 30) {
             MPC.DATAXINT = 30;
             VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-          }
+          } // dataxint
           LARA.PHASE = 1;
           break;
-        }
-      } else if (GlobalRestart)
-        ParseStartupParams(
-            true); // Added 9.28.2016 after first deployment Lake W.
+        } // recovery
+      } // Real Commands
+      else if (GlobalRestart) {
+        // Added 9.28.2016 after first deployment Lake W.
+        ParseStartupParams(true); 
+      } // restart
 
-    }
-    // Bad GPS- GPS fails usually from bad reception.
+    } // IRIDIUM Successful success/fake/real/3rd, next phase
     else if (result == -1) {
+      // Bad GPS- GPS fails usually from bad reception.
       flogf("\n\t|PhaseThree(); Failed GPS attempt: %d", attempts);
       if (attempts >= 5) {
         flogf("\n\t|Exiting PhaseThree()");
         break;
-      }
+      } // >=5
       OpenTUPort_NIGK(true);
       OpenTUPort_CTD(true);
 
@@ -652,9 +666,8 @@ void PhaseThree() {
         RTCDelayMicroSeconds(100000L);
         count++;
         // Break on time being exceeded.
-        if ((count / 10) >= secs)
-          break;
-      }
+        if ((count / 10) >= secs) break;
+      } // depth > target
 
       AscentStop = Winch_Stop();
       WaitForWinch(0);
@@ -666,27 +679,27 @@ void PhaseThree() {
       // confirm stop
       OpenTUPort_CTD(false);
       OpenTUPort_NIGK(false);
-    }
-    // GPS Success, IRID Fail
+    } // Bad GPS- GPS fails usually from bad reception
     else if (result == -2) {
+      // GPS Success, IRID Fail
       flogf("\n\t|PhaseThree(): Failed Iridium Transfer");
       IridiumCalls++;
       if (IridiumCalls > 3) {
         IridiumCalls = 0;
         ParseStartupParams(true);
-      }
+      } // calls>3
       if (NIGK.RECOVERY) {
         if (MPC.DATAXINT != 30) {
           MPC.DATAXINT = 30;
           VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-        }
+        } // datax
         LARA.PHASE = 1;
         break;
-      }
+      } // recovery
       LARA.PHASE = 4;
       break;
-    }
-  }
+    } // GPS Success, IRID Fail
+  } // while result<=0
 
   GlobalRestart = false;
   MPC.FILENUM++;
