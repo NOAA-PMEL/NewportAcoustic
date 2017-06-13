@@ -158,12 +158,14 @@ short IRIDGPS(bool reboot) {
 ** UploadFiles();
 \*********************************************************************************/
 short UploadFiles(bool reboot) {
+  // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
   short antsw;
   //	long fnum;
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
+  // three global vars - not used anywhere ??
   strcpy(ProjID, MPC.PROJID);
   strcpy(PltfrmID, MPC.PLTFRMID);
   strcpy(PhoneNum, IRID.PHONE);
@@ -267,8 +269,7 @@ it,
 ** 6) Hung up
 **
 ** Three kinds of response from Rudics land
-** 'R' for Resend, 'cmds' for command to receive, and 'done' for no more
-commands
+** 'R' for Resend, 'cmds' for command to receive, and 'done' for no more commands
 ** Two kinds of cmds: Real =2, fake (Senddata)=1.  Otherwise =0
 **
 ** Returns TX_Success

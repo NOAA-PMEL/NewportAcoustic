@@ -560,9 +560,10 @@ time_t CTD_VertVel(time_t seconds) {
 } //____ CTD_VertVel() ____//
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
+** !! calloc/free may not match, poor use of globals
 \******************************************************************************/
 void OpenTUPort_CTD(bool on) {
-
+  // writestring, stringin
   short CTD_RX, CTD_TX;
   flogf("\n\t|%s CTD TUPort", on ? "Open" : "Close");
   if (on) {
