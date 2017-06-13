@@ -1,0 +1,16 @@
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\LARA\LARA.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\LARA\PLATFORM.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\ADS\ADS.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\ADS\ADS.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\CTD\CTD.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\CTD\CTD.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\GPSIRID\GPSIRID.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\GPSIRID\GPSIRID.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\WISPR\WISPR.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\WISPR\WISPR.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\WINCH\Winch.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\WINCH\Winch.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\MPC_SETTINGS\Settings.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\MPC_SETTINGS\Settings.h
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\MPC_Global\MPC.c
+C:\Users\kahn\Documents\codeCF2\NewportAcoustic\MPC\MPC_Global\MPC_Global.h
