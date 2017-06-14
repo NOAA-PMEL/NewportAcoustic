@@ -5,10 +5,11 @@ if [ $# -eq 0 ]; then
 else
   Files="$*"
 fi
-Headers="$(find ~/cf2/headers/*/Headers -name '*.h')"
 
-ctags -o .tags $Files $Headers
+ctags -o .tags $Files 
 
+
+# Headers="$(find ~/cf2/headers/*/Headers -name '*.h')"
 
 
 #cd ~/NewportAcoustic
