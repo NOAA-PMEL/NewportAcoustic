@@ -375,18 +375,26 @@ int Sea_Ice_Algorithm() {
 } //____ bool Sea_Ice_Algorithm(void) ____/
 /******************************************************************************\
 ** void CTD_data()
+* CTD with fluro, par
+* Temp, conductivity, depth, fluromtr, PAR, salinity, time
+* 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
+* The response is approximately 2 sec.
+* FLS and PAR data in between the depth and salinity. Ignore the conductivity.
 \******************************************************************************/
 bool CTD_Data() {
   bool log = false;
   bool prompt = false;
   bool returnvalue = false;
   char *split_temp;
+  char *split_cond;
   char *split_pres;
-  char *split_SAL;
+  char *split_flu;
+  char *split_par;
+  char *split_sal;
   char *split_date;
   float temp;
   char *mon;
-  float SAL;
+  float sal;
   char charin;
   int filehandle;
   int i = 0, count = 0, byteswritten, month;
@@ -405,6 +413,7 @@ bool CTD_Data() {
     }
   }
 
+  // expect to see stringin start with " *# "
   if (strchr(stringin, '#') != NULL) {
     log = true;
   } else if (strchr(stringin, '>') != NULL)
@@ -422,6 +431,9 @@ bool CTD_Data() {
     return returnvalue;
   }
 
+  // error here if log!=true
+  flogf("\n%s", stringin);
+
   // Split data string up into separate values
   // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
   strtok(stringin, "# ");
@@ -430,15 +442,18 @@ bool CTD_Data() {
     cprintf("\nNo Commas in CTD Data");
   }
   strtok(NULL, " "); // erase cond.
+  split_cond = strtok(NULL, " "); // ignor cond
   split_pres = strtok(NULL, " ");
-  split_SAL = strtok(NULL, " ");
+  split_flu = strtok(NULL, " ");
+  split_par = strtok(NULL, " ");
+  split_sal = strtok(NULL, " ");
   split_date = strtok(NULL, ",");
 
   temp = atof(strtok(split_temp, ","));
 
   LARA.DEPTH = atof(strtok(split_pres, ","));
 
-  SAL = atof(strtok(split_SAL, ","));
+  sal = atof(strtok(split_sal, ","));
 
   info.tm_mday = atoi(strtok(split_date, " "));
   info.tm_mon = -1;
@@ -486,17 +501,19 @@ bool CTD_Data() {
   secs = mktime(&info);
 
   // Log WriteString
+  // error here (and above) if !log
   if (log) {
-    memset(writestring, 0, 64 * sizeof(char));
+    memset(writestring, 0, 128 * sizeof(char));
     sprintf(writestring, "#%.4f,", temp);
     strcat(writestring, split_pres);
     LARA.DEPTH = atof(strtok(split_pres, ","));
     strcat(writestring, ","); // added 9.28 after deploy 2, data 1. 02UTC of
                               // 9.29
-    strcat(writestring, split_SAL);
+    strcat(writestring, split_sal);
     strcat(writestring, split_date);
     strcat(writestring, "\n");
 
+    // this might be an error, done in VertVel
     LARA.CTDSAMPLES++;
     TURxFlush(CTDPort);
     filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
@@ -509,6 +526,7 @@ bool CTD_Data() {
     }
 
     flogf("\nLog: %s", writestring);
+    // this should not be in log section
     if (LARA.BUOYMODE != 0)
       CTD_VertVel(secs);
 
@@ -575,7 +593,7 @@ void OpenTUPort_CTD(bool on) {
     RTCDelayMicroSeconds(20000L);
     if (CTDPort == 0)
       flogf("\nBad TU Channel: CTDPort...");
-    writestring = (char *)calloc(64, sizeof(char));
+    writestring = (char *)calloc(128, sizeof(char));
     stringin = (char *)calloc(128, sizeof(char));
   }
   if (!on) {
