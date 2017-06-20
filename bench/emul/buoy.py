@@ -101,14 +101,16 @@ def ctdDateTime():
 
 def ctdOut():
     "instrument sample"
-    # "# 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50"
-    # "\r\n# t.t,  c.c,  d.d,  s.s,  dd Mmm yyyy hh:mm:ss\r\n"
+    # CTD with fluro, par
+    # Temp, conductivity, depth, fluromtr, PAR, salinity, time
+    # 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
+    # "\r\n# t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss\r\n"
 
     # ctd delay to process, nominal 3.5 sec. Add variance?
     sleep(3.8)
     ###
     # note: modify temp for ice
-    ser.put("\r\n# %f, %f, %f, %f, %s\r\n" %
-        (20.1, 0.01, depth(), 0.06, ctdDateTime() ))
+    ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
+        (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
 
 
