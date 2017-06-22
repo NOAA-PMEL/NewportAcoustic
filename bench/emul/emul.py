@@ -36,11 +36,11 @@ def init():
     if winchArgs: winch.modGlobals(**winchArgs)
     if radioArgs: radio.modGlobals(**winchArgs)
 
-def run():
+def start():
     "start up"
-    buoy.run()
-    radio.run()
-    winch.run()
+    buoy.start()
+    radio.start()
+    winch.start()
 
 def stop():
     "close down"
@@ -50,7 +50,8 @@ def stop():
 
 
 
-if __name__=='__main__': init(); run()
+if __name__=='__main__': init(); start()
+else: print "init(); start(); stop()   or buoy.start(); winch.start()"
 
 
 # Notes:

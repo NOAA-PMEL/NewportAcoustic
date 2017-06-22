@@ -30,6 +30,7 @@ amodDelay = 5.5
 def modGlobals(**kwargs):
     "change defaults from command line"
     # change any of module globals, most likely mooring or cableLen
+    # ?? globals need defaults to reset on run()
     if kwargs: 
         # update module globals
         glob = globals()
@@ -38,9 +39,19 @@ def modGlobals(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-def run():
+def start():
     "start serial and reader thread"
+    # ?? globals need defaults to reset on run()
     global ser, go, motorOn
+    global motorRunState, motorLastTime, cableLen, mooring 
+    # motor 0=off, 1=down, -1=up; motorLastTime=utc motor started
+    motorRunState = 0 
+    motorLastTime = 0.0
+
+    # cableStartLen is length of cable when motor started
+    cableLen = cableStartLen = 0
+    mooring = 30
+
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     # threads run while go is set
     go = Event()
@@ -53,12 +64,10 @@ def run():
 def stop():
     "stop threads, close serial"
     if go: go.clear()
-    if ser: ser.close()
     if motorOn: 
         # release waiting motor thread
         motorOn.set()
         motorOn.clear()
-
 
 def serThread():
     "thread: looks for serial input, output; sleeps to simulate amodDelay"
@@ -68,6 +77,9 @@ def serThread():
             amodInput()
         if buffOut:
             amodOutput()
+    # while go
+    if ser: ser.close()
+
 
 def amodInput():
     "process input at serial, sleeps to simulate amodDelay"
