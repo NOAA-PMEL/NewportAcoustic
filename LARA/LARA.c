@@ -6,9 +6,34 @@
 **
 **	September 2016  Alex Turpin
 *****************************************************************************
-**	LARA.PHASE Parameter:
+* PLATFORM.h:  
+* short PHASE; // 1=AUH, 2=Ascent, 3=Surface Communication, 4= Descent
+* short BUOYMODE;  // 0=stopped 1=ascend 2=descend 3=careful ascent
+*        At depth and no velocity. Phase 1 && BuoyMode 0
+*        Ascending Phase 2 && BuoyMode 1
+*        On surface Phase 3 && BuoyMode 0
+*        Descending Phase 4 && BuoyMode 2
 **
-**
+ Console(char)
+  LARA.PHASE case 1:
+    case 'i': WISPRPower(true);
+    case 'e': WISPRSafeShutdown();
+    case 'd': WISPRDet(c);
+    case 'f': WISPRDFP();
+    case 'w': ChangeWISPR(c);
+    case 'p': LARA.PHASE = c;
+    case '1': LARA.ON = false;
+    case '2': LARA.DATA = LARA.DATA ? false : true;
+  LARA.PHASE case 2: case 4:
+    case 'w': WinchConsole();
+    case 'p': LARA.PHASE = c;
+    case 't': CTD_Sample();
+    case '1': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+    case 'a': PrintSystemStatus();
+    case 's': LARA.SURFACED = true;
+  LARA.PHASE case 3:
+    case '1': LARA.ON = false; // exit from GPSIRID
+    case 'p': LARA.PHASE = c;
 **
 
 WISPR BOARD
@@ -24,16 +49,13 @@ Interrupts:
 ** IRQ5 Interrupt to stop the program
 **
 *****************************************************************************
-**	Before deploying, set CF2 time and SM2 time, format SD cards, replace
-SM2 and CF2 clock batteries
+** Before deploying, set CF2 time and SM2 time, format SD cards, 
+** replace SM2 and CF2 clock batteries
 ** erase activity.log, set status=0, set startups=0,
-**	verify boottime is correct, verify pwrondepth and pwroffdepth are
-correct,
+** verify boottime is correct, verify pwrondepth and pwroffdepth are correct,
 ** make sure you have the correct mA multiplier set in the mAh calculation in
-status 5
-** for the SM2 settings that you are using(compression, kHz, etc.) as power
-consumption
-** varies between those settings
+** status 5 for the SM2 settings that you are using (compression, kHz, etc.)
+** as power consumption varies between those settings
 **
 \******************************************************************************/
 
