@@ -10,13 +10,14 @@ import time
 
 # globals
 go = ser = None
+timeOff = 0
 
 #
 # these defaults may be changed by a dict passed to modGlobals
 #
 name = 'ctd'
-eol = '\r\n'
-port = '/dev/ttyS7'
+eol = '\r'
+port = '/dev/ttyS8'
 baudrate = 9600
 sleepMode = syncMode = 0
 
@@ -31,9 +32,10 @@ def modGlobals(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-def run():
+def start():
     "start serial and reader thread"
-    global ser, go
+    global ser, go, sleepMode, syncMode 
+    sleepMode = syncMode = 0
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     # threads run while go is set
     go = Event()
@@ -43,7 +45,6 @@ def run():
 def stop():
     "stop threads, close serial"
     if go: go.clear()
-    if ser: ser.close()
 
 
 def serThread():
@@ -53,6 +54,7 @@ def serThread():
         # CTD. syncMode, sample, settings
         if ser.in_waiting:
             # syncMode is special, a trigger not a command, eol not required
+            # consume input while pondering
             if syncMode and sleepMode:
                 c = ser.get()
                 if '\x00' in c:
@@ -64,24 +66,28 @@ def serThread():
                     ser.reset_input_buffer
                 else:
                     ctdOut()
-            # command line. note: we don't do timeout
-            else:
+            else: # not sync & sleep
+                # command line. note: we don't do timeout
                 # upper case is standard for commands, but optional
-                l = ser.getline().upper()
-                if 'TS' in l: 
-                    ctdOut()
-                elif 'DATE' in l:
-                    dt = l[l.find('=')+1:]
-                    setDateTime(dt)
-                    ser.log( "set date time %s -> %s" % (dt, ctdDateTime()))
-                elif 'SYNCMODE=Y' in l:
-                    syncMode=1
-                    ser.log( "syncMode pending (when ctd sleeps)")
-                elif 'QS' in l:
-                    sleepMode = 1
-                    ser.log("ctd sleepMode")
-                if sleepmode != 1: 
-                    ser.put('S>')
+                l = ser.getline(echo=1).upper()
+                if l:
+                    l = l[:-len(ser.eol)]
+                    if 'TS' in l: 
+                        ctdOut()
+                    elif 'DATE' in l:
+                        dt = l[l.find('=')+1:]
+                        setDateTime(dt)
+                        ser.log( "set date time %s -> %s" % (dt, ctdDateTime()))
+                    elif 'SYNCMODE=Y' in l:
+                        syncMode=1
+                        ser.log( "syncMode pending (when ctd sleeps)")
+                    elif 'QS' in l:
+                        sleepMode = 1
+                        ser.log("ctd sleepMode")
+                    if sleepMode != 1: 
+                        ser.put('S>')
+    # while go:
+    if ser: ser.close()
 
 def setDateTime(dt):
     "set ctdClock global timeOff from command in seabird format"
@@ -99,16 +105,17 @@ def ctdDateTime():
     f='%d %b %Y %H:%M:%S'
     return time.strftime(f,time.localtime(time.time()-timeOff))
 
+# Temp, conductivity, depth, fluromtr, PAR, salinity, time
+# 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
 def ctdOut():
     "instrument sample"
-    # "# 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50"
-    # "\r\n# t.t,  c.c,  d.d,  s.s,  dd Mmm yyyy hh:mm:ss\r\n"
+    # "\r\n# t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss\r\n"
 
     # ctd delay to process, nominal 3.5 sec. Add variance?
     sleep(3.8)
     ###
     # note: modify temp for ice
-    ser.put("\r\n# %f, %f, %f, %f, %s\r\n" %
-        (20.1, 0.01, depth(), 0.06, ctdDateTime() ))
+    ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
+        (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
 
 

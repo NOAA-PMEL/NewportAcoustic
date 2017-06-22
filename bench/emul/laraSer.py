@@ -1,10 +1,11 @@
 import serial
 from threading import Lock
+import time
 
 class Serial(serial.Serial):
     "extra methods to handle our serial ports"
 
-    def __init__(self, eol='\n', name=None, *args, **kwargs):
+    def __init__(self, eol='\r', name=None, *args, **kwargs):
         # buff is for input not consumed by getline
         super(Serial, self).__init__(*args, **kwargs)
         # getline() buffers partial line input
@@ -52,27 +53,28 @@ class Serial(serial.Serial):
         self.logIn(b)
         return b
 
-    def getline(self, eol=''):
-        "Get full lines from serial, strip eol; partial to self.buff"
-        if eol == '': eol = self.eol
+    def getline(self, eol=None, echo=0):
+        "Get full lines from serial, keep eol; partial to self.buff"
+        r = ''
+        if eol==None: eol = self.eol
         if self.in_waiting:
             # read chars
-            b = self.buff + self.read(self.in_waiting)
+            c = self.read(self.in_waiting)
+            if echo: self.write(c)
+            b = self.buff + c
             if eol in b:
-                i = b.find(eol)
+                i = b.find(eol) + len(eol)
                 r = b[:i]
-                i += len(eol)
                 self.buff = b[i:]
                 self.logIn(r)
             else: 
                 # partial
                 self.buff = b
-                r = ''
             return r
 
-    def putline(self, s, eol=''):
+    def putline(self, s, eol=None):
         "put to serial"
-        if eol == '': eol = self.eol
+        if eol==None: eol = self.eol
         self.write("%s%s" % (s, eol))
         self.logOut(s)
 
