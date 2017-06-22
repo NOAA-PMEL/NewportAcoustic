@@ -14,7 +14,26 @@
 *        On surface Phase 3 && BuoyMode 0
 *        Descending Phase 4 && BuoyMode 2
 **
-**
+ Console(char)
+  LARA.PHASE case 1:
+    case 'i': WISPRPower(true);
+    case 'e': WISPRSafeShutdown();
+    case 'd': WISPRDet(c);
+    case 'f': WISPRDFP();
+    case 'w': ChangeWISPR(c);
+    case 'p': LARA.PHASE = c;
+    case '1': LARA.ON = false;
+    case '2': LARA.DATA = LARA.DATA ? false : true;
+  LARA.PHASE case 2: case 4:
+    case 'w': WinchConsole();
+    case 'p': LARA.PHASE = c;
+    case 't': CTD_Sample();
+    case '1': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+    case 'a': PrintSystemStatus();
+    case 's': LARA.SURFACED = true;
+  LARA.PHASE case 3:
+    case '1': LARA.ON = false; // exit from GPSIRID
+    case 'p': LARA.PHASE = c;
 **
 
 WISPR BOARD
