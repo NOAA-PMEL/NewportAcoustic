@@ -16,7 +16,7 @@ timeOff = 0
 # these defaults may be changed by a dict passed to modGlobals
 #
 name = 'ctd'
-eol = '\r'
+eol = '\r'        # input is \r, output \r\n
 port = '/dev/ttyS8'
 baudrate = 9600
 sleepMode = syncMode = 0

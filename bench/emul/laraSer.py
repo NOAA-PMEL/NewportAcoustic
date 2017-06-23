@@ -5,7 +5,7 @@ import time
 class Serial(serial.Serial):
     "extra methods to handle our serial ports"
 
-    def __init__(self, eol='\r', name=None, *args, **kwargs):
+    def __init__(self, eol='\r', eol_out='', name=None, *args, **kwargs):
         # buff is for input not consumed by getline
         super(Serial, self).__init__(*args, **kwargs)
         # getline() buffers partial line input
@@ -13,6 +13,7 @@ class Serial(serial.Serial):
         # putQ() buffers output, to emulate slow comm
         self.logLevel=2
         self.eol=eol
+        self.eol_out=eol_out
         self.timeout = ( 1 / self.baudrate ) * 3
         if name: self.name = name
 
@@ -53,14 +54,20 @@ class Serial(serial.Serial):
         self.logIn(b)
         return b
 
-    def getline(self, eol=None, echo=0):
+    def getline(self, echo=0):
         "Get full lines from serial, keep eol; partial to self.buff"
         r = ''
-        if eol==None: eol = self.eol
+        eol = self.eol
+        eol_out = self.eol_out
+
         if self.in_waiting:
             # read chars
             c = self.read(self.in_waiting)
-            if echo: self.write(c)
+            if echo: 
+                # translate if echo & self.eol_out
+                # note - only works if eol is one char (i.e. \r->\r\n)
+                if eol_out and (eol==c): self.write(eol_out)
+                else: self.write(c)
             b = self.buff + c
             if eol in b:
                 i = b.find(eol) + len(eol)
@@ -72,9 +79,9 @@ class Serial(serial.Serial):
                 self.buff = b
             return r
 
-    def putline(self, s, eol=None):
+    def putline(self, s):
         "put to serial"
-        if eol==None: eol = self.eol
+        eol = self.eol_out
         self.write("%s%s" % (s, eol))
         self.logOut(s)
 

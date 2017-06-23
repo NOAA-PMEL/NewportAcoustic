@@ -1,3 +1,7 @@
+/** handling CTD in buoy, seabird SBE 16plus
+ * general note: ctd wants \r only for input
+ * Bug:! TUTxPrint translates \n into \r\n, which sorta kinda works if lucky
+ */
 #include <cfxbios.h> // Persistor BIOS and I/O Definitions
 #include <cfxpico.h> // Persistor PicoDOS Definitions
 #include <MPC_Global.h>
@@ -143,7 +147,7 @@ void CTD_DateTime() {
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 
-  TUTxPrintf(CTDPort, "DATETIME=%s\n", buffer);
+  TUTxPrintf(CTDPort, "DATETIME=%s\r", buffer);
   RTCDelayMicroSeconds(250000L);
   while (tgetq(CTDPort))
     cprintf("%c", TURxGetByte(CTDPort, true));
@@ -163,7 +167,7 @@ bool CTD_GetPrompt() {
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
                                                     // command line for CTDPort
                                                     // or 7 seconds pass
-    TUTxPrintf(CTDPort, "\n");
+    TUTxPrintf(CTDPort, "\r");
     RTCDelayMicroSeconds(1000000);
     LastByteInQ = TURxPeekByte(CTDPort, (tgetq(CTDPort) - 1));
     count++;
@@ -191,11 +195,9 @@ bool CTD_GetPrompt() {
 void CTD_Sample() {
 
   if (SyncMode) {
-    // cprintf("pulse");
-    TUTxPrintf(CTDPort, "pulse\n");
+    TUTxPrintf(CTDPort, "x\r");
   } else {
-    // cprintf("ts");
-    TUTxPrintf(CTDPort, "TS\n");
+    TUTxPrintf(CTDPort, "TS\r");
   }
 
   RTCDelayMicroSeconds(250000);
@@ -206,10 +208,10 @@ void CTD_Sample() {
 \********************************************************************************/
 void CTD_SyncMode() {
 
-  TUTxPrintf(CTDPort, "Syncmode=y\n");
+  TUTxPrintf(CTDPort, "Syncmode=y\r");
   TUTxWaitCompletion(CTDPort);
   RTCDelayMicroSeconds(500000);
-  TUTxPrintf(CTDPort, "QS\n");
+  TUTxPrintf(CTDPort, "QS\r");
   TUTxWaitCompletion(CTDPort);
   RTCDelayMicroSeconds(1000000);
 
@@ -382,29 +384,21 @@ int Sea_Ice_Algorithm() {
 * FLS and PAR data in between the depth and salinity. Ignore the conductivity.
 \******************************************************************************/
 bool CTD_Data() {
-  bool log = false;
-  bool prompt = false;
-  bool returnvalue = false;
-  char *split_temp;
-  char *split_cond;
-  char *split_pres;
-  char *split_flu;
-  char *split_par;
-  char *split_sal;
-  char *split_date;
-  float temp;
-  char *mon;
-  float flu;
-  float par;
-  float sal;
+  // global stringin CTDLogFile
+  char *strin;  // pointer into stringin
   char charin;
   int filehandle;
   int i = 0, count = 0, byteswritten, month;
+  char *split_temp, *split_cond, *split_pres;
+  char *split_flu, *split_par, *split_sal;
+  float temp, cond, pres, flu, par, sal;
+  char *split_date, *mon;
   struct tm info;
   time_t secs = 0;
 
   memset(stringin, 0, 128 * sizeof(char));
 
+  // loop until 3 timeouts; should this be loop until \n ?
   while (count < 3 && i < 128) {
     charin = TURxGetByteWithTimeout(CTDPort, 250);
     if (charin == -1)
@@ -415,50 +409,58 @@ bool CTD_Data() {
     }
   }
 
-  // expect to see stringin start with " *# "
-  if (strchr(stringin, '#') != NULL) {
-    log = true;
-  } else if (strchr(stringin, '>') != NULL)
-    prompt = true;
-  else if (strchr(stringin, '<') != NULL)
-    prompt = true;
+  // expect to see stringin start with ".*# "
+  // do better sanity checking
+  strin = strchr(stringin, '#');
+  if (strin == NULL) {
+    if ((strchr(stringin, '>') != NULL)
+        || (strchr(stringin, '<') != NULL)) {
+      // prompt
+      flogf("\nERROR|CTD_Data(): Received >s rather than #, sending into sleep "
+            "mode.");
+      CTD_SyncMode();
+      Delay_AD_Log(3);
+      TUTxPrintf(CTDPort, "TS\r");
+      TUTxWaitCompletion(CTDPort);
+    } else {
+      // no < > #
+      // why are these two cases different action?
+      cprintf("\nNo \# found: %s", stringin);
+      CTD_Start_Up(true);
+      CTD_SyncMode();
+    }
+    return false;
+  } // no #
 
-  if (prompt) {
-    flogf("\nERROR|CTD_Data(): Received >s rather than #, sending into sleep "
-          "mode.");
-    CTD_SyncMode();
-    Delay_AD_Log(3);
-    TUTxPrintf(CTDPort, "TS\n");
-    TUTxWaitCompletion(CTDPort);
-    return returnvalue;
-  }
-
-  // error here if log!=true
-  flogf("\n%s", stringin);
+  flogf("\n%s", strin);
 
   // Split data string up into separate values
   // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
-  strtok(stringin, "# ");
-  split_temp = strtok(NULL, ", ");
-  if (split_temp == NULL) {
-    cprintf("\nNo Commas in CTD Data");
-  }
-  split_cond = strtok(NULL, ", "); // ignor cond
+  split_temp = strtok(strin, "#, ");
+  split_cond = strtok(NULL, ", "); 
   split_pres = strtok(NULL, ", ");
   split_flu = strtok(NULL, ", ");
   split_par = strtok(NULL, ", ");
   split_sal = strtok(NULL, ", ");
-  split_date = strtok(NULL, ",");
+  split_date = strtok(NULL, "\r\n"); 
 
   temp = atof(split_temp);
-  LARA.DEPTH = atof(split_pres);
+  cond = atof(split_cond);
+  pres = atof(split_pres);
   flu = atof(split_flu);
   par = atof(split_par);
   sal = atof(split_sal);
+  LARA.DEPTH = pres;
 
+  // convert date time to secs
   info.tm_mday = atoi(strtok(split_date, " "));
-  info.tm_mon = -1;
   mon = strtok(NULL, " ");
+  info.tm_year = (atoi(strtok(NULL, " ")) - 1900);
+  info.tm_hour = atoi(strtok(NULL, ":"));
+  info.tm_min = atoi(strtok(NULL, ":"));
+  info.tm_sec = atoi(strtok(NULL, " "));
+
+  info.tm_mon = -1;
   if (strstr(mon, "Jan") != NULL)
     info.tm_mon = 0;
   else if (strstr(mon, "Feb") != NULL)
@@ -484,16 +486,15 @@ bool CTD_Data() {
   else if (strstr(mon, "Dec") != NULL)
     info.tm_mon = 11;
 
+  // need better sanity checks
   if (info.tm_mon == -1) {
-    flogf("\nERROR|CTD_Data(): %d %s Date incorrect. flush tuport ", info.tm_mday, mon);
+    flogf("\nERROR|CTD_Data(): month %s incorrect. flush tuport ", mon);
+    flogf("\nERROR|CTD_Data(): %s ", stringin );
+    flogf("\nERROR|CTD_Data(): %f, %f, %f, %f, %f, %f, %d, %s, %d ", 
+      temp, cond, pres, flu, par, sal, info.tm_mday, mon, info.tm_year);
     TURxFlush(CTDPort);
-    return returnvalue;
+    return false;
   }
-
-  info.tm_year = (atoi(strtok(NULL, " ")) - 1900);
-  info.tm_hour = atoi(strtok(NULL, ":"));
-  info.tm_min = atoi(strtok(NULL, ":"));
-  info.tm_sec = atoi(strtok(NULL, " "));
 
   month = info.tm_mon + 2;
   sprintf(split_date, ", %d.%d.%d %d:%d:%d", info.tm_mday, month,
@@ -502,28 +503,25 @@ bool CTD_Data() {
   secs = mktime(&info);
 
   // Log WriteString
-  // error here (and above) if !log
-  if (log) {
-    memset(writestring, 0, 128 * sizeof(char));
-    sprintf(writestring, "#%.4f,", temp);
-    strcat(writestring, split_pres);
-    LARA.DEPTH = atof(strtok(split_pres, ","));
-    strcat(writestring, ","); // added 9.28 after deploy 2, data 1. 02UTC of
-                              // 9.29
-    strcat(writestring, split_sal);
-    strcat(writestring, split_date);
-    strcat(writestring, "\n");
+  memset(writestring, 0, 128 * sizeof(char));
+  sprintf(writestring, "#%.4f,", temp);
+  strcat(writestring, split_pres);
+  LARA.DEPTH = atof(strtok(split_pres, ","));
+  strcat(writestring, ","); // added 9.28 after deploy 2, data 1. 02UTC of
+                            // 9.29
+  strcat(writestring, split_sal);
+  strcat(writestring, split_date);
+  strcat(writestring, "\n");
 
-    // this might be an error, done in VertVel
-    LARA.CTDSAMPLES++;
-    TURxFlush(CTDPort);
-    filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
-    if (filehandle <= 0) {
-      flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
-      if (errno != 0) {
-        // CTD_CreateFile(MPC.FILENUM);
-        return true;
-      }
+  // this incr might be an error, done in VertVel
+  LARA.CTDSAMPLES++;
+  TURxFlush(CTDPort);
+  filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
+  if (filehandle <= 0) {
+    flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
+    if (errno != 0) {
+      // CTD_CreateFile(MPC.FILENUM);
+      return true;
     }
 
     flogf("\nLog: %s", writestring);
@@ -536,12 +534,7 @@ bool CTD_Data() {
 
     if (close(filehandle) != 0)
       flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
-
-  } else {
-    cprintf("\nNo \# found: %s", stringin);
-    CTD_Start_Up(true);
-    CTD_SyncMode();
-  }
+  } 
   return true;
 
 } //____ CTD_Data() _____//
