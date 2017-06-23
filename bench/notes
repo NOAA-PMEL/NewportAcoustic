@@ -3,5 +3,6 @@ write ctd data
 create_dtx_file() c:00000208.dtx opened
 ctd chokes on crlf - use cr [^M] only
 should cf2 be setting date on ctd?
+1680x1050 weird.
 
-
+ctd: don't emul with \r\n

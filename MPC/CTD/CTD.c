@@ -441,7 +441,6 @@ bool CTD_Data() {
   if (split_temp == NULL) {
     cprintf("\nNo Commas in CTD Data");
   }
-  strtok(NULL, " "); // erase cond.
   split_cond = strtok(NULL, " "); // ignor cond
   split_pres = strtok(NULL, " ");
   split_flu = strtok(NULL, " ");
@@ -484,7 +483,7 @@ bool CTD_Data() {
     info.tm_mon = 11;
 
   if (info.tm_mon == -1) {
-    flogf("\nERROR|CTD_Data(): Date incorrect. flush tuport ");
+    flogf("\nERROR|CTD_Data(): %d %s Date incorrect. flush tuport ", info.tm_mday, mon);
     TURxFlush(CTDPort);
     return returnvalue;
   }
