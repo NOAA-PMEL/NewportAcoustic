@@ -83,6 +83,7 @@ def serThread():
 
 def amodInput():
     "process input at serial, sleeps to simulate amodDelay"
+    # #R,01,03
     riseCmd = "#R,%s,03" % winchID
     riseRsp = "%%R,%s,00" % buoyID
     stopCmd = "#S,%s,00" % winchID
@@ -91,6 +92,8 @@ def amodInput():
     fallRsp = "%%F,%s,00" % buoyID
     buoyAck = "%%S,%s,00" % winchID
     l = ser.getline()
+    if not l: return
+    ser.log( "heard %s" % l )
     if len(l) > 6: sleep(amodDelay)
     # rise
     if riseCmd in l:

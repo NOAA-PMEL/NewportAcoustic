@@ -6,3 +6,5 @@ should cf2 be setting date on ctd?
 1680x1050 weird.
 
 ctd: don't emul with \r\n
+
+what is line terminator to/from winch in winch.c?
