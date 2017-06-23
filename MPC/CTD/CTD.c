@@ -394,6 +394,8 @@ bool CTD_Data() {
   char *split_date;
   float temp;
   char *mon;
+  float flu;
+  float par;
   float sal;
   char charin;
   int filehandle;
@@ -437,22 +439,22 @@ bool CTD_Data() {
   // Split data string up into separate values
   // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
   strtok(stringin, "# ");
-  split_temp = strtok(NULL, " ");
+  split_temp = strtok(NULL, ", ");
   if (split_temp == NULL) {
     cprintf("\nNo Commas in CTD Data");
   }
-  split_cond = strtok(NULL, " "); // ignor cond
-  split_pres = strtok(NULL, " ");
-  split_flu = strtok(NULL, " ");
-  split_par = strtok(NULL, " ");
-  split_sal = strtok(NULL, " ");
+  split_cond = strtok(NULL, ", "); // ignor cond
+  split_pres = strtok(NULL, ", ");
+  split_flu = strtok(NULL, ", ");
+  split_par = strtok(NULL, ", ");
+  split_sal = strtok(NULL, ", ");
   split_date = strtok(NULL, ",");
 
-  temp = atof(strtok(split_temp, ","));
-
-  LARA.DEPTH = atof(strtok(split_pres, ","));
-
-  sal = atof(strtok(split_sal, ","));
+  temp = atof(split_temp);
+  LARA.DEPTH = atof(split_pres);
+  flu = atof(split_flu);
+  par = atof(split_par);
+  sal = atof(split_sal);
 
   info.tm_mday = atoi(strtok(split_date, " "));
   info.tm_mon = -1;
