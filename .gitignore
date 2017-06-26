@@ -9,6 +9,7 @@
 *.RMP
 *.RUN
 *.bin
+*.mcp
 Resource.frk
 bin
 *_Data

@@ -8,6 +8,8 @@ extern volatile clock_t stop_clock;
 extern bool SystemOn;
 extern int DataTimer;
 extern long SystemFreeSpace;
+// static global - seen only in file where declared
+// static local - retains value between func calls
 static char *WriteBuffer;
 
 /*********************************************************

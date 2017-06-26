@@ -38,9 +38,7 @@ void LARA_Recovery();
 #define PROG_VERSION 3.3 // Keep this up to date!!!
 
 #define POWERLOGGING
-// two levels of debug
 #define DEBUG
-// #define DEBUG2
 #define SYSTEMDIAGNOSTICS
 #define WISPR
 #define IRIDIUM
@@ -88,20 +86,12 @@ void LARA_Recovery();
 #define RTS(X)
 #endif
 
-// two levels of debug
 // DEBUG
 #ifdef DEBUG
 #define DBG(X) X
 #else
 #define DBG(X)
 #endif
-// DEBUG2
-#ifdef DEBUG2
-#define DBG2(X) X
-#else
-#define DBG2(X)
-#endif
-
 /*
 //CTD
 #ifdef CTDSENSOR

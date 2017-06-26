@@ -145,7 +145,6 @@ void WaitForWinch(short);
 void SleepUntilWoken();
 bool GlobalRestart;
 bool PutInSleepMode = false;
-static char *returnstr;
 static char uploadfile[] =
     "c:00000000.dat"; // 12.9.2015 Can this be a static char?
 // static char *WriteBuffer;
@@ -160,9 +159,7 @@ void main() {
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
   // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(1024, sizeof(char));
-  // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(1024, sizeof(char));
+  WriteBuffer = (char *)calloc(256, sizeof(char));
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -205,7 +202,8 @@ void main() {
       Time(&PwrOn);
 
       PhaseThree();
-      CTD_Start_Up(true); // ?? why start here
+
+      CTD_Start_Up(true);
       CTD_SyncMode();
       break;
 
@@ -221,7 +219,6 @@ void main() {
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
   free(WriteBuffer);
-  free(returnstr);
 
   SleepUntilWoken();
   BIOSReset();
@@ -295,6 +292,8 @@ void InitializeLARA(ulong *PwrOn) {
   Free_Disk_Space(); // Does finding the free space of a large CF card cause
                      // program to crash? or Hang?
 
+  CTD_CreateFile(MPC.FILENUM);
+
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {
     MPC.FILENUM--;
@@ -333,8 +332,6 @@ void InitializeLARA(ulong *PwrOn) {
     LARA.LOWPOWER = false;
 
   // SETUP CTD
-  CTD_CreateFile(MPC.FILENUM);
-  DBG2( flogf("\n .. setup ctd"); )
   OpenTUPort_CTD(true);
   CTD_Start_Up(true);
   CTD_SyncMode();
@@ -731,7 +728,7 @@ void PhaseThree() {
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(MPC.FILENUM); // ??
+  CTD_CreateFile(MPC.FILENUM);
   LARA.TDEPTH = NIGK.TDEPTH;
 
   OpenTUPort_CTD(true);
@@ -1117,7 +1114,7 @@ void Sleep(void) {
 
   PutInSleepMode = false;
 
-  // DBG2(flogf(".");)
+  // DBG(flogf(".");)
   RTCDelayMicroSeconds(10000L);
 
 } //____ Sleep() ____//
@@ -1162,7 +1159,7 @@ void CTDSleep(void) {
                       */
   PutInSleepMode = false;
 
-  //   DBG2(flogf(",");)
+  //   DBG(flogf(",");)
   RTCDelayMicroSeconds(10000L);
 
 } //____ Sleep() ____//
@@ -1272,7 +1269,7 @@ ulong WriteFile(ulong TotalSeconds) {
     if (errno != 0)
       return -1;
   }
-  DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
+  DBG(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
 
   //*** LARA Write ***//
   sprintf(WriteBuffer, "LARA Program Ver:%.1f\naa:bb.cccc North ddd:ee.ffff "
@@ -1284,19 +1281,19 @@ ulong WriteFile(ulong TotalSeconds) {
 
   flogf("\n%s", WriteBuffer);
   bytesWritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-  DBG2(flogf("\nBytesWritten: %d", bytesWritten);)
+  DBG(flogf("\nBytesWritten: %d", bytesWritten);)
 
   // Only comes here if not rebooted.
   if (TotalSeconds != 0) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     RTCDelayMicroSeconds(50000L);
-    memset(WriteBuffer, 0, 1024 * sizeof(char));
+    memset(WriteBuffer, 0, 256 * sizeof(char));
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());
     bytesWritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-    DBG2(flogf("\nBytesWritten: %d", bytesWritten);)
+    DBG(flogf("\nBytesWritten: %d", bytesWritten);)
   }
   // Else, coming from reboot. Name the PowerLogging File.
   else {
@@ -1364,18 +1361,20 @@ ulong WriteFile(ulong TotalSeconds) {
 **	PrintSystemStatus()
 \**************************************************************************************/
 char *PrintSystemStatus() {
-  // global returnstr
-  sprintf(returnstr, "LARA: "
+
+  char *returnString;
+  returnString = (char *)calloc(128, sizeof(char));
+  sprintf(returnString, "LARA: "
                         "%d%d%d%d\nMOORDEPTH:%5.2f\nCURRENTDEPTH:%5."
                         "2f\nTOPDEPTH:%5.2f\nTARGETDPETH:%d\nAVG.VEL:%5."
                         "2f\nCTDSAMPLES:%d\n\0",
           LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
           LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
           LARA.CTDSAMPLES);
-  flogf("\n%s", returnstr);
+  flogf("\n%s", returnString);
   RTCDelayMicroSeconds(100000L);
 
-  return returnstr;
+  return returnString;
 }
 /**************************************************************************************\
 ** WaitForWinch
@@ -1493,4 +1492,3 @@ bool CheckTime(ulong prevTime, short mode, short hour) {
 ** LARA_Recovery()
 \**************************************************************************************/
 void LARA_Recovery() {} //____ LARA_Recovery() ____//
-
