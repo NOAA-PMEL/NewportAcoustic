@@ -294,11 +294,10 @@ reading.
 void AD_Write(ushort *AveragedEnergy) {
 
   CLK(start_clock = clock();)
-  ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND);
+  ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND | O_CREAT);
   if (ADSFileHandle <= 0) {
     flogf("\nERROR|AD_Write() %s open fail. errno: %d", ADAvgFileName, errno);
-    if (errno != 0)
-      return;
+    return;
   }
   // DBG(   else      flogf("\n\t|AD_Write() %s opened", ADAvgFileName);)
 
@@ -321,37 +320,37 @@ void AD_Write(ushort *AveragedEnergy) {
 
 } //_____ AD_Write() _____//
 /******************************************************************************\
-** PowerMonitor
+** Power_Monitor
 ** This function is called when the WriteInterval (WRTINT) is met.
-** With a FWT for the ADS of 32seconds and a WRTINT of ~60 minutes (really 64
-minutes)
+** With a FWT for the ADS of 32seconds 
+** and a WRTINT of ~60 minutes (really 64 minutes)
+* writes to filehandle passed in parm
+* reads from global ADSFileHandle opened by ??
+* globals set up by ??
 \******************************************************************************/
 float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
+  // global ADSTIME ADSLOT adbuf ad ADAvgFileName ADSFileHandle 
   struct stat fileinfo;
-  ulong DataCount = 0;
-  ulong filelength = 0;
-  ulong TotalAmp = 0;
-  ulong TotalVolts = 0;
-  ulong TotalTime = 0;
-  ulong calculatedtime = 0L;
+  ulong DataCount, filelength, calculatedtime;
+  ulong TotalAmp, TotalVolts, TotalTime;
+  float MaxCurrent, MinVoltage, kjoules, floater, voltage, amps;
   ushort energy[3] = {0, 0, 0};
-  float MaxCurrent = 0.0, MinVoltage = 0.0;
-  float kjoules;
-  float floater = 0.0;
   int byteswritten;
-  float voltage = 0.0, amps = 0.0;
+
+  DataCount = filelength = calculatedtime = 0L;
+  TotalAmp = TotalVolts = TotalTime = 0L;
+  MaxCurrent = MinVoltage = kjoules = floater = voltage = amps = 0.0;
 
   // Normal enterance to Power_Monitor
   if (totaltime != 0) {
     Setup_ADS(false, NULL, NULL);
     if (ADSTIME < 1)
       ADSTIME = 1044;
-    ADSTIME = ((10 * totaltime) % ADSTIME); // Last AD Power Buffer size
+    ADSTIME = ((10 * totaltime) % ADSTIME); // Last AD Power Buffer size ??
     AD_Log();
   }
   // Coming in after reboot
   else {
-    ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND);
     ad = CFxADInit(&adbuf, ADSLOT, ADInitFunction);
     if (!CFxADLock(ad)) {
       flogf("\nCouldn't lock and own A-D with QSPI\n");
@@ -361,49 +360,56 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
 
   flogf("\n\t|POWERMonitor(%s)", ADAvgFileName);
 
+  //
+  // open and read ADAvgFileName. close. compute. write to filehandle.
+  //
+
   // Reset Global Write Buffer
-  memset(WriteBuffer, 0, 256 * sizeof(char));
+  // memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
 
   // Get file status
   stat(ADAvgFileName, &fileinfo);
   filelength = fileinfo.st_size;
-
-  // if file unwritten to
+  DBG2( flogf("\n PM: %s length %d", ADAvgFileName, (int) filelength); )
+  // if file is empty
   if (filelength < 6)
     return 0.0;
 
-  if (ADSFileHandle > 0) {
-    lseek(ADSFileHandle, 0, SEEK_SET);
-    filelength =
-        filelength /
-        6; // 6 is the number of bytes for the values of current, voltage, time.
-
-    // Get the number of times file has been written to
-    while (DataCount < filelength) {
-      byteswritten = read(ADSFileHandle, energy, 3 * sizeof(ushort));
-      TotalAmp += energy[0];
-      TotalVolts += energy[1];
-      TotalTime += (ulong)energy[2];
-      DataCount++;
-    }
-
-    if (close(ADSFileHandle) < 0)
-      flogf("\nERROR  |PowerMonitor: File Close error: %d", errno);
-    DBG(else flogf("\n\t|PowerMonitor: ADSFile Closed");)
-
-    RTCDelayMicroSeconds(25000L);
-    if (DataCount != 0) {
-      energy[0] = (ushort)(TotalAmp / DataCount);
-      energy[1] = (ushort)(TotalVolts / DataCount);
-    }
-
-    amps = CFxADRawToVolts(ad, energy[0], VREF, true);
-    RTCDelayMicroSeconds(10000L);
-    voltage = CFxADRawToVolts(ad, energy[1], VREF, true) * 100;
-    RTCDelayMicroSeconds(10000L);
-    TotalTime = TotalTime / 10;
-    kjoules = (amps * voltage * TotalTime) / 1000.0;
+  // why is this a global, if open/close is here?
+  ADSFileHandle = open(ADAvgFileName, O_RDONLY | O_BINARY | O_CREAT);
+  if (ADSFileHandle <= 0) {
+    flogf("\nERROR Power_Monitor(): open '%s' %d", ADAvgFileName, errno);
+    return 0.0;
   }
+
+  lseek(ADSFileHandle, 0, SEEK_SET); // ??
+  // 6 is the number of bytes for the values of current, voltage, time.
+  filelength = filelength / 6; 
+
+  // Get the number of times file has been written to ??
+  while (DataCount < filelength) {
+    byteswritten = read(ADSFileHandle, energy, 3 * sizeof(ushort));
+    TotalAmp += energy[0];
+    TotalVolts += energy[1];
+    TotalTime += (ulong)energy[2];
+    DataCount++; 
+  } // while file
+  close(ADSFileHandle);
+  DBG2( flogf("\n PM: TotalAmp, TotalVolts, TotalTime %f, %f, %f", 
+    TotalAmp, TotalVolts, TotalTime ); )
+
+  RTCDelayMicroSeconds(25000L);
+  if (DataCount != 0) {
+    energy[0] = (ushort)(TotalAmp / DataCount);
+    energy[1] = (ushort)(TotalVolts / DataCount);
+  }
+
+  amps = CFxADRawToVolts(ad, energy[0], VREF, true);
+  RTCDelayMicroSeconds(10000L);
+  voltage = CFxADRawToVolts(ad, energy[1], VREF, true) * 100;
+  RTCDelayMicroSeconds(10000L);
+  TotalTime = TotalTime / 10;
+  kjoules = (amps * voltage * TotalTime) / 1000.0;
   MaxCurrent = CFxADRawToVolts(ad, maxcurrent, VREF, true);
   MinVoltage = CFxADRawToVolts(ad, minvoltage, VREF, true) * 100;
   *LoggingTime = TotalTime;
@@ -424,20 +430,21 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
                          "Volt:%.2fV\nMin Volt:%.2fV\nMax "
                          "Current:%.3fA\nBattery Capacity:%.2fkJ\n",
             TotalTime, kjoules, voltage, MinVoltage, MaxCurrent, floater);
-  } else
+  } else {
     sprintf(WriteBuffer, "\n---POWER---\nTime: %lu\nEnergy:%.2fkJ\nAvg "
                          "Volt:%.2fV\nMin Volt:%.2fV\nMax Current:%.3fA\n",
-            TotalTime, kjoules, voltage, MinVoltage, MaxCurrent);
+      TotalTime, kjoules, voltage, MinVoltage, MaxCurrent);
+  }
 
   DBG(flogf("\n%s", WriteBuffer); cdrain(); coflush();)
-  if (filehandle > 0)
+
+  // use fh, but don't close it
+  if (filehandle>0)  // param
     byteswritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-
-  RTCDelayMicroSeconds(150000L);
-
+  RTCDelayMicroSeconds(150000L);  // ?? what for?
   return floater;
 
-} //_____ PowerMonitor() _____//
+} //_____ Power_Monitor() _____//
 /******************************************************************************\
 **	ADTimingRuptHandler Chore		Initiate conversion
 ** 1) Makes sure QSM is running and repeats previous synchronization

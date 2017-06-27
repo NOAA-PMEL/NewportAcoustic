@@ -620,18 +620,16 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 
     if (i == NumBlks)
       BlockLength = LastBlkLength;
-    //   	buf = (char *) calloc(BlockLength, sizeof(char));
-    memset(WriteBuffer, 0, 256 * sizeof(char));
+    memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
 
     byteswritten = read(Source, WriteBuffer, BlockLength * sizeof(char));
     DBG(flogf("\n\t|AppendFiles: bytes read: %d", byteswritten);)
     if (i == NumBlks) {
       strcat(WriteBuffer, "\n");
-      BlockLength++;
+      BlockLength++; // ??
     }
     byteswritten = write(Dest, WriteBuffer, BlockLength * sizeof(char));
     DBG(flogf("\n\t|AppendFiles: bytes written: %d", byteswritten);)
-    // free(buf);
   }
 
   if (erase) {

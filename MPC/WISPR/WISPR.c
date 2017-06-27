@@ -609,7 +609,7 @@ void WISPRWriteFile(int uploadfilehandle) {
   // char* buf;
 
   //   buf = (char*) calloc(256, sizeof(char));
-  memset(WriteBuffer, 0, 256 * sizeof(char));
+  memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
 
   flogf("\n\t|WISPRWriteFile()");
 

@@ -309,7 +309,7 @@ void Winch_Monitor(int filehandle) {
   // char *writebuffer;
   int byteswritten = 0;
   // writebuffer = (char*)calloc(256, sizeof(char));
-  memset(WriteBuffer, 0, 256 * sizeof(char));
+  memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
   sprintf(
       WriteBuffer, "NIGK "
                    "%s\nProfile:%d\nDelay:%d\nTDepth:%d\nRiseRate:%d\nFallRate:"

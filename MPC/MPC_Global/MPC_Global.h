@@ -11,6 +11,7 @@ extern long SystemFreeSpace;
 // static global - seen only in file where declared
 // static local - retains value between func calls
 static char *WriteBuffer;
+#define BUFFSZ 1024
 
 /*********************************************************
 ** SYSTEM PARAMETER STRUCTURES

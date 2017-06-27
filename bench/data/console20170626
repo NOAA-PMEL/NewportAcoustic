@@ -1,0 +1,6537 @@
+
+###MX Load: CRC E40000 E6FFFF = 3219B537
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.20,  Build: Jun 20 2017 14:35:05
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 234
+Program start time: 06/25/2017  19:36:37.054 [ctime: 1498419397]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..9..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=3 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=26 (vee)
+NIGK.RECOVERY=1 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 3
+Program Start time: 06/25/2017 19:36:39
+	|FreeDiskSpace 1000048kB
+	|WriteFile(c:00000233.dat)
+	|WriteFile: c:00000233.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 233
+Starts:3 of 50
+WriteTime:06/25/2017 19:36:41
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000233.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/25/2017 19:36:41|ADS(c:00000234.pwr)
+	|Writing every 104.4Seconds
+06/25/2017 19:36:41|COMDos() del c:00000233.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/25/2017 19:36:43|COMDos() del c:00000233.dtx
+1 file(s) erased
+
+	|WriteFile:233 ctd file: c:00000233.ctd
+ERROR  |Return upon no file to append
+06/25/2017 19:36:43|COMDos() copy c:00000233.CTD c:CTD\00000233.CTD
+00000233.CTD
+
+       1 file(s) copied
+
+06/25/2017 19:36:44|COMDos() del c:00000233.CTD
+1 file(s) erased
+
+	|WriteFile: 233 log file: 00000234.log
+	|Append_Files() 00000234.log opened
+	|Append_Files 00000234.log Size: 1184 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 160
+	|AppendFiles: bytes written: 161
+	|AppendFiles() 00000234.log Closed
+06/25/2017 19:36:45|COMDos() copy c:00000233.LOG c:LOG\00000233.LOG
+00000233.LOG
+
+       1 file(s) copied
+
+06/25/2017 19:36:46|COMDos() del c:00000233.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.90V
+	|Open CTD TUPort
+	|Close CTD TUPort
+	|Open CTD TUPort
+CTD_DateTime(): 05252017193706
+
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 19:37:09|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+	|POWER: 0.806A, 14.00V
+	|POWER: 0.813A, 14.03V
+	|POWER: 0.813A, 14.03V
+	|POWER: 0.813A, 14.03V
+	|POWER: 0.813A, 14.03V
+06/25/2017 19:45:26|CheckCallTime():
+	|Time to check 208 
+hour now 19 vs call hour 2
+LARA: 0140
+MOORDEPTH: 0.00
+CURRENTDEPTH: 0.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:0
+
+	|create_dtx_file() c:00000234.dtx opened
+	|create_dtx_file(): c:00000234.dtx closed
+	|Open WISPR1 TUPort
+06/25/2017 19:45:27|WISPR: ON
+06/25/2017 19:45:27|Phase_Four():
+	|Open NIGK Winch TUPort
+LARA: 0040
+MOORDEPTH: 0.00
+CURRENTDEPTH: 0.00
+TOPDEPTH: 0.00
+TARGETDPETH:10
+AVG.VEL: 0.00
+CTDSAMPLES:0
+
+	|POWER: 0.805A, 13.97V
+	|POWER: 0.805A, 13.97V
+06/25/2017 19:48:56|Winch_Descend():
+06/25/2017 19:48:56|WaitForWinch(): ExpectedBuoyMode: 2
+SummedVel:  0.00, samples: 0
+	|CTD_CalculatedVelocity(): nan
+	|Calculated Descent Velocity: nanm/s
+	|Rate of Descent: 0.000000Meters/Minute
+	|User calculated Cable Payout: -755.400000Meters
+	|Time for Descent: -5036
+LARA: 0040
+MOORDEPTH: 0.00
+CURRENTDEPTH: 0.00
+TOPDEPTH: 0.00
+TARGETDPETH:10
+AVG.VEL: 0.00
+CTDSAMPLES:0
+
+	|Close NIGK Winch TUPort
+	|PHASE ONE
+06/25/2017 19:49:12|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|RECOVERY MODE
+	|Data Interval 31.32 minutes
+	|DataInterval: 1
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+	|POWER: 0.805A, 13.97V
+	|POWER: 0.805A, 13.97V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/25/2017 19:52:37|WISPR: OFF
+06/25/2017 19:52:38|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/25/2017 19:52:46|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>set
+MPC.PROGNAME=RAOS
+MPC.PROJID=QUEH
+MPC.PLTFRMID=RA01
+MPC.LONG=125:00.00W
+MPC.LAT=45:00.00N
+MPC.LOCATION=Location
+MPC.MINVOLT=11.5
+IRID.ANTSWT=0
+IRID.PHONE=0088160000519
+IRID.WARMUP=27
+IRID.MAXUPL=30000
+IRID.REST=30
+IRID.MAXCALLS=4
+IRID.MINSIGQ=3
+AMDM.MAXUPL=4000
+AMDM.OFFSET=6
+AMDM.BLKSIZE=1000
+BT.ON=1
+IRID.OFFSET=1
+MPC.BATLOG=1
+MPC.BATCAP= -92.44
+WISP.NUM=1
+WISP.DETMAX=10
+WISP.DETNUM=0
+WISP.GAIN=0
+WISP.DUTYCYCL=100
+IRID.CALLMODE=1
+MPC.DETINT=30
+MPC.STARTMAX=50
+IRID.CALLHOUR=2
+ADS.MINVOLT=11.5
+ADS.BATCAP=12000.0
+ADS.BATLOG=0
+CTD.UPLOAD=1
+MPC.DATAXINT=30
+STARTUPS=1
+SYS.QPBC=32
+NIGK.RECOVERY=1
+NIGK.PROFILES=26
+MPC.FILENUM=00000234
+MPC.STARTUPS=4
+
+C:\>set NIGK.RECOVERY=0
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 79D101E4
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.20,  Build: Jun 20 2017 14:35:05
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 235
+Program start time: 06/25/2017  20:20:18.811 [ctime: 1498422018]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..9..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=4 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=26 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 4
+Program Start time: 06/25/2017 20:20:21
+	|FreeDiskSpace 1000016kB
+	|WriteFile(c:00000234.dat)
+	|WriteFile: c:00000234.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 234
+Starts:4 of 50
+WriteTime:06/25/2017 20:20:22
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000234.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/25/2017 20:20:23|ADS(c:00000235.pwr)
+	|Writing every 104.4Seconds
+06/25/2017 20:20:23|COMDos() del c:00000234.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/25/2017 20:20:24|COMDos() del c:00000234.dtx
+1 file(s) erased
+
+	|WriteFile:234 ctd file: c:00000234.ctd
+ERROR  |Return upon no file to append
+06/25/2017 20:20:25|COMDos() copy c:00000234.CTD c:CTD\00000234.CTD
+00000234.CTD
+
+       1 file(s) copied
+
+06/25/2017 20:20:25|COMDos() del c:00000234.CTD
+1 file(s) erased
+
+	|WriteFile: 234 log file: 00000235.log
+	|Append_Files() 00000235.log opened
+	|Append_Files 00000235.log Size: 1184 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 160
+	|AppendFiles: bytes written: 161
+	|AppendFiles() 00000235.log Closed
+06/25/2017 20:20:27|COMDos() copy c:00000234.LOG c:LOG\00000234.LOG
+00000234.LOG
+
+       1 file(s) copied
+
+06/25/2017 20:20:27|COMDos() del c:00000234.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.02V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05252017202035
+DATETIME=05252017202035
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:20:37|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:20:41
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:20:46
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:20:51
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:20:56
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:21:01
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/25/2017 20:21:03|CheckCallTime():
+	|Time to check 939 
+hour now 20 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000235.dtx opened
+	|create_dtx_file(): c:00000235.dtx closed
+	|Open WISPR1 TUPort
+06/25/2017 20:21:04|WISPR: ON
+	|PHASE ONE
+06/25/2017 20:21:04|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 20
+	|Hours: 5Minutes: 39
+	|Time until call: 339 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18
+	|POWER: 0.798A, 13.97V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98V
+	|POWER: 0.803A, 13.98VIncoming Char: p
+	|CHANGE OF PHASE #? Phase: 2
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:03
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:08
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|PHASE TWO: Target Depth:10
+	|Open NIGK Winch TUPort
+LARA: 0020
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:10
+AVG.VEL: 0.00
+CTDSAMPLES:7
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:20
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:25
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:29
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+DepthChange: 0.000000 over 2 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+06/25/2017 20:39:31|Winch_Ascend():
+06/25/2017 20:39:32|WaitForWinch(): ExpectedBuoyMode: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:35
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+	|Response: R,00,00
+06/25/2017 20:39:43|Received Expected BuoyMode
+	|POWER: 0.804A, 13.97V
+# 20.100000, 0.010000, 26.705579, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:46
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 25.091985, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:51
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 23.478391, 0.010000, 0.010000, 0.060000, 25 May 2017 20:39:56
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 21.859625, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:01
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 20.246031, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:06
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 18.637609, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:11
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 17.018843, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:15
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 15.410421, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:20
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 13.791655, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:25
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 12.183233, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:30
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 10.564467, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:35
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+# 20.100000, 0.010000, 8.950873, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:40
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+	|REACHED TARGETDPETH!
+06/25/2017 20:40:42|Winch_Stop():
+06/25/2017 20:40:42|WaitForWinch(): ExpectedBuoyMode: 0
+# 20.100000, 0.010000, 7.326935, 0.010000, 0.010000, 0.060000, 25 May 2017 20:40:45
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+	|Response: S,00,00
+06/25/2017 20:40:53|Received Expected BuoyMode
+SummedVel:  0.00, samples: 0
+	|CTD_CalculatedVelocity(): nan
+	|Rate of Ascent: -19.16Meters/Minute
+	|Calculated Cable Payout:  -0.2Meters
+	|Time for Ascent: 71
+LARA: 0120
+MOORDEPTH:30.00
+CURRENTDEPTH: 7.33
+TOPDEPTH: 7.33
+TARGETDPETH:10
+AVG.VEL:  nan
+CTDSAMPLES:24
+
+	|Close NIGK Winch TUPort
+	|File Number: 00000235
+	|WriteFile(c:00000235.dat)
+	|WriteFile: c:00000235.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 235
+Starts:5 of 50
+WriteTime:06/25/2017 20:40:55
+Seconds:1234
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 169
+	|Winch_Monitor():
+
+BytesWritten: 120
+LARA: 0130
+MOORDEPTH:30.00
+CURRENTDEPTH: 7.33
+TOPDEPTH: 7.33
+TARGETDPETH:10
+AVG.VEL:  nan
+CTDSAMPLES:24
+
+BytesWritten: 105
+	|POWER: 0.804A, 13.97V
+	|POWERMonitor(c:00000235.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/25/2017 20:40:56|ADS(c:00000236.pwr)
+	|Writing every 104.4Seconds
+06/25/2017 20:40:56|COMDos() del c:00000235.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/25/2017 20:40:57|COMDos() del c:00000235.dtx
+1 file(s) erased
+
+	|WriteFile:235 ctd file: c:00000235.ctd
+ERROR  |Return upon no file to append
+06/25/2017 20:40:58|COMDos() copy c:00000235.CTD c:CTD\00000235.CTD
+00000235.CTD
+
+       1 file(s) copied
+
+06/25/2017 20:40:58|COMDos() del c:00000235.CTD
+1 file(s) erased
+
+06/25/2017 20:40:59|COMDos() copy c:00000235.LOG c:LOG\00000235.LOG
+00000235.LOG
+
+       1 file(s) copied
+
+06/25/2017 20:40:59|COMDos() del c:00000235.LOG
+1 file(s) erased
+
+	|PHASE THREE
+	|Close CTD TUPort
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/25/2017 20:41:12|WISPR: OFF
+	|Close WISPR1 TUPort
+06/25/2017 20:41:14|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.798A, 13.92V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:43:04|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:43:04|Found OK
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+ERROR|CTD_Data(): Received >s rather than #, sending into sleep mode.
+# 20.100000, 0.010000, 6.654604, 0.010000, 0.010000, 0.060000, 25 May 2017 20:43:23
+
+
+DepthChange: 0.000000 over 0 samples
+	|Profiling Buoy Stationary at  6.65 at   nanm/sample
+	|Ascend for 10 seconds, 1.654604meters
+06/25/2017 20:43:25|Winch_Ascend():
+06/25/2017 20:43:25|WaitForWinch(): ExpectedBuoyMode: 1
+	|Response: R,00,00
+06/25/2017 20:43:37|Received Expected BuoyModeIncoming Char: 1
+06/25/2017 20:43:47|Winch_Stop():
+06/25/2017 20:43:47|WaitForWinch(): ExpectedBuoyMode: 0
+# 20.100000, 0.010000, 3.365418, 0.010000, 0.010000, 0.060000, 25 May 2017 20:43:40
+
+
+ERROR  |CTD_Logger() c:00000235.ctd open errno: 23
+	|Response: S,00,00
+06/25/2017 20:43:58|Received Expected BuoyMode
+	|AscentTime: 22864
+	|Close CTD TUPort
+	|Close NIGK Winch TUPort
+06/25/2017 20:43:59|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.803A, 13.97V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:45:49|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:45:49|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:45:52|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:45:53|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.794A, 13.89V
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:47:42|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:47:43|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:47:46|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:47:46|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.788A, 13.85V
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:49:36|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:49:36|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:49:39|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:49:39|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.782A, 13.82V
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.781A, 13.82V
+06/25/2017 20:51:29|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:51:29|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:51:33|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:51:33|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.781A, 13.83V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:53:23|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:53:23|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:53:26|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:53:27|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.781A, 13.83V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:55:16|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:55:17|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:55:20|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:55:20|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.781A, 13.83V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:57:10|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:57:10|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:57:13|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:57:13|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.781A, 13.83V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/25/2017 20:59:03|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/25/2017 20:59:03|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 20:59:07|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/25/2017 20:59:07|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.782A, 13.83V
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 41907299
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.20,  Build: Jun 20 2017 14:35:05
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 236
+Program start time: 06/25/2017  22:59:37.783 [ctime: 1498431577]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=5 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 5
+Program Start time: 06/25/2017 22:59:39
+	|FreeDiskSpace 999968kB
+	|WriteFile(c:00000235.dat)
+	|WriteFile: c:00000235.dat Opened
+LARA Program Ver:3.2
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 235
+Starts:5 of 50
+WriteTime:06/25/2017 22:59:41
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000235.pwr)
+
+06/25/2017 22:59:41|ADS(c:00000236.pwr)
+	|Writing every 104.4Seconds
+06/25/2017 22:59:41|COMDos() del c:00000235.PWR
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/25/2017 22:59:42|COMDos() del c:00000235.dtx
+	|WriteFile:235 ctd file: c:00000235.ctd
+ERROR  |Return upon no file to append
+06/25/2017 22:59:43|COMDos() copy c:00000235.CTD c:CTD\00000235.CTD
+00000235.CTD
+
+       1 file(s) copied
+
+06/25/2017 22:59:44|COMDos() del c:00000235.CTD
+1 file(s) erased
+
+	|WriteFile: 235 log file: 00000236.log
+	|Append_Files() 00000236.log opened
+	|Append_Files 00000236.log Size: 13407 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 95
+	|AppendFiles: bytes written: 96
+	|AppendFiles() 00000236.log Closed
+06/25/2017 22:59:50|COMDos() copy c:00000235.LOG c:LOG\00000235.LOG
+06/25/2017 22:59:51|COMDos() del c:00000235.LOG
+	|Check Startup Voltage: 14.02V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05252017225958
+DATETIME=05252017225958
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 23:00:00|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at 2: 0
+value at L: 2
+value at 2: 0
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:05
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:09
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:14
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:19
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:24
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/25/2017 23:00:27|CheckCallTime():
+	|Time to check 0 
+hour now 23 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000236.dtx opened
+	|create_dtx_file(): c:00000236.dtx closed
+	|Open WISPR1 TUPort
+06/25/2017 23:00:28|WISPR: ON
+	|PHASE ONE
+06/25/2017 23:00:28|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 23
+	|Hours: 2Minutes: 60
+	|Time until call: 180 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:35
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:00:40
+
+
+ERROR  |ctdlogfile 'c:00000236.ctd'
+ERROR  |CTD_Logger() c:00000236.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/25/2017 23:00:54|WISPR: OFF
+06/25/2017 23:00:55|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/25/2017 23:01:00|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = C5BAF77A
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 15:41:06
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 237
+Program start time: 06/25/2017  23:43:15.178 [ctime: 1498434195]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=6 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 6
+Program Start time: 06/25/2017 23:43:17
+	|FreeDiskSpace 999952kB
+	|WriteFile(c:00000236.dat)
+	|WriteFile: c:00000236.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 236
+Starts:6 of 50
+WriteTime:06/25/2017 23:43:18
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000236.pwr)
+06/25/2017 23:43:19|ADS(c:00000237.pwr)
+	|Writing every 104.4Seconds
+06/25/2017 23:43:19|COMDos() del c:00000236.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/25/2017 23:43:20|COMDos() del c:00000236.dtx
+1 file(s) erased
+
+	|WriteFile:236 ctd file: c:00000236.ctd
+ERROR  |12345678.txt open errno: 23, fh: -1
+ERROR  |Return upon no file to append
+06/25/2017 23:43:21|COMDos() copy c:00000236.CTD c:CTD\00000236.CTD
+00000236.CTD
+
+       1 file(s) copied
+
+06/25/2017 23:43:21|COMDos() del c:00000236.CTD
+1 file(s) erased
+
+	|WriteFile: 236 log file: 00000237.log
+ERROR  |12345678.txt open errno: 23, fh: -1
+	|Append_Files() 00000237.log opened
+	|Append_Files 00000237.log Size: 1239 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 215
+	|AppendFiles: bytes written: 216
+	|AppendFiles() 00000237.log Closed
+06/25/2017 23:43:23|COMDos() copy c:00000236.LOG c:LOG\00000236.LOG
+00000236.LOG
+
+       1 file(s) copied
+
+06/25/2017 23:43:23|COMDos() del c:00000236.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.95V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05252017234331
+DATETIME=05252017234331
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/25/2017 23:43:33|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:43:38
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:43:42
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:43:47
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:43:52
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:43:57
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/25/2017 23:43:59|CheckCallTime():
+	|Time to check 868 
+hour now 23 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000237.dtx opened
+	|create_dtx_file(): c:00000237.dtx closed
+	|Open WISPR1 TUPort
+06/25/2017 23:44:01|WISPR: ON
+	|PHASE ONE
+06/25/2017 23:44:01|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 23
+	|Hours: 2Minutes: 16
+	|Time until call: 136 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:44:08
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 25 May 2017 23:44:13
+
+
+ERROR  |ctdlogfile 'c:00000237.ctd'
+ERROR  |CTD_Logger() c:00000237.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/25/2017 23:44:27|WISPR: OFF
+06/25/2017 23:44:28|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 00:08:36|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+C:\>
+###MX Load: CRC E40000 E4FFFF = 6780EC61
+G
+ -->"??" @ E40000 
+success
+
+Application returned: 8
+
+C:\>dir
+
+ Volume in drive C is LARA       
+ Volume Serial Number is B8DF-C0B9
+ Directory of C:\
+
+CTD            <DIR>         09-22-16  3:43p
+LOG            <DIR>         09-22-16  3:43p
+SNT            <DIR>         09-22-16  3:43p
+ACTIVITY.LOG         16,216  05-09-17  2:41a
+AUH.PXE              79,964  11-14-16  5:11p
+DEFAULT.CFG              25  09-28-16  6:09p
+DTX                       0  12-03-16  8:59p
+GAINTEST.PXE         26,094  05-04-17 10:10p
+RAOS.PXE             86,760  10-05-16  5:56p
+SYSTEM.CFG               23  09-30-16  1:35p
+TEST.PXE              7,724  07-05-06  1:05a
+TESTWISP.PXE         26,584  04-29-17 12:04a
+LARA.APP            132,554  06-23-17 12:50p
+00000237.DTX              0  06-25-17 11:44p
+ABC.TXT                   0  06-25-17 11:00p
+00000231.DAT          1,564  06-24-17 12:48a
+00000235.DAT         13,801  06-25-17 10:59p
+00000232.DAT          1,615  06-25-17  7:23p
+00000234.DAT          1,543  06-25-17  8:20p
+12345678.TXT              0  06-25-17 11:43p
+00000233.DAT          1,542  06-25-17  7:36p
+00000237.LOG          4,695  06-26-17 12:08a
+00000237.CTD              0  06-25-17 11:43p
+00000236.DAT          1,510  06-25-17 11:43p
+00000237.PWR              0  06-25-17 11:43p
+
+        22 file(s)         402,214 bytes
+         3 dir(s)    1,023,934,464 bytes free
+
+C:\>del 12*.txt
+1 file(s) erased
+
+C:\>del abc.txt
+1 file(s) erased
+
+C:\>
+###MX Load: CRC E40000 E4FFFF = 1F9DF2FC
+G
+ -->"??" @ E40000 
+success
+
+Application returned: 8
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = A33E826D
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 238
+Program start time: 06/26/2017  00:50:39.850 [ctime: 1498438239]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=7 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 7
+Program Start time: 06/26/2017 00:50:42
+	|FreeDiskSpace 999920kB
+	|WriteFile(c:00000237.dat)
+	|WriteFile: c:00000237.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 237
+Starts:7 of 50
+WriteTime:06/26/2017 00:50:43
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000237.pwr)
+06/26/2017 00:50:43|ADS(c:00000238.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 00:50:44|COMDos() del c:00000237.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 00:50:45|COMDos() del c:00000237.dtx
+1 file(s) erased
+
+	|WriteFile:237 ctd file: c:00000237.ctd
+ERROR  |Return upon no file to append
+06/26/2017 00:50:45|COMDos() copy c:00000237.CTD c:CTD\00000237.CTD
+00000237.CTD
+
+       1 file(s) copied
+
+06/26/2017 00:50:46|COMDos() del c:00000237.CTD
+1 file(s) erased
+
+	|WriteFile: 237 log file: 00000238.log
+	|Append_Files() 00000238.log opened
+	|Append_Files 00000238.log Size: 1151 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 127
+	|AppendFiles: bytes written: 128
+	|AppendFiles() 00000238.log Closed
+06/26/2017 00:50:47|COMDos() copy c:00000237.LOG c:LOG\00000237.LOG
+00000237.LOG
+
+       1 file(s) copied
+
+06/26/2017 00:50:48|COMDos() del c:00000237.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.01V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017005055
+DATETIME=05262017005055
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 00:50:58|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50success
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:02
+
+ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:06
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt open errno: 23ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:11
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:16
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:21
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 00:51:24|CheckCallTime():
+	|Time to check 868 
+hour now 0 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000238.dtx opened
+	|create_dtx_file(): c:00000238.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 00:51:25|WISPR: ON
+	|PHASE ONE
+06/26/2017 00:51:25|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 0
+	|Hours: 1Minutes: 9
+	|Time until call: 69 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:32
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23ERROR  | c:12345678.txt open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 00:51:37
+
+
+ERROR  |ctdlogfile 'c:00000238.ctd'
+ERROR  |CTD_Logger() c:00000238.ctd open errno: 23
+ERROR  |abc.txt append open errno: 23
+ERROR  |abc.txt open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 00:51:51|WISPR: OFF
+06/26/2017 00:51:52|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 00:51:56|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+C:\>
+###MX Load: CRC E40000 E6FFFF = CF8A9CC1
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 239
+Program start time: 06/26/2017  01:01:18.812 [ctime: 1498438878]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=8 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 8
+Program Start time: 06/26/2017 01:01:20
+	|FreeDiskSpace 999888kB
+	|WriteFile(c:00000238.dat)
+	|WriteFile: c:00000238.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 238
+Starts:8 of 50
+WriteTime:06/26/2017 01:01:22
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000238.pwr)
+06/26/2017 01:01:22|ADS(c:00000239.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:01:22|COMDos() del c:00000238.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:01:23|COMDos() del c:00000238.dtx
+1 file(s) erased
+
+	|WriteFile:238 ctd file: c:00000238.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:01:24|COMDos() copy c:00000238.CTD c:CTD\00000238.CTD
+00000238.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:01:25|COMDos() del c:00000238.CTD
+1 file(s) erased
+
+	|WriteFile: 238 log file: 00000239.log
+	|Append_Files() 00000239.log opened
+	|Append_Files 00000239.log Size: 1151 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 127
+	|AppendFiles: bytes written: 128
+	|AppendFiles() 00000239.log Closed
+06/26/2017 01:01:26|COMDos() copy c:00000238.LOG c:LOG\00000238.LOG
+00000238.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:01:27|COMDos() del c:00000238.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.91V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017010134
+DATETIME=05262017010134
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:01:36|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at 2: 0
+value at L: 2
+value at 2: 0
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:01:41
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:01:45
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:01:50
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:01:55
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:02:00
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:02:02|CheckCallTime():
+	|Time to check 868 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000239.dtx opened
+	|create_dtx_file(): c:00000239.dtx closedtestfile: success
+
+	|Open WISPR1 TUPort
+06/26/2017 01:02:04|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:02:04|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 58
+	|Time until call: 58 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:02:11
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:02:16
+
+
+ERROR  |ctdlogfile 'c:00000239.ctd'
+ERROR  |CTD_Logger() c:00000239.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:02:30|WISPR: OFF
+06/26/2017 01:02:31|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:17:01|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 8CAC1897
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 240
+Program start time: 06/26/2017  01:17:45.385 [ctime: 1498439865]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..9..8..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=9 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 9
+Program Start time: 06/26/2017 01:17:48
+	|FreeDiskSpace 999856kB
+
+testfile: success
+----
+
+	|WriteFile(c:00000239.dat)
+	|WriteFile: c:00000239.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 239
+Starts:9 of 50
+WriteTime:06/26/2017 01:17:50
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 166
+	|POWERMonitor(c:00000239.pwr)
+06/26/2017 01:17:50|ADS(c:00000240.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:17:50|COMDos() del c:00000239.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:17:52|COMDos() del c:00000239.dtx
+1 file(s) erased
+
+	|WriteFile:239 ctd file: c:00000239.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:17:52|COMDos() copy c:00000239.CTD c:CTD\00000239.CTD
+00000239.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:17:53|COMDos() del c:00000239.CTD
+1 file(s) erased
+
+	|WriteFile: 239 log file: 00000240.log
+	|Append_Files() 00000240.log opened
+	|Append_Files 00000240.log Size: 1151 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 127
+	|AppendFiles: bytes written: 128
+	|AppendFiles() 00000240.log Closed
+06/26/2017 01:17:54|COMDos() copy c:00000239.LOG c:LOG\00000239.LOG
+00000239.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:17:55|COMDos() del c:00000239.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.93V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017011802
+DATETIME=05262017011802
+S>
+
+testfile: success
+----
+
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:18:04|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:09
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:13
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:18
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:23
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:28
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:18:30|CheckCallTime():
+	|Time to check 868 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000240.dtx opened
+	|create_dtx_file(): c:00000240.dtx closed
+
+testfile: success
+----
+
+	|Open WISPR1 TUPort
+06/26/2017 01:18:32|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:18:32|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 42
+	|Time until call: 42 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:39
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:18:44
+
+
+ERROR  |ctdlogfile 'c:00000240.ctd'
+ERROR  |CTD_Logger() c:00000240.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:18:58|WISPR: OFF
+06/26/2017 01:18:59|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:25:02|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 48CE7C4A
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 241
+Program start time: 06/26/2017  01:25:58.262 [ctime: 1498440358]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..9..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=10 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 10
+Program Start time: 06/26/2017 01:26:00
+	|FreeDiskSpace 999824kB
+	|WriteFile(c:00000240.dat)
+	|WriteFile: c:00000240.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 240
+Starts:10 of 50
+WriteTime:06/26/2017 01:26:02
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000240.pwr)
+06/26/2017 01:26:02|ADS(c:00000241.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:26:02|COMDos() del c:00000240.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:26:03|COMDos() del c:00000240.dtx
+1 file(s) erased
+
+	|WriteFile:240 ctd file: c:00000240.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:26:04|COMDos() copy c:00000240.CTD c:CTD\00000240.CTD
+00000240.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:26:05|COMDos() del c:00000240.CTD
+1 file(s) erased
+
+	|WriteFile: 240 log file: 00000241.log
+	|Append_Files() 00000241.log opened
+	|Append_Files 00000241.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000241.log Closed
+06/26/2017 01:26:06|COMDos() copy c:00000240.LOG c:LOG\00000240.LOG
+00000240.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:26:07|COMDos() del c:00000240.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.99V
+	|Open CTD TUPort
+
+testfile: success
+----
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017012614
+DATETIME=05262017012614
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:26:16|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:21
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:25
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:30
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:35
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:40
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:26:42|CheckCallTime():
+	|Time to check 868 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000241.dtx opened
+	|create_dtx_file(): c:00000241.dtx closed
+
+testfile: success
+----
+
+	|Open WISPR1 TUPort
+06/26/2017 01:26:44|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:26:44|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 34
+	|Time until call: 34 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:51
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:26:56
+
+
+ERROR  |ctdlogfile 'c:00000241.ctd'
+ERROR  |CTD_Logger() c:00000241.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:27:10|WISPR: OFF
+06/26/2017 01:27:11|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:28:30|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = D0948922
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 242
+Program start time: 06/26/2017  01:29:06.234 [ctime: 1498440546]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=11 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 11
+Program Start time: 06/26/2017 01:29:08
+	|FreeDiskSpace 999792kB
+	|WriteFile(c:00000241.dat)
+	|WriteFile: c:00000241.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 241
+Starts:11 of 50
+WriteTime:06/26/2017 01:29:09
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000241.pwr)
+06/26/2017 01:29:10|ADS(c:00000242.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:29:10|COMDos() del c:00000241.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:29:11|COMDos() del c:00000241.dtx
+1 file(s) erased
+
+	|WriteFile:241 ctd file: c:00000241.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:29:12|COMDos() copy c:00000241.CTD c:CTD\00000241.CTD
+00000241.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:29:12|COMDos() del c:00000241.CTD
+1 file(s) erased
+
+	|WriteFile: 241 log file: 00000242.log
+	|Append_Files() 00000242.log opened
+	|Append_Files 00000242.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000242.log Closed
+06/26/2017 01:29:14|COMDos() copy c:00000241.LOG c:LOG\00000241.LOG
+00000241.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:29:14|COMDos() del c:00000241.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.00V
+	|Open CTD TUPort
+
+testfile: success
+----
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017012922
+DATETIME=05262017012922
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:29:24|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+
+testfile: success
+----
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:29:29
+
+
+
+testfile: success
+----
+
+
+testfile: success
+----
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:29:33
+
+
+
+testfile: success
+----
+
+ERROR  |ctdlogfile 'c:00000242.ctd'
+ERROR  |CTD_Logger() c:00000242.ctd open errno: 23
+
+testfile: success
+----
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:29:38
+
+
+
+testfile: success
+----
+
+ERROR  |ctdlogfile 'c:00000242.ctd'
+ERROR  |CTD_Logger() c:00000242.ctd open errno: 23
+
+testfile: success
+----
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:29:43
+
+
+
+testfile: success
+----
+
+ERROR  |ctdlogfile 'c:00000242.ctd'
+ERROR  |CTD_Logger() c:00000242.ctd open errno: 23
+
+testfile: success
+----
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:29:48
+
+
+
+testfile: success
+----
+
+ERROR  |ctdlogfile 'c:00000242.ctd'
+ERROR  |CTD_Logger() c:00000242.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:29:50|CheckCallTime():
+	|Time to check 868 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000242.dtx opened
+	|create_dtx_file(): c:00000242.dtx closed
+
+testfile: success
+----
+
+	|Open WISPR1 TUPort
+06/26/2017 01:29:51|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:29:52|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 31
+	|Time until call: 31 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+	|POWER: 0.807A, 13.99V
+	|POWER: 0.805A, 13.97V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:32:52|WISPR: OFF
+06/26/2017 01:32:53|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:34:48|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 699701DE
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 243
+Program start time: 06/26/2017  01:35:22.380 [ctime: 1498440922]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=12 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 12
+Program Start time: 06/26/2017 01:35:24
+	|FreeDiskSpace 999744kB
+	|WriteFile(c:00000242.dat)
+	|WriteFile: c:00000242.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 242
+Starts:12 of 50
+WriteTime:06/26/2017 01:35:25
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000242.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 01:35:26|ADS(c:00000243.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:35:26|COMDos() del c:00000242.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:35:27|COMDos() del c:00000242.dtx
+1 file(s) erased
+
+	|WriteFile:242 ctd file: c:00000242.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:35:28|COMDos() copy c:00000242.CTD c:CTD\00000242.CTD
+00000242.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:35:28|COMDos() del c:00000242.CTD
+1 file(s) erased
+
+	|WriteFile: 242 log file: 00000243.log
+	|Append_Files() 00000243.log opened
+	|Append_Files 00000243.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000243.log Closed
+06/26/2017 01:35:30|COMDos() copy c:00000242.LOG c:LOG\00000242.LOG
+00000242.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:35:30|COMDos() del c:00000242.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.00V
+	|Open CTD TUPort
+
+testfile: success
+----
+
+1 file(s) erased
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017013538
+DATETIME=05262017013538
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:35:40|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:35:45
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:35:50
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000243.ctd'
+ERROR  |CTD_Logger() c:00000243.ctd open errno: 23
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:35:55
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000243.ctd'
+ERROR  |CTD_Logger() c:00000243.ctd open errno: 23
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:36:00
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000243.ctd'
+ERROR  |CTD_Logger() c:00000243.ctd open errno: 23
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:36:05
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000243.ctd'
+ERROR  |CTD_Logger() c:00000243.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:36:07|CheckCallTime():
+	|Time to check 208 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000243.dtx opened
+	|create_dtx_file(): c:00000243.dtx closed
+
+testfile: success
+----
+
+1 file(s) erased
+
+	|Open WISPR1 TUPort
+06/26/2017 01:36:09|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:36:09|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 24
+	|Time until call: 24 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+
+testfile: success
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:36:16
+
+
+
+testfile: success
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000243.ctd'
+ERROR  |CTD_Logger() c:00000243.ctd open errno: 23
+	|POWER: 0.807A, 13.99V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:37:23|WISPR: OFF
+06/26/2017 01:37:24|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:40:49|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = C563CDF4
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 244
+Program start time: 06/26/2017  01:41:34.299 [ctime: 1498441294]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=13 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 13
+Program Start time: 06/26/2017 01:41:36
+	|FreeDiskSpace 999712kB
+	|WriteFile(c:00000243.dat)
+	|WriteFile: c:00000243.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 243
+Starts:13 of 50
+WriteTime:06/26/2017 01:41:37
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000243.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 01:41:38|ADS(c:00000244.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:41:38|COMDos() del c:00000243.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:41:39|COMDos() del c:00000243.dtx
+1 file(s) erased
+
+	|WriteFile:243 ctd file: c:00000243.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:41:40|COMDos() copy c:00000243.CTD c:CTD\00000243.CTD
+00000243.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:41:40|COMDos() del c:00000243.CTD
+1 file(s) erased
+
+	|WriteFile: 243 log file: 00000244.log
+	|Append_Files() 00000244.log opened
+	|Append_Files 00000244.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000244.log Closed
+06/26/2017 01:41:42|COMDos() copy c:00000243.LOG c:LOG\00000243.LOG
+00000243.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:41:42|COMDos() del c:00000243.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.98V
+	|Open CTD TUPort
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017014150
+DATETIME=05262017014150
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:41:52|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:41:57
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:42:02
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000244.ctd'
+ERROR  |CTD_Logger() c:00000244.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:42:07
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000244.ctd'
+ERROR  |CTD_Logger() c:00000244.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:42:12
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000244.ctd'
+ERROR  |CTD_Logger() c:00000244.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:42:18
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000244.ctd'
+ERROR  |CTD_Logger() c:00000244.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:42:20|CheckCallTime():
+	|Time to check 104 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000244.dtx opened
+	|create_dtx_file(): c:00000244.dtx closed
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|Open WISPR1 TUPort
+06/26/2017 01:42:22|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:42:22|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 18
+	|Time until call: 18 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+	|POWER: 0.806A, 13.99V
+	|POWER: 0.805A, 13.97V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:45:20|WISPR: OFF
+06/26/2017 01:45:21|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:45:24|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 7F74F02E
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 245
+Program start time: 06/26/2017  01:46:10.024 [ctime: 1498441570]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=14 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 14
+Program Start time: 06/26/2017 01:46:11
+	|FreeDiskSpace 999680kB
+	|WriteFile(c:00000244.dat)
+	|WriteFile: c:00000244.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 244
+Starts:14 of 50
+WriteTime:06/26/2017 01:46:13
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000244.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 01:46:14|ADS(c:00000245.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:46:14|COMDos() del c:00000244.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:46:15|COMDos() del c:00000244.dtx
+1 file(s) erased
+
+	|WriteFile:244 ctd file: c:00000244.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:46:16|COMDos() copy c:00000244.CTD c:CTD\00000244.CTD
+00000244.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:46:16|COMDos() del c:00000244.CTD
+1 file(s) erased
+
+	|WriteFile: 244 log file: 00000245.log
+	|Append_Files() 00000245.log opened
+	|Append_Files 00000245.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000245.log Closed
+06/26/2017 01:46:18|COMDos() copy c:00000244.LOG c:LOG\00000244.LOG
+00000244.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:46:18|COMDos() del c:00000244.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.02V
+	|Open CTD TUPort
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017014626
+DATETIME=05262017014626
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:46:28|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:46:33
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:46:38
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000245.ctd'
+ERROR  |CTD_Logger() c:00000245.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:46:43
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000245.ctd'
+ERROR  |CTD_Logger() c:00000245.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:46:49
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000245.ctd'
+ERROR  |CTD_Logger() c:00000245.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:46:54
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000245.ctd'
+ERROR  |CTD_Logger() c:00000245.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:46:56|CheckCallTime():
+	|Time to check 208 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000245.dtx opened
+	|create_dtx_file(): c:00000245.dtx closed
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|Open WISPR1 TUPort
+06/26/2017 01:46:58|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:46:58|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 14
+	|Time until call: 14 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:47:18
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000245.ctd'
+ERROR  |CTD_Logger() c:00000245.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|POWER: 0.807A, 14.00V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:48:11|WISPR: OFF
+06/26/2017 01:48:12|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 01:54:41|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = B430DED4
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 246
+Program start time: 06/26/2017  01:55:13.164 [ctime: 1498442113]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=15 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 15
+Program Start time: 06/26/2017 01:55:15
+	|FreeDiskSpace 999648kB
+	|WriteFile(c:00000245.dat)
+	|WriteFile: c:00000245.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 245
+Starts:15 of 50
+WriteTime:06/26/2017 01:55:16
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000245.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 01:55:17|ADS(c:00000246.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 01:55:17|COMDos() del c:00000245.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 01:55:18|COMDos() del c:00000245.dtx
+1 file(s) erased
+
+	|WriteFile:245 ctd file: c:00000245.ctd
+ERROR  |Return upon no file to append
+06/26/2017 01:55:19|COMDos() copy c:00000245.CTD c:CTD\00000245.CTD
+00000245.CTD
+
+       1 file(s) copied
+
+06/26/2017 01:55:19|COMDos() del c:00000245.CTD
+1 file(s) erased
+
+	|WriteFile: 245 log file: 00000246.log
+	|Append_Files() 00000246.log opened
+	|Append_Files 00000246.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000246.log Closed
+06/26/2017 01:55:21|COMDos() copy c:00000245.LOG c:LOG\00000245.LOG
+00000245.LOG
+
+       1 file(s) copied
+
+06/26/2017 01:55:21|COMDos() del c:00000245.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.98V
+	|Open CTD TUPort
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017015529
+DATETIME=05262017015529
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 01:55:31|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:55:36
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:55:41
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000246.ctd'
+ERROR  |CTD_Logger() c:00000246.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:55:46
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000246.ctd'
+ERROR  |CTD_Logger() c:00000246.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:55:52
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000246.ctd'
+ERROR  |CTD_Logger() c:00000246.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:55:57
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000246.ctd'
+ERROR  |CTD_Logger() c:00000246.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 01:56:00|CheckCallTime():
+	|Time to check 104 
+hour now 1 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000246.dtx opened
+	|create_dtx_file(): c:00000246.dtx closed
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|Open WISPR1 TUPort
+06/26/2017 01:56:01|WISPR: ON
+	|PHASE ONE
+06/26/2017 01:56:01|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 1
+	|Hours: 0Minutes: 4
+	|Time until call: 4 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 01:56:09
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000246.ctd'
+ERROR  |CTD_Logger() c:00000246.ctd open errno: 23
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|POWER: 0.805A, 13.98V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 01:57:14|WISPR: OFF
+06/26/2017 01:57:15|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 02:23:36|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>?
+
+=========  PicoDOS built-in commands  (plus .PXE and .BAT Files)  =========
+APP         run flash app [args...]   ATTRIB      [+ - RASH] [d:][p][name]  
+BACKROM     [d:][path] [/SAVPI]       BAUD        [newrate] [/Q/P/E/O/N/2]  
+BOOT        [PICO][PBM][APP]          CAPTURE     [d:][p]fn [/Dx/B/N/E]     
+CCC         Card Change [delay secs]  CHDIR       [drive:][path]            
+CHKDSK      [d:][p][fn] [/F][/I]      COPY        source dest [/V]          
+DUMP        file[start[,end]]         DATE        [mdy[hms[a|p]]] /IEUMCP]  
+DEL         [drv:][pth][name] [/P]    DIR         [d:][p][fn] [/PWBLV4A:a]  
+ERASE       [drv:][pth][name] [/P]    FDISK       [/Pnn/M/Sdev/@/F/Rnn/Q]   
+FORMAT      [drv:][/V[:label]][/Q/E]  GO          args... | addr /A | /Fn   
+LO          [ofs][;Bx[+]] [;G]        MOUNT       [V:][DEV[-n]][/D/P/N/V/Q] 
+MKDIR       [drive:][path]            MD          display [range]           
+MM          modify [address]          ML          disassemble [range]       
+MR          Memory Read      MR[.bwl] MW          Memory Write     MW[.bwl] 
+MON         Reset to PBM              PATH        [[d:]path[;...]] [/P]     
+PBM         Reset to PBM              PROMPT      [text] [/P]               
+PR          pin read    <1..50>       PC          pin clear   <1..50>       
+PS          pin set     <1..50>       PT          pin toggle  <1..50>       
+PM          pin mirror  <1..50>       TIME        [hh:mm:ss [a|p]] [/M/C]   
+TYPE        [drv:][pth][name]         REN         [d:][p]oldname newname    
+RESET       (hard reset)              RMDIR       [drive:][path]            
+SAVE        file[start][end]          SD          sect.dump[d:][range][/C]  
+SET         [var=[str]] [/SLFE?]      XS          [/X][/C][/Q]file          
+XR          [/X][/C][/Q][file]        YS          [/G][/Q]file[,file...]    
+YR          [/G][/Q]                  VER         Firmware versions [/I]    
+
+C:\>dir
+
+ Volume in drive C is LARA       
+ Volume Serial Number is B8DF-C0B9
+ Directory of C:\
+
+CTD            <DIR>         09-22-16  3:43p
+LOG            <DIR>         09-22-16  3:43p
+SNT            <DIR>         09-22-16  3:43p
+ACTIVITY.LOG         16,216  05-09-17  2:41a
+AUH.PXE              79,964  11-14-16  5:11p
+DEFAULT.CFG              25  09-28-16  6:09p
+DTX                       0  12-03-16  8:59p
+GAINTEST.PXE         26,094  05-04-17 10:10p
+RAOS.PXE             86,760  10-05-16  5:56p
+SYSTEM.CFG               23  09-30-16  1:35p
+TEST.PXE              7,724  07-05-06  1:05a
+TESTWISP.PXE         26,584  04-29-17 12:04a
+LARA.APP            132,554  06-23-17 12:50p
+ABC.TXT                   0  06-26-17 12:51a
+00000246.DTX              0  06-26-17  1:56a
+00000231.DAT          1,564  06-24-17 12:48a
+00000246.LOG          4,073  06-26-17  2:23a
+00000235.DAT         13,801  06-25-17 10:59p
+00000232.DAT          1,615  06-25-17  7:23p
+00000234.DAT          1,543  06-25-17  8:20p
+00000246.CTD              0  06-26-17  1:55a
+00000233.DAT          1,542  06-25-17  7:36p
+00000237.DAT          1,422  06-26-17 12:50a
+00000243.DAT          1,544  06-26-17  1:41a
+00000236.DAT          1,510  06-25-17 11:43p
+00000239.DAT          1,422  06-26-17  1:17a
+00000238.DAT          1,422  06-26-17  1:01a
+00000240.DAT          1,425  06-26-17  1:26a
+00000241.DAT          1,425  06-26-17  1:29a
+00000242.DAT          1,544  06-26-17  1:35a
+00000245.DAT          1,544  06-26-17  1:55a
+00000244.DAT          1,544  06-26-17  1:46a
+00000246.PWR              6  06-26-17  1:57a
+
+        30 file(s)         414,890 bytes
+         3 dir(s)    1,023,623,168 bytes free
+
+C:\>attrib 00000246.ctd
+  A         00000246.CTD
+
+C:\>attrib abc.txt
+  A         ABC.TXT
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 13BA0A0D
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 247
+Program start time: 06/26/2017  02:34:15.212 [ctime: 1498444455]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=16 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 16
+Program Start time: 06/26/2017 02:34:17
+	|FreeDiskSpace 999616kB
+	|WriteFile(c:00000246.dat)
+	|WriteFile: c:00000246.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 246
+Starts:16 of 50
+WriteTime:06/26/2017 02:34:18
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000246.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 02:34:19|ADS(c:00000247.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 02:34:19|COMDos() del c:00000246.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 02:34:20|COMDos() del c:00000246.dtx
+1 file(s) erased
+
+	|WriteFile:246 ctd file: c:00000246.ctd
+ERROR  |Return upon no file to append
+06/26/2017 02:34:21|COMDos() copy c:00000246.CTD c:CTD\00000246.CTD
+00000246.CTD
+
+       1 file(s) copied
+
+06/26/2017 02:34:21|COMDos() del c:00000246.CTD
+1 file(s) erased
+
+	|WriteFile: 246 log file: 00000247.log
+	|Append_Files() 00000247.log opened
+	|Append_Files 00000247.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000247.log Closed
+06/26/2017 02:34:23|COMDos() copy c:00000246.LOG c:LOG\00000246.LOG
+00000246.LOG
+
+       1 file(s) copied
+
+06/26/2017 02:34:23|COMDos() del c:00000246.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 14.01V
+	|Open CTD TUPort
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017023431
+DATETIME=05262017023431
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 02:34:33|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:34:38
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:1
+----
+
+1 file(s) erased
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:34:43
+
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:-1 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000247.ctd' fd -1
+ERROR  |CTD_Logger() c:00000247.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:34:48
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000247.ctd' fd -1
+ERROR  |CTD_Logger() c:00000247.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:34:53
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000247.ctd' fd -1
+ERROR  |CTD_Logger() c:00000247.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:34:58
+
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+ERROR  |ctdlogfile 'c:00000247.ctd' fd -1
+ERROR  |CTD_Logger() c:00000247.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 02:35:01|CheckCallTime():
+	|Time to check 104 
+hour now 2 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000247.dtx opened
+	|create_dtx_file(): c:00000247.dtx closed
+
+testfile: success| c:12345678.txt err:23 fd:2
+----
+
+1 file(s) erased
+
+	|Open WISPR1 TUPort
+06/26/2017 02:35:02|WISPR: ON
+	|PHASE ONE
+06/26/2017 02:35:02|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 2
+	|Hours: 23Minutes: 25
+	|Time until call: 1405 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+	|POWER: 0.797A, 13.95V
+	|POWER: 0.801A, 13.95V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 02:38:01|WISPR: OFF
+06/26/2017 02:38:02|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 02:50:11|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 14AAD4B2
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 248
+Program start time: 06/26/2017  02:50:43.377 [ctime: 1498445443]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=17 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 17
+Program Start time: 06/26/2017 02:50:45
+	|FreeDiskSpace 999584kB
+	|WriteFile(c:00000247.dat)
+	|WriteFile: c:00000247.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 247
+Starts:17 of 50
+WriteTime:06/26/2017 02:50:46
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000247.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 02:50:47|ADS(c:00000248.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 02:50:47|COMDos() del c:00000247.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 02:50:48|COMDos() del c:00000247.dtx
+1 file(s) erased
+
+	|WriteFile:247 ctd file: c:00000247.ctd
+ERROR  |Return upon no file to append
+06/26/2017 02:50:49|COMDos() copy c:00000247.CTD c:CTD\00000247.CTD
+00000247.CTD
+
+       1 file(s) copied
+
+06/26/2017 02:50:49|COMDos() del c:00000247.CTD
+1 file(s) erased
+
+	|WriteFile: 247 log file: 00000248.log
+	|Append_Files() 00000248.log opened
+	|Append_Files 00000248.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000248.log Closed
+06/26/2017 02:50:51|COMDos() copy c:00000247.LOG c:LOG\00000247.LOG
+00000247.LOG
+
+       1 file(s) copied
+
+06/26/2017 02:50:51|COMDos() del c:00000247.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.91V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017025059
+DATETIME=05262017025059
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 02:51:01|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:06
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:10
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:15
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:20
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:25
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 02:51:27|CheckCallTime():
+	|Time to check 208 
+hour now 2 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000248.dtx opened
+	|create_dtx_file(): c:00000248.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 02:51:29|WISPR: ON
+	|PHASE ONE
+06/26/2017 02:51:29|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 2
+	|Hours: 23Minutes: 9
+	|Time until call: 1389 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:36
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:51:41
+
+
+ERROR  |CTD_Logger() c:00000248.ctd test errno: 23
+ERROR  |ctdlogfile 'c:00000248.ctd' fd -1
+ERROR  |CTD_Logger() c:00000248.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 02:51:55|WISPR: OFF
+06/26/2017 02:51:56|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 02:51:59|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 2458C310
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 249
+Program start time: 06/26/2017  02:56:16.856 [ctime: 1498445776]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=18 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 18
+Program Start time: 06/26/2017 02:56:18
+	|FreeDiskSpace 999568kB
+	|WriteFile(c:00000248.dat)
+	|WriteFile: c:00000248.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 248
+Starts:18 of 50
+WriteTime:06/26/2017 02:56:20
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000248.pwr)
+06/26/2017 02:56:20|ADS(c:00000249.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 02:56:20|COMDos() del c:00000248.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 02:56:21|COMDos() del c:00000248.dtx
+1 file(s) erased
+
+	|WriteFile:248 ctd file: c:00000248.ctd
+ERROR  |Return upon no file to append
+06/26/2017 02:56:22|COMDos() copy c:00000248.CTD c:CTD\00000248.CTD
+00000248.CTD
+
+       1 file(s) copied
+
+06/26/2017 02:56:23|COMDos() del c:00000248.CTD
+1 file(s) erased
+
+	|WriteFile: 248 log file: 00000249.log
+	|Append_Files() 00000249.log opened
+	|Append_Files 00000249.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000249.log Closed
+06/26/2017 02:56:24|COMDos() copy c:00000248.LOG c:LOG\00000248.LOG
+00000248.LOG
+
+       1 file(s) copied
+
+06/26/2017 02:56:25|COMDos() del c:00000248.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.99V
+	|Open CTD TUPort
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017025632
+DATETIME=05262017025632
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 02:56:34|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:56:39
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:56:43
+
+
+ERROR  |CTD_CreateFile() errno: 23
+ERROR  |ctdlogfile 'c:00000249.ctd' fd -1
+ERROR  |CTD_Logger() c:00000249.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:56:48
+
+
+ERROR  |CTD_CreateFile() errno: 23
+ERROR  |ctdlogfile 'c:00000249.ctd' fd -1
+ERROR  |CTD_Logger() c:00000249.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:56:53
+
+
+ERROR  |CTD_CreateFile() errno: 23
+ERROR  |ctdlogfile 'c:00000249.ctd' fd -1
+ERROR  |CTD_Logger() c:00000249.ctd open errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:56:59
+
+
+ERROR  |CTD_CreateFile() errno: 23
+ERROR  |ctdlogfile 'c:00000249.ctd' fd -1
+ERROR  |CTD_Logger() c:00000249.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 02:57:01|CheckCallTime():
+	|Time to check 868 
+hour now 2 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000249.dtx opened
+	|create_dtx_file(): c:00000249.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 02:57:02|WISPR: ON
+	|PHASE ONE
+06/26/2017 02:57:02|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 2
+	|Hours: 23Minutes: 3
+	|Time until call: 1383 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 02:57:09
+
+
+ERROR  |CTD_CreateFile() errno: 23
+ERROR  |ctdlogfile 'c:00000249.ctd' fd -1
+ERROR  |CTD_Logger() c:00000249.ctd open errno: 23
+	|POWER: 0.806A, 13.99V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 02:58:17|WISPR: OFF
+06/26/2017 02:58:18|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 03:12:05|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 185DD484
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 250
+Program start time: 06/26/2017  03:13:40.762 [ctime: 1498446820]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=19 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 19
+Program Start time: 06/26/2017 03:13:42
+	|FreeDiskSpace 999520kB
+	|WriteFile(c:00000249.dat)
+	|WriteFile: c:00000249.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 249
+Starts:19 of 50
+WriteTime:06/26/2017 03:13:44
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000249.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 03:13:44|ADS(c:00000250.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 03:13:44|COMDos() del c:00000249.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 03:13:46|COMDos() del c:00000249.dtx
+1 file(s) erased
+
+	|WriteFile:249 ctd file: c:00000249.ctd
+ERROR  |Return upon no file to append
+06/26/2017 03:13:46|COMDos() copy c:00000249.CTD c:CTD\00000249.CTD
+00000249.CTD
+
+       1 file(s) copied
+
+06/26/2017 03:13:47|COMDos() del c:00000249.CTD
+1 file(s) erased
+
+	|WriteFile: 249 log file: 00000250.log
+	|Append_Files() 00000250.log opened
+	|Append_Files 00000250.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000250.log Closed
+06/26/2017 03:13:48|COMDos() copy c:00000249.LOG c:LOG\00000249.LOG
+00000249.LOG
+
+       1 file(s) copied
+
+06/26/2017 03:13:49|COMDos() del c:00000249.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.93V
+ .. setup ctd
+	|Open CTD TUPorti
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017031357
+DATETIME=05262017031357
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 03:13:59|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+ . CTD_AverageDepth
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:04
+
+
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:08
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:13
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:18
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:23
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 03:14:25|CheckCallTime():
+	|Time to check 104 
+hour now 3 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000250.dtx opened
+	|create_dtx_file(): c:00000250.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 03:14:26|WISPR: ON
+	|PHASE ONE
+06/26/2017 03:14:26|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 3
+	|Hours: 22Minutes: 46
+	|Time until call: 1366 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+ . CTD_AverageDepth
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:34
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:14:39
+
+
+ERROR  |ctdlogfile 'c:00000250.ctd' fd -1
+ERROR  |CTD_Logger() c:00000250.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 03:14:52|WISPR: OFF
+06/26/2017 03:14:53|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 03:29:22|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 0C29A8B9
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 251
+Program start time: 06/26/2017  03:30:08.121 [ctime: 1498447808]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=20 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 20
+Program Start time: 06/26/2017 03:30:10
+	|FreeDiskSpace 999504kB
+	|WriteFile(c:00000250.dat)
+	|WriteFile: c:00000250.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 250
+Starts:20 of 50
+WriteTime:06/26/2017 03:30:11
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000250.pwr)
+06/26/2017 03:30:11|ADS(c:00000251.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 03:30:12|COMDos() del c:00000250.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 03:30:13|COMDos() del c:00000250.dtx
+1 file(s) erased
+
+	|WriteFile:250 ctd file: c:00000250.ctd
+ERROR  |Return upon no file to append
+06/26/2017 03:30:13|COMDos() copy c:00000250.CTD c:CTD\00000250.CTD
+00000250.CTD
+
+       1 file(s) copied
+
+06/26/2017 03:30:14|COMDos() del c:00000250.CTD
+1 file(s) erased
+
+	|WriteFile: 250 log file: 00000251.log
+	|Append_Files() 00000251.log opened
+	|Append_Files 00000251.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000251.log Closed
+06/26/2017 03:30:15|COMDos() copy c:00000250.LOG c:LOG\00000250.LOG
+00000250.LOG
+
+       1 file(s) copied
+
+06/26/2017 03:30:16|COMDos() del c:00000250.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.92V
+ .. setup ctd
+	|Open CTD TUPorti
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017033024
+DATETIME=05262017033024
+S>
+No # found: i
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017033032
+DATETIME=05262017033032
+S>
+No # found: i
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017033042
+DATETIME=05262017033042
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 03:30:45|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at 2: 0
+value at L: 2
+value at 2: 0
+value at M: 1
+value at I: 30
+value at S: 50
+ . CTD_AverageDepth
+ . CTD_Sample
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:30:47
+
+
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:30:51
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:30:55
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:30:59
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:31:03
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 03:31:04|CheckCallTime():
+	|Time to check 868 
+hour now 3 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000251.dtx opened
+	|create_dtx_file(): c:00000251.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 03:31:06|WISPR: ON
+	|PHASE ONE
+06/26/2017 03:31:06|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 3
+	|Hours: 22Minutes: 29
+	|Time until call: 1349 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:31:07
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23Incoming Char: 1
+ . CTD_AverageDepth
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:31:15
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:31:20
+
+
+ERROR  |ctdlogfile 'c:00000251.ctd' fd -1
+ERROR  |CTD_Logger() c:00000251.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 03:31:33|WISPR: OFF
+06/26/2017 03:31:34|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+###MX Load: CRC E40000 E6FFFF = 3CDB0B22
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 252
+Program start time: 06/26/2017  03:35:59.312 [ctime: 1498448159]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=21 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 21
+Program Start time: 06/26/2017 03:36:01
+	|FreeDiskSpace 999472kB
+	|WriteFile(c:00000251.dat)
+	|WriteFile: c:00000251.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 251
+Starts:21 of 50
+WriteTime:06/26/2017 03:36:02
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000251.pwr)
+06/26/2017 03:36:03|ADS(c:00000252.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 03:36:03|COMDos() del c:00000251.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 03:36:04|COMDos() del c:00000251.dtx
+1 file(s) erased
+
+	|WriteFile:251 ctd file: c:00000251.ctd
+ERROR  |Return upon no file to append
+06/26/2017 03:36:05|COMDos() copy c:00000251.CTD c:CTD\00000251.CTD
+00000251.CTD
+
+       1 file(s) copied
+
+06/26/2017 03:36:05|COMDos() del c:00000251.CTD
+1 file(s) erased
+
+	|WriteFile: 251 log file: 00000252.log
+	|Append_Files() 00000252.log opened
+	|Append_Files 00000252.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000252.log Closed
+06/26/2017 03:36:07|COMDos() copy c:00000251.LOG c:LOG\00000251.LOG
+00000251.LOG
+
+       1 file(s) copied
+
+06/26/2017 03:36:07|COMDos() del c:00000251.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.99V
+ .. setup ctd
+	|Open CTD TUPorti
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017033615
+DATETIME=05262017033615
+S>
+ . CTD_Sample
+ . CTD_Sample
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 03:36:18|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at 2: 0
+value at L: 2
+value at 2: 0
+value at M: 1
+value at I: 30
+value at S: 50
+ . CTD_AverageDepth
+ . CTD_Sample
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:36:19
+
+S>Syncmode=y
+QS
+x
+x
+S>
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+No # found: x
+i
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017033628
+DATETIME=05262017033628
+S>
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:36:33
+
+
+ERROR  |ctdlogfile 'c:00000252.ctd' fd -1
+ERROR  |CTD_Logger() c:00000252.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:36:38
+
+
+ERROR  |ctdlogfile 'c:00000252.ctd' fd -1
+ERROR  |CTD_Logger() c:00000252.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:36:43
+
+
+ERROR  |ctdlogfile 'c:00000252.ctd' fd -1
+ERROR  |CTD_Logger() c:00000252.ctd open errno: 23
+ . CTD_Sample
+ERROR  |CTD_CreateFile() errno: 23
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 03:36:48
+
+
+ERROR  |ctdlogfile 'c:00000252.ctd' fd -1
+ERROR  |CTD_Logger() c:00000252.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 03:36:51|CheckCallTime():
+	|Time to check 868 
+hour now 3 vs call hour 2
+	|CheckTime(Less than an hour until call... call now)
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000252.dtx opened
+	|create_dtx_file(): c:00000252.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 03:36:52|WISPR: ON
+	|PHASE ONE
+06/26/2017 03:36:52|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 3
+	|Hours: 22Minutes: 24
+	|Time until call: 1344 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+ . CTD_AverageDepth
+ . CTD_Sample
+	|POWER: 0.807A, 13.99V
+ . CTD_Sample
+	|POWER: 0.805A, 13.97V
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 03:39:45|WISPR: OFF
+06/26/2017 03:39:46|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E6FFFF = 7D10E2F5
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 25 2017 16:13:21
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 253
+Program start time: 06/26/2017  04:02:46.397 [ctime: 1498449766]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=22 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 22
+Program Start time: 06/26/2017 04:02:48
+	|FreeDiskSpace 999424kB
+	|WriteFile(c:00000252.dat)
+	|WriteFile: c:00000252.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 252
+Starts:22 of 50
+WriteTime:06/26/2017 04:02:49
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000252.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 04:02:50|ADS(c:00000253.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 04:02:50|COMDos() del c:00000252.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 04:02:51|COMDos() del c:00000252.dtx
+1 file(s) erased
+
+	|WriteFile:252 ctd file: c:00000252.ctd
+ERROR  |Return upon no file to append
+06/26/2017 04:02:52|COMDos() copy c:00000252.CTD c:CTD\00000252.CTD
+00000252.CTD
+
+       1 file(s) copied
+
+06/26/2017 04:02:52|COMDos() del c:00000252.CTD
+1 file(s) erased
+
+	|WriteFile: 252 log file: 00000253.log
+	|Append_Files() 00000253.log opened
+	|Append_Files 00000253.log Size: 1185 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 161
+	|AppendFiles: bytes written: 162
+	|AppendFiles() 00000253.log Closed
+06/26/2017 04:02:54|COMDos() copy c:00000252.LOG c:LOG\00000252.LOG
+00000252.LOG
+
+       1 file(s) copied
+
+06/26/2017 04:02:54|COMDos() del c:00000252.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.88V
+ .. setup ctd
+	|Open CTD TUPorti
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017040302
+DATETIME=05262017040302
+S>
+ . CTD_Sample
+ . CTD_Sample
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 04:03:05|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:06
+
+S>Syncmode=y
+QS
+x
+x
+S>
+ . CTD_Sample
+. CTD_Data()
+x
+
+ERROR|CTD_Data(): No prompt found, reset ctdi
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017040316
+DATETIME=05262017040316
+S>
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:21
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:26
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:31
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:36
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 04:03:37|CheckCallTime():
+	|Time to check 208 
+hour now 4 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000253.dtx opened
+	|create_dtx_file(): c:00000253.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 04:03:39|WISPR: ON
+	|PHASE ONE
+06/26/2017 04:03:39|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 4
+	|Hours: 21Minutes: 57
+	|Time until call: 1317 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18Incoming Char: 1
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:46
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 04:03:51
+
+
+ERROR  |ctdlogfile 'c:00000253.ctd' fd -1
+ERROR  |CTD_Logger() c:00000253.ctd open errno: 23
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 04:04:05|WISPR: OFF
+06/26/2017 04:04:06|SleepUntilWoken()
+Low-power sleep mode until keyboard input is received...
+06/26/2017 15:56:43|Aquisition ended!
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>
+###MX Load: CRC E40000 E4FFFF = 5D301FBA
+G
+ -->"??" @ E40000 
+success
+ERROR  | c:12345678.txt open errno: 23
+Application returned: 38
+
+C:\>
+C:\>
+###MX Load: CRC E40000 E6FFFF = 695E6CD6
+G
+ -->"??" @ E40000 
+
+----------------------------------------------------------------
+Program: MPC.c,  Version: 3.30,  Build: Jun 26 2017 09:03:44
+System Parameters: CF2 SN 14918, PicoDOS 4.03, BIOS 4.03
+16000kHz nsF:90 nsR:70 nsC:190 adj:-10 WF:0  WR:0  WC:2  SYPCR:13
+	|Starting FileNumber: 254
+Program start time: 06/26/2017  17:05:50.693 [ctime: 1498496750]
+
+The program will start in five seconds unless an operator keys in a
+period '.' character. If a period is received, you have about
+### seconds to respond to access other software functions on this
+system before a watchdog reset occurs.
+
+You have 10 seconds to launch
+10..
+Starting...
+PROGNAME=RAOS (vee)
+PROJID=QUEH (vee)
+PLTFRMID=RA01 (vee)
+LONGITUDE=125:00.00W (vee)
+LATITUDE=45:00.00N (vee)
+STARTUPS=23 (vee)
+STARTMAX=50 (vee)
+DETINT=30 (vee)
+DATAXINT=30 (vee)
+MINVOLT=11.5 (vee)
+BATCAP=12000.0 (vee)
+BATLOG=0 (vee)
+CTD.UPLOAD=1 (vee)
+DETMAX=10 (vee)
+WISPRGAIN=0 (vee)
+DETECTNUM=0 (vee)
+DUTYCYCLE=100 (vee)
+WISPRNUM=1 (vee)
+MAXUPL=30000 (vee)
+NIGK.DELAY=4 (def)
+NIGK.ANTLEN=14 (def)
+NIGK.TDEPTH=10 (def)
+NIGK.RRATE=15 (def)
+NIGK.FRATE=9 (def)
+NIGK.PROFILES=27 (vee)
+NIGK.RECOVERY=0 (vee)
+
+Program: RAOS  Project ID: QUEH   Platform ID: RA01  Boot ups: 23
+Program Start time: 06/26/2017 17:05:52
+	|FreeDiskSpace 999408kB
+	|WriteFile(c:00000253.dat)
+	|WriteFile: c:00000253.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 253
+Starts:23 of 50
+WriteTime:06/26/2017 17:05:53
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 167
+	|POWERMonitor(c:00000253.pwr)
+06/26/2017 17:05:54|ADS(c:00000254.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 17:05:54|COMDos() del c:00000253.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 17:05:55|COMDos() del c:00000253.dtx
+1 file(s) erased
+
+	|WriteFile:253 ctd file: c:00000253.ctd
+ERROR  |Return upon no file to append
+06/26/2017 17:05:56|COMDos() copy c:00000253.CTD c:CTD\00000253.CTD
+00000253.CTD
+
+       1 file(s) copied
+
+06/26/2017 17:05:56|COMDos() del c:00000253.CTD
+1 file(s) erased
+
+	|WriteFile: 253 log file: 00000254.log
+	|Append_Files() 00000254.log opened
+	|Append_Files 00000254.log Size: 1153 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 129
+	|AppendFiles: bytes written: 130
+	|AppendFiles() 00000254.log Closed
+06/26/2017 17:05:58|COMDos() copy c:00000253.LOG c:LOG\00000253.LOG
+00000253.LOG
+
+       1 file(s) copied
+
+06/26/2017 17:05:59|COMDos() del c:00000253.LOG
+1 file(s) erased
+
+	|Check Startup Voltage: 13.94V
+ .. setup ctd
+	|Open CTD TUPorti
+. CTD_Start_Up
+Prompt from CTDsuccessful startup
+CTD_DateTime(): 05262017170606
+DATETIME=05262017170606
+S>
+Last Irid call mode: 1
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 17:06:08|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:06:13
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:06:18
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:06:22
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:06:27
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:06:32
+
+
+Bytes Written: 45
+DepthChange: 0.000000 over 4 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|At depth and no velocity. Phase 1 && BuoyMode 0
+06/26/2017 17:06:34|CheckCallTime():
+	|Time to check 868 
+hour now 17 vs call hour 2
+LARA: 0010
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:0
+AVG.VEL: 0.00
+CTDSAMPLES:5
+
+	|create_dtx_file() c:00000254.dtx opened
+	|create_dtx_file(): c:00000254.dtx closed
+	|Open WISPR1 TUPort
+06/26/2017 17:06:36|WISPR: ON
+	|PHASE ONE
+06/26/2017 17:06:36|Check_Timers()
+MPC.DETINT: 30
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 31.32 minutes
+	|Detection Int: 18
+	|CallTime: 2, Hour Now; 17
+	|Hours: 8Minutes: 54
+	|Time until call: 534 minutes
+	|WISPR Duty Cycle: 100%
+	|DutyCycleTicks: 18
+	|POWER: 0.751A, 13.94VIncoming Char: p
+	|CHANGE OF PHASE #? Phase: 2
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:08:50
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:08:55
+
+
+Bytes Written: 45
+DepthChange: 0.000000 over 1 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+	|PHASE TWO: Target Depth:10
+	|Open NIGK Winch TUPort
+LARA: 0020
+MOORDEPTH:30.00
+CURRENTDEPTH:30.00
+TOPDEPTH: 0.00
+TARGETDPETH:10
+AVG.VEL: 0.00
+CTDSAMPLES:7
+
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:07
+
+
+Bytes Written: 44
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:12
+
+
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:16
+
+
+Bytes Written: 45
+DepthChange: 0.000000 over 2 samples
+	|Profiling Buoy Stationary at 30.00 at  0.00m/sample
+06/26/2017 17:09:19|Winch_Ascend():
+ . CTD_Sample
+06/26/2017 17:09:19|WaitForWinch(): ExpectedBuoyMode: 1
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 30.000000, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:22
+
+
+Bytes Written: 45
+	|Response: R,00,00
+ . CTD_Sample
+06/26/2017 17:09:31|Received Expected BuoyMode
+	|POWER: 0.802A, 13.97V
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 26.684977, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:33
+
+
+	|CTD_VertVel: No previous recent measurements, reinitialize
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 25.040394, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:38
+
+, -0.33 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 23.416498, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:43
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 21.787431, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:48
+
+, -0.33 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 20.163534, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:53
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 18.539638, 0.010000, 0.010000, 0.060000, 26 May 2017 17:09:58
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 16.915742, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:03
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 15.291847, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:08
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 13.667951, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:12
+
+, -0.41 m/s
+Bytes Written: 46
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 12.044054, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:17
+
+, -0.32 m/s
+Bytes Written: 46
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 10.420158, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:22
+
+, -0.32 m/s
+Bytes Written: 46
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 8.801434, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:27
+
+, -0.32 m/s
+Bytes Written: 45
+ . CTD_Sample
+	|REACHED TARGETDPETH!
+06/26/2017 17:10:30|Winch_Stop():
+06/26/2017 17:10:30|WaitForWinch(): ExpectedBuoyMode: 0
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 7.162023, 0.010000, 0.010000, 0.060000, 26 May 2017 17:10:32
+
+, -0.33 m/s
+Bytes Written: 45
+	|Response: S,00,00
+06/26/2017 17:10:41|Received Expected BuoyMode
+SummedVel: -3.99, samples: 12
+	|CTD_CalculatedVelocity(): -0.33
+	|Rate of Ascent: -19.30Meters/Minute
+	|Calculated Cable Payout:  -0.2Meters
+	|Time for Ascent: 71
+LARA: 0120
+MOORDEPTH:30.00
+CURRENTDEPTH: 7.16
+TOPDEPTH: 7.16
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:24
+
+	|Close NIGK Winch TUPort
+	|File Number: 00000254
+	|WriteFile(c:00000254.dat)
+	|WriteFile: c:00000254.dat Opened
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 254
+Starts:24 of 50
+WriteTime:06/26/2017 17:10:43
+Seconds:290
+Detection Interval: 30
+Data Inteval: 30
+
+BytesWritten: 169
+	|Winch_Monitor():
+
+BytesWritten: 120
+LARA: 0130
+MOORDEPTH:30.00
+CURRENTDEPTH: 7.16
+TOPDEPTH: 7.16
+TARGETDPETH:10
+AVG.VEL:-0.33
+CTDSAMPLES:24
+
+BytesWritten: 105
+	|POWER: 0.802A, 13.97V
+	|POWERMonitor(c:00000254.pwr)
+	|PowerMonitor: ADSFile Closed
+
+06/26/2017 17:10:44|ADS(c:00000255.pwr)
+	|Writing every 104.4Seconds
+06/26/2017 17:10:44|COMDos() del c:00000254.PWR
+1 file(s) erased
+
+	|WISPRWriteFile()
+
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 17:10:45|COMDos() del c:00000254.dtx
+1 file(s) erased
+
+	|WriteFile:254 ctd file: c:00000254.ctd
+	|Append_Files() c:00000254.ctd opened
+	|Append_Files c:00000254.ctd Size: 1082 Bytes
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 256
+	|AppendFiles: bytes written: 256
+	|AppendFiles: bytes read: 58
+	|AppendFiles: bytes written: 59
+	|AppendFiles() c:00000254.ctd Closed
+06/26/2017 17:10:47|COMDos() copy c:00000254.CTD c:CTD\00000254.CTD
+00000254.CTD
+
+       1 file(s) copied
+
+06/26/2017 17:10:47|COMDos() del c:00000254.CTD
+1 file(s) erased
+
+06/26/2017 17:10:48|COMDos() copy c:00000254.LOG c:LOG\00000254.LOG
+00000254.LOG
+
+       1 file(s) copied
+
+06/26/2017 17:10:48|COMDos() del c:00000254.LOG
+1 file(s) erased
+
+	|PHASE THREE
+	|Close CTD TUPort
+	|WISPRDFP(1)
+	|WISPRDFP(1)
+	|WISPRExit()
+	|WISPRExit(): Forcing Off
+06/26/2017 17:11:01|WISPR: OFF
+	|Close WISPR1 TUPort
+06/26/2017 17:11:03|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.791A, 13.88V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/26/2017 17:12:53|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/26/2017 17:12:53|Found OK
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+x
+S>
+ERROR|CTD_Data(): got <|> want #, set sync mode
+ . CTD_Sample
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 6.489710, 0.010000, 0.010000, 0.060000, 26 May 2017 17:13:12
+
+
+Bytes Written: 45
+DepthChange: 0.000000 over 0 samples
+	|Profiling Buoy Stationary at  6.49 at   nanm/sample
+	|Ascend for 10 seconds, 1.489710meters
+06/26/2017 17:13:14|Winch_Ascend():
+06/26/2017 17:13:14|WaitForWinch(): ExpectedBuoyMode: 1
+	|Response: R,00,00
+ . CTD_Sample
+06/26/2017 17:13:26|Received Expected BuoyMode
+06/26/2017 17:13:36|Winch_Stop():
+06/26/2017 17:13:36|WaitForWinch(): ExpectedBuoyMode: 0
+. CTD_Data()
+
+
+# 20.100000, 0.010000, 3.195373, 0.010000, 0.010000, 0.060000, 26 May 2017 17:13:28
+
+, -0.02 m/s
+Bytes Written: 45
+	|Response: S,00,00
+06/26/2017 17:13:48|Received Expected BuoyMode
+	|AscentTime: 22865
+	|Close CTD TUPort
+	|Close NIGK Winch TUPort
+06/26/2017 17:13:48|Warming up GPS/IRID Unit for 27 Sec
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|POWER: 0.799A, 13.94V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+06/26/2017 17:15:38|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+Got 10 bytes
+GetIRIDInput: AT*P
+
+
+OK
+
+
+06/26/2017 17:15:38|Found OK
+	|ParseStartupParams():DEFAULT.CFG
+	|ParseStartupParams() opened
+	|Bytes Read: 25
+	|ParseStartupParams() closed
+06/26/2017 17:15:41|ParseStartupParam(H12L2M1I30S50)
+value at H: 12
+value at L: 2
+value at M: 1
+value at I: 30
+value at S: 50
+06/26/2017 17:15:42|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.790A, 13.86V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+	|SendString(AT+PD)
+Grabbing 82 bytes
+	|first string: 
+	|Sat num: 0
+
+----------------------------------------------------------------
+  Persistor CF21M   SN 14918    PicoDOS V4.03r1      PBM V4.03 
+  (C) 1998-2007 Persistor Instruments Inc. - www.persistor.com
+----------------------------------------------------------------
+
+C:\>

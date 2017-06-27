@@ -725,6 +725,7 @@ void StopPWRCmd() {
   static char filename[] = "c:00000000.dat";
   ulong timenow;
   int filehandle;
+  DBG2(flogf("\n . StopPWRCmd()"); )
   Time(&timenow);
   sprintf(&filename[2], "diagnost.log");
   timenow = timenow - ADSStartTime; //-timedifference from gps;
@@ -732,6 +733,7 @@ void StopPWRCmd() {
   cdrain();
   coflush();
   filehandle = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+  // error checking ??
   Power_Monitor(timenow, filehandle, 0);
   close(filehandle);
 }

@@ -160,9 +160,11 @@ void main() {
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
   // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(1024, sizeof(char));
+  WriteBuffer = (char *)calloc(BUFFSZ, sizeof(char));
+  memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
   // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(1024, sizeof(char));
+  returnstr = (char *)calloc(BUFFSZ, sizeof(char));
+  memset(returnstr, 0, BUFFSZ * sizeof(char));
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -1291,7 +1293,7 @@ ulong WriteFile(ulong TotalSeconds) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     RTCDelayMicroSeconds(50000L);
-    memset(WriteBuffer, 0, 1024 * sizeof(char));
+    memset(WriteBuffer, 0, BUFFSZ * sizeof(char));
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());

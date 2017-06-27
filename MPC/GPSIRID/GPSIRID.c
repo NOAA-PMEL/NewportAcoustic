@@ -1764,8 +1764,8 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   if (len == 0)
     return 0;
 
-  DBG(flogf("\nGot %ld bytes", lenreturn); RTCDelayMicroSeconds(25000L);
-      cdrain(); coflush();)
+  DBG(flogf("\nGot %ld bytes '%s'", lenreturn, inputstring); 
+      RTCDelayMicroSeconds(25000L); cdrain(); coflush();)
 
   TickleSWSR(); // another reprieve
 

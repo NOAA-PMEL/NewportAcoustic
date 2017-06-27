@@ -165,7 +165,7 @@ bool CTD_GetPrompt() {
   short count = 0;
   short LastByteInQ;
 
-  memset(stringin, 0, 1024 * sizeof(char));
+  memset(stringin, 0, BUFFSZ * sizeof(char));
 
   LastByteInQ = TURxPeekByte(CTDPort, (tgetq(CTDPort) - 1));
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
@@ -178,7 +178,7 @@ bool CTD_GetPrompt() {
   }
 
   if (count == 2) {
-    TURxGetBlock(CTDPort, stringin, 1024 * sizeof(uchar), 1000);
+    TURxGetBlock(CTDPort, stringin, BUFFSZ * sizeof(uchar), 1000);
     if (strstr(stringin, "S>") != NULL) {
       cprintf("\nPrompt from CTDBlock");
       TURxFlush(CTDPort);
@@ -403,9 +403,9 @@ bool CTD_Data() {
 
   DBG2( flogf("\n. CTD_Data()"); )
 
-  memset(stringin, 0, 1024 * sizeof(char));
+  memset(stringin, 0, BUFFSZ * sizeof(char));
   // loop until 3 timeouts; should this be loop until \n ?
-  while (count < 3 && i < 1024) {
+  while (count < 3 && i < BUFFSZ) {
     charin = TURxGetByteWithTimeout(CTDPort, 250);
     if (charin == -1)
       count++;
@@ -512,7 +512,7 @@ bool CTD_Data() {
 
 
   // Log WriteString
-  memset(stringout, 0, 1024 * sizeof(char));
+  memset(stringout, 0, BUFFSZ * sizeof(char));
   sprintf(stringout, "#%.4f,", temp);
   strcat(stringout, split_pres);
   LARA.DEPTH = atof(strtok(split_pres, ","));
@@ -589,8 +589,8 @@ void OpenTUPort_CTD(bool on) {
     RTCDelayMicroSeconds(20000L);
     if (CTDPort == 0)
       flogf("\nBad TU Channel: CTDPort...");
-    stringout = (char *)calloc(1024, sizeof(char));
-    stringin = (char *)calloc(1024, sizeof(char));
+    stringout = (char *)calloc(BUFFSZ, sizeof(char));
+    stringin = (char *)calloc(BUFFSZ, sizeof(char));
   }
   if (!on) {
 
