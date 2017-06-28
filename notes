@@ -1,138 +1,54 @@
+alex: winch blast of nulls
+alex: power .8A
+alex: batt cap current, new
+
+when ctd times out, bizarro depth numbers
+
 power: 0.804A, whassup with this?
 write ctd data
 create_dtx_file() c:00000208.dtx opened
 should cf2 be setting date on ctd?
 1680x1050 weird.
 
-ctd: input must be cr\r terminated, w/o lf\n
 ctd: output is crlf, doubled on pulse
-ctd: power off doesn't take ctd out of sleep mode. ctd never turns off.
+ctd: power off doesn't take ctd out of sleep mode. ctd never turns off. batt?
 ctd: batt fail mode - reset bench config?
-ctd: ! remove \n in output to ctd
+x ctd: input must be cr\r terminated, w/o lf\n
+x ctd: ! remove \n in output to ctd
 
-what is line terminator to/from winch in winch.c?
+x what is line terminator to/from winch in winch.c?
 
 what are all the appendfiles / moves at startupt
 
-MPC.PROGNAME=RAOS
-MPC.PROJID=QUEH
-MPC.PLTFRMID=RA01
-MPC.LONG=125:00.00W
-MPC.LAT=45:00.00N
-MPC.LOCATION=Location
-MPC.MINVOLT=11.5
-IRID.ANTSWT=0
-IRID.PHONE=0088160000519
-IRID.WARMUP=27
-IRID.MAXUPL=30000
-IRID.REST=30
-IRID.MAXCALLS=4
-IRID.MINSIGQ=3
-AMDM.MAXUPL=4000
-AMDM.OFFSET=6
-AMDM.BLKSIZE=1000
-BT.ON=1
-IRID.OFFSET=1
-MPC.BATLOG=1
-MPC.BATCAP= -92.44
-WISP.NUM=1
-WISP.DETMAX=10
-WISP.DETNUM=0
-WISP.GAIN=0
-WISP.DUTYCYCL=100
-IRID.CALLMODE=1
-MPC.DETINT=30
-MPC.STARTMAX=50
-IRID.CALLHOUR=2
-ADS.MINVOLT=11.5
-ADS.BATCAP=12000.0
-ADS.BATLOG=0
-CTD.UPLOAD=1
-MPC.DATAXINT=30
-STARTUPS=1
-SYS.QPBC=32
-NIGK.RECOVERY=1
-NIGK.PROFILES=25
-MPC.FILENUM=00000228
-MPC.STARTUPS=24
+== .pwr file fail
+Power_Monitor() was returning failed after file open
+==
+06/26/2017 17:15:42|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.790A, 13.86V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
 
-C:\>dir
+== ctd reset
+06/26/2017 17:12:53|Found OK
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+x
+S>
+ERROR|CTD_Data(): got <|> want #, set sync mode
+ . CTD_Sample
+. CTD_Data()
 
- Volume in drive C has no label
- Volume Serial Number is 358B-3EB7
- Directory of C:\
+== append errs at start
+        |WISPRWriteFile()
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 17:10:45|COMDos() del c:00000254.dtx
+1 file(s) erased
 
-DEFAULT.CFG              25  09-28-16  6:09p
-SYSTEM.CFG               23  09-30-16  1:35p
-00000012.CTD             80  09-30-16  2:22p
-00000013.LOG         27,043  09-30-16  3:10p
-SNT            <DIR>         09-22-16  3:43p
-CTD            <DIR>         09-22-16  3:43p
-LOG            <DIR>         09-22-16  3:43p
-TESTWISP.PXE         26,584  04-29-17 12:04a
-00000013.DTX              0  09-30-16  3:09p
-00000013.CTD            197  09-30-16  3:10p
-GAINTEST.PXE         26,094  05-04-17 10:10p
-00000013.PWR            186  09-30-16  3:10p
-LARA.APP            132,274  06-21-17 10:29p
-00000025.CTD              0  11-01-00 11:51a
-00000209.LOG         54,654  06-23-17 12:12a
-00000208.DAT         28,309  06-22-17 11:52p
-00000198.DAT          3,636  06-20-17 10:44p
-RAOS.PXE             86,760  10-05-16  5:56p
-00000209.PWR             54  06-23-17 12:08a
-00000200.DAT          1,543  06-21-17 11:36p
-00000209.CTD              0  06-22-17 11:52p
-00000025.PWR              0  11-01-00 11:51a
-00000203.DAT          1,422  06-22-17  7:19p
-00000025.LOG          2,349  11-01-00 11:51a
-00000199.DAT          1,543  06-21-17 10:29p
-00000201.DAT          1,542  06-21-17 11:52p
-00000202.DAT          1,543  06-22-17  7:16p
-00000209.DTX              0  06-23-17 12:01a
-00000204.DAT          1,422  06-22-17  7:21p
-00000206.DAT          1,542  06-22-17  8:35p
-00000205.DAT          1,543  06-22-17  8:10p
-00000207.DAT          1,544  06-22-17  8:51p
-LARA.AP1            132,276  06-23-17 12:40a
-00000222.DTX              0  06-23-17  7:12p
-00000211.LOG          2,968  06-23-17 12:59a
-00000211.CTD              0  06-23-17 12:54a
-00000210.DAT          1,563  06-23-17 12:54a
-00000211.PWR             18  06-23-17 12:59a
-00000218.DAT          4,012  06-23-17  4:52p
-00000228.DTX              0  06-24-17 12:00a
-00000212.DAT          1,563  06-23-17  1:06a
-00000214.DAT          1,425  06-23-17  1:23a
-00000228.LOG         72,635  06-24-17 12:07a
-00000213.DAT          1,425  06-23-17  1:13a
-00000220.DAT          1,546  06-23-17  6:51p
-00000216.DAT          2,252  06-23-17  4:26p
-00000215.DAT          2,028  06-23-17  1:35a
-00000217.DAT          2,265  06-23-17  4:32p
-00000222.LOG          4,951  06-23-17  7:21p
-AUH.PXE              79,964  11-14-16  5:11p
-00000222.CTD              0  06-23-17  7:03p
-00000219.DAT          1,546  06-23-17  5:55p
-00000221.DAT          1,831  06-23-17  7:03p
-00000000.DTX              0  12-03-16  8:58p
-00000227.DAT         28,543  06-24-17 12:00a
-00000222.PWR             60  06-23-17  7:20p
-00000223.DAT          1,563  06-23-17  8:22p
-00000225.DAT          1,544  06-23-17  8:48p
-00000228.CTD              0  06-23-17 11:59p
-ACTIVITY.LOG         16,216  05-09-17  2:41a
-00000000.PWR              6  12-03-16  8:58p
-00000001.PWR              0  12-03-16  8:59p
-00000226.DAT          1,544  06-23-17  8:53p
-DTX                       0  12-03-16  8:59p
-TEST.PXE              7,724  07-05-06  1:05a
-00000224.DAT          1,544  06-23-17  8:34p
-00000228.PWR             24  06-24-17 12:06a
-00000191.LOG          3,175  03-13-17 10:49a
-00000191.CTD            229  03-13-17 10:49a
-00000191.PWR              0  03-13-17 10:48a
-
-        67 file(s)         778,352 bytes
-         3 dir(s)    1,015,529,472 bytes free
 

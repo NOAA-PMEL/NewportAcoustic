@@ -220,6 +220,7 @@ short SwitchAntenna(char *r) {
 
   short pinstatus;
 
+  DBG( flogf("\n . antenna switch to %s", r); )
   if (strncmp(r, "GPS", 3) == 0x00) {
     flogf("\n%s|SwitchAntenna() GPS ANTENNA ON", Time(NULL));
     cdrain();
