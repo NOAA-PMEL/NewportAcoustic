@@ -152,6 +152,12 @@ def motorThread():
         sleep(.1)
         # up
         if motorRunState=='up':
+            # surfaced?
+            if slack():
+                motor('off')
+                # no amod delay here, sleep(amodDelay) is in serThread
+                ser.log( "buoy surfaced" )
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
             # simple linear
             cable += (time() - motorLastTime) * .331
             if slack(): # surfaced?
@@ -161,6 +167,11 @@ def motorThread():
                 amodPut("#S,%s,00%s" % (buoyID, ser.eol))
         # down
         if motorRunState=='down':
+            if docked():
+                motor('off')
+                # no amod delay here, sleep(amodDelay) is in serThread
+                ser.log( "buoy docked" )
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
             # simple linear
             cable -= (time() - motorLastTime) * .2
             if docked():
