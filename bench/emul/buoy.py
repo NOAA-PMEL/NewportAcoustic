@@ -20,12 +20,13 @@ baudrate = 9600
 
 def info():
     "globals which may be externally set"
-    print "sleepMode=%s" % sleepMode
-    print "syncMode=%s" % syncMode
+    print "(go:%s)   syncMode=%s   sleepMode=%s" % \
+        (go.isSet(), sleepMode, syncMode)
 
 def init():
     "set globals to defaults"
     global ser, go, sleepMode, syncMode
+    ser = None
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     sleepMode = syncMode = False
     timeoff = 0

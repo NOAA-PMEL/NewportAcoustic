@@ -21,9 +21,8 @@ amodDelay = 5.5
 def info():
     global mooring, cable, motorRunState
     "globals which may be externally set"
-    print "cable=%.2f \t\t mooring=%d \t\t(depth()=%.2f)" % \
-        (cable, mooring, depth())
-    print "motor('%s') \t\t('up|off|down')" % motorRunState
+    print "(go:%s)   motor('%s')   cable=%.2f   mooring=%d   (depth():%.2f)" % \
+        (go.isSet(), motorRunState, cable, mooring, depth())
 
 def init():
     "set global vars to defaults"
@@ -34,6 +33,7 @@ def init():
     motorRunState = 'off' 
     go = Event()
     motorOn = Event()
+    ser = None
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
 
 def start():
@@ -138,7 +138,7 @@ def motor(state):
         return ser.log( "motor(up|off|down), not '%s'" % state )
     #
     motorRunState = state
-    ser.log( "motor %s with cable at %s depth %s" % (state,cable,depth()) )
+    ser.log( "motor %s with cable at %.2f depth %.2f" % (state,cable,depth()) )
     if motorRunState=='off': motorOn.clear()
     else: motorOn.set()
 
@@ -146,9 +146,8 @@ def motorThread():
     "when motor is on: update cable, check dock and slack"
     global ser, go, cable, motorRunState, motorOn
     # motor could be on when emulation starts
-    while True:
+    while go.isSet(): 
         motorOn.wait()
-        if not go.isSet(): return
         motorLastTime = time()
         sleep(.1)
         # up
@@ -161,6 +160,11 @@ def motorThread():
                 amodPut("#S,%s,00%s" % (buoyID, ser.eol))
             # simple linear
             cable += (time() - motorLastTime) * .331
+            if slack(): # surfaced?
+                motor('off')
+                ser.log( "line slack, buoy surfaced" )
+                # no amod delay here, sleep(amodDelay) is in serThread
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
         # down
         if motorRunState=='down':
             if docked():
@@ -170,25 +174,29 @@ def motorThread():
                 amodPut("#S,%s,00%s" % (buoyID, ser.eol))
             # simple linear
             cable -= (time() - motorLastTime) * .2
+            if docked():
+                motor('off')
+                cable=0
+                ser.log( "buoy docked" )
+                # no amod delay here, sleep(amodDelay) is in serThread
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
 
 def slack():
     "determine if the cable is slack"
-    global mooring, cable
-    # TBD
     return depth()<.1
 
 def docked():
     "are we docked?"
     global cable
-    if cable<=0:
-        cable=0
-        return 1
+    return cable<.1
 
 def depth():
     "mooring - cable, mod by current"
     global mooring, cable
     # TBD
-    return mooring-cable
+    d = mooring-cable
+    if d<0: return 0
+    else: return d
 
 #def modGlobals(**kwargs):
 #    "change defaults from command line"
