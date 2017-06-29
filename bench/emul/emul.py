@@ -49,9 +49,9 @@ def stop():
     winch.stop()
 
 
-
-if __name__=='__main__': init(); start()
-else: print "init(); start(); stop()   or buoy.start(); winch.start()"
+init()
+if __name__=='__main__': start()
+else: print "start() stop() init() buoy.info() winch.start() winch.cable=15"
 
 
 # Notes:
