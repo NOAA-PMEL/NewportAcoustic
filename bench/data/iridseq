@@ -1,0 +1,7 @@
+AT+PD 6 sats
+AT+PT sane time
+AT+PL stable lat
+AT+CPIN="1111" ok
+AT+CPAS +CPAS:000
+AT+CLCC +CLCC:006
+AT+CSQ +CSQ:5
