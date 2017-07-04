@@ -22,17 +22,17 @@
     case 'f': WISPRDFP();
     case 'w': ChangeWISPR(c);
     case 'p': LARA.PHASE = c;
-    case '1': LARA.ON = false;
+    case 'x': LARA.ON = false;
     case '2': LARA.DATA = LARA.DATA ? false : true;
   LARA.PHASE case 2: case 4:
     case 'w': WinchConsole();
     case 'p': LARA.PHASE = c;
     case 't': CTD_Sample();
-    case '1': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
     case 'a': PrintSystemStatus();
     case 's': LARA.SURFACED = true;
   LARA.PHASE case 3:
-    case '1': LARA.ON = false; // exit from GPSIRID
+    case 'x': LARA.ON = false; // exit from GPSIRID
     case 'p': LARA.PHASE = c;
 **
 
@@ -174,9 +174,8 @@ void main() {
   if (WISP.DUTYCYCL == 100)
     WISPRPower(true);
 
-  // Main Loop. Always running unless interrupted by User input of '1' followed
-  // by 'y'. Or, if We have reached a full shutdown: below absolute minimum
-  // voltage.
+  // Main Loop. Always running unless interrupted by User input of 'x' 
+  // if We have reached a full shutdown: below absolute minimum voltage.
   while (LARA.ON) {
 
     switch (LARA.PHASE) {
@@ -1015,7 +1014,7 @@ void Console(char in) {
       LARA.PHASE = c;
       break;
 
-    case '1':
+    case 'x':
       // LARA.ON = false;
       // LARA.DATA = LARA.DATA ? false : true;
       shutdown();
@@ -1044,7 +1043,7 @@ void Console(char in) {
       flogf("\n\t|Take CTD Sample");
       CTD_Sample();
       break;
-    case '1':
+    case 'x':
       // LARA.ON = false;
       // LARA.DATA = LARA.DATA ? false : true;
       shutdown();
@@ -1062,7 +1061,7 @@ void Console(char in) {
 
   case 3:
     switch (in) {
-    case '1':
+    case 'x':
       // LARA.ON = false; // exit from GPSIRID
       shutdown();
       break;

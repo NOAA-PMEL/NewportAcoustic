@@ -2027,7 +2027,7 @@ void ConsoleIrid() {
   if (!cgetq()) return;
   while (cgetq()) {c = cgetc();}
   switch (c) {
-  case '1': shutdown();
+  case 'x': shutdown();
     break;
   }
 }
