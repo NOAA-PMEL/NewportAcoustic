@@ -57,6 +57,7 @@ of commands
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
 
+
 IridiumParameters IRID;
 extern SystemParameters MPC;
 
@@ -81,6 +82,7 @@ static int IRIDFileHandle;
 static short IRIDStatus;
 static char IRIDFilename[sizeof "c:00000000.dat"];
 
+void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
 short Connect_SendFile_RecCmd(const char *, bool);
 bool InitModem(int);
@@ -109,6 +111,7 @@ short SwitchAntenna(char *);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
+DBG( void ConsoleIrid(); ) // check console for interrupt, redirect 
 
 // IRIDUM TUPORT Setup
 TUPort *IRIDGPSPort;
@@ -1744,6 +1747,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   long len;
   long lenreturn;
 
+  DBG(ConsoleIrid();)  // check if console is asking to stop
   memset(inputstring, 0, 128);
   memset(first, 0, 40);
 
@@ -1894,6 +1898,8 @@ char *GetGPSInput(char *chars, int *numsats) {
   long len;
   long lenreturn;
 
+  DBG(ConsoleIrid();)  // check if console is asking to stop
+
   memset(inputstring, 0, 128);
   memset(first, 0, 128);
 
@@ -2009,3 +2015,20 @@ void StatusCheck() {
   RTCDelayMicroSeconds(25000L);
 
 } //____ StatusCheck() ____//
+
+/***
+ * ConsoleIrid()
+ * check for console input during IRID modem use
+ */
+DBG(
+void ConsoleIrid() {
+  // flush pending, look at most recent char
+  char c=0;
+  if (!cgetq()) return;
+  while (cgetq()) {c = cgetc();}
+  switch (c) {
+  case '1': shutdown();
+    break;
+  }
+}
+)

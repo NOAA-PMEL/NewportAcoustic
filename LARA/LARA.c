@@ -128,6 +128,7 @@ IEV_C_PROTO(ExtFinishPulseRuptHandler);
 // Define unused pins here
 uchar mirrorpins[] = {15, 16, 17, 18, 19, 26, 36, 0};
 
+void shutdown();
 void InitializeLARA(ulong *);
 
 void PhaseOne();
@@ -214,19 +215,27 @@ void main() {
       PhaseFour();
       break;
     }
-  }
+  } // while lara.on
+
+  free(WriteBuffer);
+  free(returnstr);
+  shutdown();
+} //____ Main() ____/
+
+/***
+ * shutdown
+ */
+void shutdown() {
   WISPRSafeShutdown();
 
   PIOClear(23); // Make sure Iridium is Off
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
-  free(WriteBuffer);
-  free(returnstr);
 
   SleepUntilWoken();
   BIOSReset();
+}
 
-} //____ Main() ____/
 /*********************************************************************************\
 ** InitializeAUH
 \*********************************************************************************/
@@ -843,7 +852,7 @@ void PhaseFour() {
 
 } //____ Phase_Four() ____//
 /****************************************************************************\
-** void Incoming_Data()
+** int Incoming_Data()
 \****************************************************************************/
 int Incoming_Data() {
   bool incoming = true;
@@ -960,7 +969,8 @@ int Incoming_Data() {
 ** Platform Specific Console Communication
 \************************************************************************************************************************/
 void Console(char in) {
-
+  // are there side effects from any subroutines?
+  // shutdown from here
   short c;
 
   DBG(flogf("Incoming Char: %c", in);)
@@ -1006,8 +1016,9 @@ void Console(char in) {
       break;
 
     case '1':
-      LARA.ON = false;
+      // LARA.ON = false;
       // LARA.DATA = LARA.DATA ? false : true;
+      shutdown();
       break;
     case '2':
       LARA.DATA = LARA.DATA ? false : true;
@@ -1034,8 +1045,9 @@ void Console(char in) {
       CTD_Sample();
       break;
     case '1':
-      LARA.ON = false;
-      LARA.DATA = LARA.DATA ? false : true;
+      // LARA.ON = false;
+      // LARA.DATA = LARA.DATA ? false : true;
+      shutdown();
       break;
     case 'a':
     case 'A':
@@ -1051,7 +1063,8 @@ void Console(char in) {
   case 3:
     switch (in) {
     case '1':
-      LARA.ON = false; // exit from GPSIRID
+      // LARA.ON = false; // exit from GPSIRID
+      shutdown();
       break;
     case 'P':
     case 'p':
@@ -1063,7 +1076,7 @@ void Console(char in) {
     break;
   }
 
-  PutInSleepMode = true;
+  // ?? PutInSleepMode = true;
   return;
 }
 /******************************************************************************\
