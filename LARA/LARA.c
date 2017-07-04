@@ -616,54 +616,41 @@ void PhaseThree() {
     DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
     result = IRIDGPS(); 
 
-    if (result >= 1 || attempts > 2) {
+  	if (NIGK.RECOVERY) {
+  		if (MPC.DATAXINT != 30) {
+  			MPC.DATAXINT = 30;
+  			VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
+  		} //dataxint
+  		LARA.PHASE = 1;
+  		break;
+  	} // recovery
+    if (GlobalRestart) { 
+      // Added 9.28.2016 after first deployment Lake W.
+      ParseStartupParams(true); 
+    } 
+
+		// attempts>2 ?? irrelevant in the logic flow. where set?
+		// attempts++ and checked in result==-1
+    if (result >= 1 || attempts > 4) 
       // IRIDIUM Successful success/fake/real/3rd, next phase
       LARA.PHASE = 4;
-      if (result == 1 || result == 2) { 
-        // Upload Success / Fake Commands
-        IridiumCalls++;
-        flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
-        if (IridiumCalls > 3) {
-          // calls > 3 implies ?? 
-          // Load default parameters in "default.cfg" file
-          ParseStartupParams(true); 
-          // checked here because ??
-          if (NIGK.RECOVERY) {
-            // set ??
-            if (MPC.DATAXINT != 30) {
-              // 
-              MPC.DATAXINT = 30;
-              VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-            } //dataxint
-            LARA.PHASE = 1;
-            break;
-          } // recovery
-        } // calls>3
-        if (GlobalRestart) { 
-          // Added 9.28.2016 after first deployment Lake W.
-          ParseStartupParams(true); 
-        } // restart
-      } // Upload Success / Fake Commands
-      else if (result == 3) { 
-        // Real Commands
-        ParseStartupParams(false);
-        IridiumCalls = 0;
-        flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
-        if (NIGK.RECOVERY) {
-          if (MPC.DATAXINT != 30) {
-            MPC.DATAXINT = 30;
-            VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-          } // dataxint
-          LARA.PHASE = 1;
-          break;
-        } // recovery
-      } // Real Commands
-      else if (GlobalRestart) {
-        // Added 9.28.2016 after first deployment Lake W.
+    if (result == 1 || result == 2) { 
+      // Upload Success / Fake Commands
+      IridiumCalls++;
+      flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
+      if (IridiumCalls > 3) {
+        // calls > 3 implies ?? 
+        // Load default parameters in "default.cfg" file
         ParseStartupParams(true); 
-      } // restart
-
-    } // IRIDIUM Successful success/fake/real/3rd, next phase
+        // checked here because ??
+      } // calls>3
+    } // Upload Success / Fake Commands
+    else if (result == 3) { 
+      // Real Commands
+      ParseStartupParams(false);
+      IridiumCalls = 0;
+      flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
+    } // Real Commands
     else if (result == -1) {
       // Bad GPS- GPS fails usually from bad reception.
       flogf("\n\t|PhaseThree(); Failed GPS attempt: %d", attempts);
@@ -686,6 +673,7 @@ void PhaseThree() {
         secs = 10;
       flogf("\n\t|Ascend for %d seconds, %fmeters", secs, depth);
 
+      // ?? are we trying to go up?
       if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
         LARA.TDEPTH = NIGK_MIN_DEPTH;
         attempts = 5;
@@ -695,7 +683,8 @@ void PhaseThree() {
       WaitForWinch(1);
 
       // Count++ every 1/10th of a second.
-      while (LARA.DEPTH > LARA.TDEPTH) {
+      while (LARA.DEPTH > LARA.TDEPTH) { // who changes these??
+        // reading ctd?
         Incoming_Data();
         RTCDelayMicroSeconds(100000L);
         count++;
@@ -891,7 +880,6 @@ int Incoming_Data() {
         WISPR_Data();
       } else if (tgetq(CTDPort)) {
         CTD_Data();
-
       }
       // Console Wake up.
       else if (cgetq()) {
@@ -909,8 +897,8 @@ int Incoming_Data() {
   case 4:
 
     while (incoming) {
+      // ?? does adcheck need to run between each incoming? how often?
       AD_Check();
-
       if (tgetq(PAMPort)) {
         // DBG(flogf("WISPR Incoming");)
         WISPR_Data();

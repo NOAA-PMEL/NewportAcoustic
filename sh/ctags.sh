@@ -1,7 +1,8 @@
 #!/bin/bash
 # make lara tags file
+dir=$(dirname $0)
 if [ $# -eq 0 ]; then
-  Files="$(cat ~/NewportAcoustic/sh/filelist.lara)"
+  Files="$(cat $dir/filelist.lara)"
 else
   Files="$*"
 fi
