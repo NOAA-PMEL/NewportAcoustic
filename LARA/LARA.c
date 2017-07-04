@@ -614,8 +614,7 @@ void PhaseThree() {
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
     DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
-    result = IRIDGPS(GlobalRestart); 
-    // GlobalRestart set in InitializeLARA if mpc.startups>0
+    result = IRIDGPS(); 
 
     if (result >= 1 || attempts > 2) {
       // IRIDIUM Successful success/fake/real/3rd, next phase

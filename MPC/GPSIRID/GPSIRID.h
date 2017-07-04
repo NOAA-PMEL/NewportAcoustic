@@ -11,6 +11,7 @@ typedef struct {
   short REST;     // Rest period for Iridium to call again
   short CALLHOUR; // Hour at which to call
   short CALLMODE; // 0==call on Dataxinterval, 1== call at set hour everyday.
+  bool LOWFIRST;  // send file with lowest value first
 } IridiumParameters;
 
 /*******************
@@ -21,12 +22,8 @@ typedef struct {
    return: 	-1 on failed GPS
                         -2 on failed IRID
                         1 on successful IRID && GPS
-        Param1: 	Boolean, true if recent reboot. In which case we send
-   the most recent WriteFile for which a reboot was caused.
-                                                        false, we send the
-   oldest, non-uploaded writefile.
    */
-short IRIDGPS(bool recentReboot);
+short IRIDGPS();
 
 /* GetIRIDIUMSettings:
    if #define IRIDIUM then grab necessary VEEPROM Parameters for IRIDIUM use.

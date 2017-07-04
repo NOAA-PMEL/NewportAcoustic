@@ -84,13 +84,13 @@ static char IRIDFilename[sizeof "c:00000000.dat"];
 
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
-short Connect_SendFile_RecCmd(const char *, bool);
+short Connect_SendFile_RecCmd(const char *);
 bool InitModem(int);
 bool CheckSignal(void);
 short CallStatus(void);
 short PhoneStatus(void);
 short PhonePin(void);
-short UploadFiles(bool);
+short UploadFiles();
 
 short SignalQuality(short *signal_quality);
 bool Call_Land(void);
@@ -134,7 +134,7 @@ sleep before
 //   Block size should be 1024 or 2048
 //   Cyclic Redundancy Check, CRC-CCITT(0x1D0F)
 *********************************************************************************/
-short IRIDGPS(bool reboot) {
+short IRIDGPS() {
 
   short TX_Result;
 
@@ -143,7 +143,7 @@ short IRIDGPS(bool reboot) {
     return -1;
   }
 
-  TX_Result = UploadFiles(reboot);
+  TX_Result = UploadFiles();
   if (TX_Result >= 1) {
     flogf("\n\t|IRIDGPS SUccess");
     OpenTUPort_IRIDGPS(false);
@@ -160,7 +160,7 @@ short IRIDGPS(bool reboot) {
 /*********************************************************************************\
 ** UploadFiles();
 \*********************************************************************************/
-short UploadFiles(bool reboot) {
+short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
@@ -185,7 +185,7 @@ short UploadFiles(bool reboot) {
   // if(fnum==0) flogf("\n\t|Highest filenum is zero");
   sprintf(&fname[2], "%08ld.dat", MPC.FILENUM);
 
-  TX_Result = Connect_SendFile_RecCmd(fname, reboot);
+  TX_Result = Connect_SendFile_RecCmd(fname);
 
   return TX_Result;
 
@@ -284,7 +284,7 @@ it,
 ** Can upload up to ComMax (=10) files per connection
 **
 \******************************************************************************/
-short Connect_SendFile_RecCmd(const char *filename, bool reboot) {
+short Connect_SendFile_RecCmd(const char *filename) {
 
   short icall = 0;
   short CmdType = 0;
@@ -350,7 +350,7 @@ short Connect_SendFile_RecCmd(const char *filename, bool reboot) {
         strncpy(currentfile, filename + 2, 8);
         filenumber = atol(currentfile);
         DOS_Com("move", filenumber, "DAT", "SNT");
-        filename = GetFileName(!reboot, false, NULL, "DAT");
+        filename = GetFileName(IRID.LOWFIRST, false, NULL, "DAT");
         if (filename == NULL)
           FileExist = false;
 

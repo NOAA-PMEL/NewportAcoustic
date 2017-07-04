@@ -130,6 +130,10 @@ typedef struct // Used to access runtime settings
 #define CALLMODE_DEFAULT "0"
 #define CALLMODE_DESC "Induce call from Call Hour or Data Transfer Interval\n"
 
+#define LOWFIRST_NAME "IRID.LOWFIRST"
+#define LOWFIRST_DEFAULT "0"
+#define LOWFIRST_DESC "Send file name with lowest # in the name first\n"
+
 // WISPR VEEPROM SETTINGS
 #define DETECTIONNUM_NAME "WISP.DETNUM" //-n
 #define DETECTIONNUM_DEFAULT "0"
