@@ -616,23 +616,23 @@ void PhaseThree() {
     DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
     result = IRIDGPS(); 
 
-  	if (NIGK.RECOVERY) {
-  		if (MPC.DATAXINT != 30) {
-  			MPC.DATAXINT = 30;
-  			VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-  		} //dataxint
-  		LARA.PHASE = 1;
-  		break;
-  	} // recovery
+    if (NIGK.RECOVERY) {
+      if (MPC.DATAXINT != 30) {
+        MPC.DATAXINT = 30;
+        VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
+      } //dataxint
+      LARA.PHASE = 1;
+      break;
+    } // recovery
     if (GlobalRestart) { 
       // Added 9.28.2016 after first deployment Lake W.
       ParseStartupParams(true); 
     } 
 
-		// attempts>2 ?? irrelevant in the logic flow. where set?
-		// attempts++ and checked in result==-1
+    // attempts>2 ?? irrelevant in the logic flow. where set?
+    // attempts++ and checked in result==-1
     if (result >= 1 || attempts > 4) 
-      // IRIDIUM Successful success/fake/real/3rd, next phase
+      // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
     if (result == 1 || result == 2) { 
       // Upload Success / Fake Commands
@@ -1270,8 +1270,8 @@ ulong WriteFile(ulong TotalSeconds) {
 
   if (filehandle <= 0) {
     flogf("\nERROR  |WriteFile(): open error: errno: %d", errno);
-    if (errno != 0)
-      return -1;
+    // ?? if (errno != 0)
+    return -1;
   }
   DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
 

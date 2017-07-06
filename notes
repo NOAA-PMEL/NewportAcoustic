@@ -69,3 +69,20 @@ ERROR  |Return upon no file to append
 	|Open CTD TUPort
 Bad TU Channel: CTDPort...
 =======
+
+
+what is this about?
+Updates from ADS.c version 2.0
+   -Working to make file open more efficient.
+   -Received many errno=0 when fopen return NULL. No idea why. waiting to hear
+back from JG 12.2.2015
+ grep errno * | grep 0
+ADS.c:   -Received many errno=0 when fopen return NULL. No idea why. waiting to hear
+ADS.c:    if (errno != 0)
+LARA.c:    if (errno != 0)
+MPC.c:    if (errno != 0)
+MPC.c:    if (errno != 0)
+WISPR.c:      if (errno != 0)
+
+
+

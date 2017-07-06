@@ -206,8 +206,8 @@ short WISPR_Data() {
 
     if (WISPRFile <= 0) {
       flogf("\nERROR|WISPR_Data() open errno: %d", errno);
-      if (errno != 0)
-        return -3;
+      // ?? if (errno != 0)
+      return -3;
     }
 
     if ((int)returndouble < dtxrqst)
