@@ -107,7 +107,7 @@ short GetIRIDInput(char *, short, uchar *, int *, short wait);
 char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
-short SwitchAntenna(char *);
+short SwitchAntenna(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
@@ -175,7 +175,7 @@ short UploadFiles() {
   antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
 
   if (antsw == 1)
-    SwitchAntenna("IRID");
+    SwitchAntenna('I');
   else
     PinMirror(1);
 
@@ -204,7 +204,7 @@ bool PowerOn_GPS() {
 
   // First get the GPS
   if (antsw == 1)
-    SwitchAntenna("GPS");
+    SwitchAntenna('G');
   else
     PinMirror(1);
 
@@ -215,43 +215,32 @@ bool PowerOn_GPS() {
     return false;
 }
 /**********************************************************************************\
-** SwitchAntenna
-** Switch antenna between Iridium and GPS.  ROAS has dedicated antenna for each,
-** therefore this function is not necessary.
+ * SwitchAntenna
+ * Switch antenna module between SBE39 TD, Iridium and GPS.  
+ * send ^b to connect SB39.Type 'ts' to get the T-D from SB39plus.
+ * send ^f to connect GPS. Antenna SW is GPS side.
+ * send ^d to connect Iridium/GPS. Antenna to IRID side.
+ * send ^e to exit.
 \**********************************************************************************/
-short SwitchAntenna(char *r) {
-
-  short pinstatus;
-
-  if (strncmp(r, "GPS", 3) == 0x00) {
-    flogf("\n%s|SwitchAntenna() GPS ANTENNA ON", Time(NULL));
-    cdrain();
-    coflush();
-    RTCDelayMicroSeconds(10000L);
-    pinstatus = PIOClear(ANTSWPIN);
-    while (pinstatus != 0)
-      pinstatus = PIOClear(ANTSWPIN);
-
-    RTCDelayMicroSeconds(1500000L); // wait 1.5 sec to settle swtich noise
-    return 1;
+short SwitchAntenna(char r) {
+  ushort code;
+  switch(r) {
+    case 'G': code=0x06;
+    case 'I': code=0x04;
+    case 'S': code=0x02;
+    default: { // bad case
+      flogf("\nError SwitchAntenna(%c): bad choice", r);
+      return -1;
+    }
   }
+  DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
 
-  if (strncmp(r, "IRID", 3) == 0x00) {
-    flogf("\n%s|SwitchAntenna() IRIDIUM ANTENNA ON", Time(NULL));
-    cdrain();
-    coflush();
-    RTCDelayMicroSeconds(10000L);
-    pinstatus = PIOSet(ANTSWPIN);
-    while (pinstatus != 1)
-      pinstatus = PIOSet(ANTSWPIN);
-
-    RTCDelayMicroSeconds(1500000L);
-    return 0;
-  }
-
-  return -1;
-
+  TUTxFlush(IRIDGPSPort);
+  TURxFlush(IRIDGPSPort);
+  TUTxPutByte(IRIDGPSPort, code, true);  // block, wait for send
+  RTCDelayMicroSeconds(1500000L); // wait 1.5 sec to settle antenna switch noise
 } //____ SwitchAntenna ____//
+
 /******************************************************************************\
 ** Connect_SendFile_RecCmd
 ** 1) Switch antenna to IRID
@@ -966,7 +955,7 @@ void SendString(const char *StringIn) {
   DBG(flogf("\n\t|SendString(%s)", StringIn); putflush(); CIOdrain();)
   TUTxPrintf(IRIDGPSPort, "%s\r", StringIn);
   TUTxWaitCompletion(IRIDGPSPort);
-  RTCDelayMicroSeconds(20000L);
+  // ?? RTCDelayMicroSeconds(20000L);
 
 } //_____ SendString() _____//
 /******************************************************************************\
