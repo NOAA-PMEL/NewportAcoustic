@@ -9,12 +9,12 @@ from threading import Thread, Event
 # buffOut = ''
 #motorRunState = off, down, up
 #cable = 0
-#mooring = 30
+#mooring = 20
 
 # amodRate measured about 6.5 sec 
 name = 'winch'
 eol = '\n'
-port = '/dev/ttyS9'
+port = '/dev/ttyS6'
 baudrate = 4800
 amodDelay = 5.5
 
@@ -28,7 +28,7 @@ def init():
     "set global vars to defaults"
     global ser,cable, mooring, motorRunState, go, motorOn
     cable = 0
-    mooring = 30
+    mooring = 20
     # motorRunState off, down, up
     motorRunState = 'off' 
     go = Event()

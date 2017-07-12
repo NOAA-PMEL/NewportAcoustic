@@ -35,11 +35,7 @@ bool PowerOn_GPS();
 
 #define IRIDBAUD 19200L
 
-// if IRIDGPSMODEM defined
-#define IRIDGPSPWR 23 // Iridium Power pin (1=ON, 0=OFF)
-#define IRIDGPSCOM 22
-#define IRIDGPSRX 32
-#define IRIDGPSTX 31
+// defines for pins moved to platform.h
 
 // char* GetFileName(bool, bool, long*, const char*);
 // INT_MAX

@@ -16,7 +16,7 @@ typedef struct // Used to access runtime settings
 } Settings;
 
 #define PROG_NAME "MPC.PROGNAME"
-#define PROG_DEFAULT "RAOS"
+#define PROG_DEFAULT "LARA"
 #define PROG_DESC "Program name\n"
 
 #define PROJID_NAME "MPC.PROJID"
@@ -24,7 +24,7 @@ typedef struct // Used to access runtime settings
 #define PROJID_DESC "Project ID\n"
 
 #define PLTFRMID_NAME "MPC.PLTFRMID"
-#define PLTFRMID_DEFAULT "RA01" // RA01 for RUDICS Login
+#define PLTFRMID_DEFAULT "LR01" // RA01 for RUDICS Login
 #define PLTFRMID_DESC "Platform ID\n"
 
 #define LONGITUDE_NAME "MPC.LONG"

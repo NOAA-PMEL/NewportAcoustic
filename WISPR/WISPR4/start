@@ -1,0 +1,50 @@
+#!/bin/sh
+# WISPR control script.
+# 
+
+#mount -t devpts devpts /dev/pts
+
+/bin/ifconfig eth0 192.168.0.20
+#dhcpcd &
+
+cp /mnt/console_prompt /bin
+chmod 777 /bin/console_prompt
+count=10
+quit='q'
+echo " "
+echo "--- Embedded Ocean Systems WISPR V1.0 ---"
+echo "Starting recording and detection."
+echo "Enter 'q' to stop."
+while [ "$count" -gt 0 ]
+do
+    val=`console_prompt -t 100`
+    if [ "$val" = "$quit" ]; then
+       exit 1
+    fi
+    count=`expr "$count" - 1`
+done
+
+# Uncomment these to cut cpu freq in half
+echo userspace > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo 250000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed
+
+# to check it type cat /proc/cpuinfo
+
+sleep 1
+
+# clear cache to free memory
+sync; echo 3 > /proc/sys/vm/drop_caches
+sleep 1
+
+# Start detection/recording 
+#echo "WISPR recording and detection started."
+
+cp /mnt/wispr /bin
+chmod 777 /bin/wispr
+cp /mnt/spectrogram /bin
+chmod 777 /bin/spectrogram
+#/bin/wispr -v1 -T8 -M2 -F2 -L -l wispr.log  
+/bin/wispr -v1 -T8 -M2 -F2 -L -g0    
+sleep 1
+/bin/mount /dev/sda1 /mnt
+/bin/spectrogram -T10 -C3 -v1 -s1 -n512 -o256 -t20 -L

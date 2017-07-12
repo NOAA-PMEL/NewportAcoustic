@@ -15,7 +15,7 @@ import time
 
 name = 'ctd'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS8'
+port = '/dev/ttyS5'
 baudrate = 9600
 
 def info():

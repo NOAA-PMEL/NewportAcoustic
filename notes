@@ -2,11 +2,21 @@ alex: winch blast of nulls
 alex: power .8A
 alex: batt cap current, new
 
+vee - 7.5K, each set uses more space, erase to free space but limited
+v check free space sometimes
+
 when ctd times out, bizarro depth numbers
 
 at surface, never gives up on gps fail (e.g. no antenna)
 
-in GPSIRID, never checks for console input
+x in GPSIRID, never checks for console input
+
+v at start, turn ant off, defaults on
+v recovery mode after failed irid calls
+
+v shut down at phase 4 for 12v or lower
+v duty cycle = half time
+
 
 descend phase 4: motor stop before dock, no stop command, goes to phase 1
 
@@ -14,7 +24,6 @@ power: 0.804A, whassup with this?
 write ctd data
 create_dtx_file() c:00000208.dtx opened
 should cf2 be setting date on ctd?
-1680x1050 weird.
 
 ctd: output is crlf, doubled on pulse
 ctd: power off doesn't take ctd out of sleep mode. ctd never turns off. batt?

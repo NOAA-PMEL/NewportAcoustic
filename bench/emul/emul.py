@@ -60,6 +60,11 @@ def info():
     winch.info()
     # radio.info()
     
+def restart():
+    "stop init start"
+    stop()
+    init()
+    start()
 
 if __name__=='__main__': start()
 else: print "start() stop() init() buoy.info() winch.start() winch.cable=15"

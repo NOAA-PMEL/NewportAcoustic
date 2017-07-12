@@ -18,9 +18,6 @@ void AModem_SetPower(bool);
 // Global Variables defined
 extern TUPort *AModemPort;
 
-// if ACOUSTICMODEM defined
-#define AMODEMPWR 21
-#define AMODEMRX 33
-#define AMODEMTX 35
+// pin defines moved to platform.h
 
 #define MAX_RESENDS 4

@@ -17,12 +17,10 @@ extern TUPort *NIGKPort;
 extern bool Surfaced;
 
 #define NIGK_MIN_DEPTH 6
-
-// if ACOUSTICMODEM defined
-#define AMODEMPWR 21
-#define AMODEMRX 33
-#define AMODEMTX 35
 #define AMODEMBAUD 4800L
+
+// pin defines moved to platform.h
+
 
 typedef struct {
 

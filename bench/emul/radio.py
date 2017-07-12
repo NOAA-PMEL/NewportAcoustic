@@ -13,7 +13,7 @@ go = ser = None
 #
 name = 'radio'
 eol = '\r'
-port = '/dev/ttyS7'
+port = '/dev/ttyS4'
 baudrate = 19200
 syncmode = 0
 

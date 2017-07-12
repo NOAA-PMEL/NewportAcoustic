@@ -224,10 +224,10 @@ bool PowerOn_GPS() {
 \**********************************************************************************/
 short SwitchAntenna(char r) {
   ushort code;
-  switch(r) {
-    case 'G': code=0x06;
-    case 'I': code=0x04;
-    case 'S': code=0x02;
+  switch (r) {
+    case 'G': { code=0x06; break; }
+    case 'I': { code=0x04; break; }
+    case 'S': { code=0x02; break; }
     default: { // bad case
       flogf("\nError SwitchAntenna(%c): bad choice", r);
       return -1;
@@ -239,6 +239,7 @@ short SwitchAntenna(char r) {
   TURxFlush(IRIDGPSPort);
   TUTxPutByte(IRIDGPSPort, code, true);  // block, wait for send
   RTCDelayMicroSeconds(1500000L); // wait 1.5 sec to settle antenna switch noise
+  return 0;
 } //____ SwitchAntenna ____//
 
 /******************************************************************************\
@@ -646,17 +647,23 @@ void OpenTUPort_IRIDGPS(bool on) {
 
   short wait = 10000;
   int warm;
+
+  DBG(flogf("  ..OpenTUPort_IRIDGPS() ");)
   if (on) {
     IRIDGPS_RX = TPUChanFromPin(32);
     IRIDGPS_TX = TPUChanFromPin(31);
 
     // Power ON
-    PIOSet(23);
-    PIOSet(22);
+    PIOSet(IRIDGPSPWR);
+    PIOSet(IRIDGPSCOM);
     IRIDGPSPort = TUOpen(IRIDGPS_RX, IRIDGPS_TX, 19200, 0);
+    // exercise antenna switch
+    // SwitchAntenna('I');
+    // SwitchAntenna('G');
     if (IRIDGPSPort == 0)
       flogf("\n\t|Bad IridiumPort");
 
+    SwitchAntenna('G');
     warm = IRID.WARMUP;
     flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);
     putflush();
@@ -905,6 +912,9 @@ short PhoneStatus() {
 \******************************************************************************/
 short PhonePin(void) {
   short wait = 10000;
+  flogf("\n\t|no PhonePin()");
+  return 0;
+  // ?? sim card setup
   flogf("\n\t|PhonePin()");
   SendString("AT+CPIN=\"1111\"");
   Delay_AD_Log(2);
@@ -1149,6 +1159,7 @@ short Send_File(bool FileExist, long filelength) {
   ulong val0, val1; // 64-bit bit map for resending the data block
   short Reply = 0;
   short Delay;
+  DBG2(flogf(" .Send_File() ");)
   if (FileExist) {
 
     if (filelength > (long)IRID.MAXUPL + 500) {
@@ -1284,6 +1295,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   int crc_calc;
   long bytesread;
 
+  DBG2(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
 
   crc_calc = 0x0000;
@@ -1881,7 +1893,7 @@ SigQual, and returns
 ** 3: Compares that string str1 to input char* compstring and returns "true"
 \*******************************************************************************/
 char *GetGPSInput(char *chars, int *numsats) {
-
+  // global inputstring first 
   bool good = false;
   int count = 0;
   long len;
@@ -1895,15 +1907,16 @@ char *GetGPSInput(char *chars, int *numsats) {
   inputstring[0] = TURxGetByteWithTimeout(
       IRIDGPSPort, 5000); // Wait for first character to come in.
 
-  RTCDelayMicroSeconds(25000L);
+  RTCDelayMicroSeconds(50000L);
   len = (long)tgetq(IRIDGPSPort);
-  DBG(flogf("\nGrabbing %ld bytes", len);)
   RTCDelayMicroSeconds(20000L);
+  // ?? why flush here
   cdrain();
   coflush();
 
   lenreturn = TURxGetBlock(IRIDGPSPort, inputstring + 1, len,
                            TUBlockDuration(IRIDGPSPort, len));
+  DBG(flogf("\nGPS<< %s", inputstring);)
 
   if (chars != NULL) {
     strtok(inputstring, "=");

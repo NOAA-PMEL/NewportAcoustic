@@ -572,9 +572,18 @@ time_t CTD_VertVel(time_t seconds) {
   return timechange;
 
 } //____ CTD_VertVel() ____//
+/***
+ * void SwitchTD(char);
+ * select, A=>antenna TD sbe39, B=>buoy CTD sbeCat
+ ***/
+void SwitchTD(char c) {
+  if (c == 'A') PIOSet(TDCOM);
+  else if (c == 'B') PIOClear(TDCOM);
+  else flogf("\nError: SwitchTD(%c) bad choice", c);
+} //__ SwitchTD() __//
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
-** !! calloc/free may not match, poor use of globals
+** ?? calloc/free may not match, should these be globals?
 \******************************************************************************/
 void OpenTUPort_CTD(bool on) {
   // global stringout, stringin
@@ -584,7 +593,8 @@ void OpenTUPort_CTD(bool on) {
     CTD_RX = TPUChanFromPin(32);
     CTD_TX = TPUChanFromPin(31);
     PIOSet(22);
-    PIOClear(23);
+    // use buoy CTD
+    SwitchTD('B'); 
     CTDPort = TUOpen(CTD_RX, CTD_TX, BAUD, 0);
     RTCDelayMicroSeconds(20000L);
     if (CTDPort == 0)
@@ -597,7 +607,6 @@ void OpenTUPort_CTD(bool on) {
     free(stringout);
     free(stringin);
 
-    PIOClear(22);
     TUClose(CTDPort);
   }
   return;

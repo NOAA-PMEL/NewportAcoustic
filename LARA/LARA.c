@@ -227,7 +227,7 @@ void main() {
 void shutdown() {
   WISPRSafeShutdown();
 
-  PIOClear(23); // Make sure Iridium is Off
+  PIOClear(IRIDGPSPWR); // Make sure Iridium is Off
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
 
@@ -248,7 +248,7 @@ void InitializeLARA(ulong *PwrOn) {
   bool check = false;
 
   PIOMirrorList(mirrorpins);
-  PIOClear(23); // Make sure iridium is off...
+  PIOClear(IRIDGPSPWR); // Make sure iridium is off...
   PIOSet(26);
   // Get the system settings running
   SetupHardware();
@@ -445,7 +445,7 @@ void InitializeLARA(ulong *PwrOn) {
   VEEStoreShort(STARTUPS_NAME, MPC.STARTUPS);
   if (MPC.STARTUPS >= MPC.STARTMAX) {
     WISPRSafeShutdown();
-    PinClear(23);
+    PinClear(22);
     PinClear(21);
     PinClear(26);
     SleepUntilWoken();

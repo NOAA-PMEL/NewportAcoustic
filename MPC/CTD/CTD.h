@@ -9,6 +9,7 @@ void CTD_SampleBreak();
 void CTD_CreateFile(long);
 void CTD_SyncMode();
 void GetCTDSettings();
+void SwitchTD(char);
 void OpenTUPort_CTD(bool);
 float CTD_CalculateVelocity();
 float CTD_AverageDepth(int, float *);

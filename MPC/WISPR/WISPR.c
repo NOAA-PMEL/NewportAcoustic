@@ -167,6 +167,7 @@ short WISPR_Data() {
         if (!WISPRExit())
           if (!WISPRExit()) {
             flogf(": Forcing Off");
+            // ?? fetch storm warning
             WISPRPower(false);
           }
         Check_Timers(Return_ADSTIME());
