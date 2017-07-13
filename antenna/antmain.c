@@ -1,7 +1,7 @@
 /*
  * antmain.c    Antenna module, LARA
 **  Program to communicate with T-D sensor and Iridium/GPS modem.
-**  Main electronics serial<->COM4 of this CF2 <->SB39
+**  Main electronics serial<->COM4 of this CF2 <->SBE
 **  July 12, 2017 blk
 *****************************************************************************
 **
@@ -49,9 +49,9 @@
 // keep this up to date!!! 
 
 // Definitions of uMPC TPU ports
-#define SB39PWR 23 // SB#39plus TD power
-#define SB39RX 32  // Tied to IRQ2
-#define SB39TX 31
+#define SBEPWR 23 // SB#39plus TD power
+#define SBERX 32  // Tied to IRQ2
+#define SBETX 31
 
 #define PAMPWR 24     // PAM PWR on/off
 #define PAMZEROBIT 29 // PAM selecton
@@ -72,73 +72,61 @@
 //#define       SYSCLK   8000           // choose: 160 to 32000 (kHz)
 #define SYSCLK 16000            // choose: 160 to 32000 (kHz)
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
-#define BAUD 9600
+#define BAUDRATE 9600L
+
+#define BUOY 0
+#define SBE 1
+#define IRID 2
+
 //#define       LPMODE  FastStop                        // choose: FullStop or
 // FastStop or CPUStop
 //
-TUPort *SB39Port;                 // SB39 TD TUport
-TUPort *PAMPort;                  // PAM TUport
-TUPort *IRIDGPSPort = 0;          // IRID GPS port
-TUPort *COM4Port;                 // COM4 port
-char *LogFile = {"activity.log"}; // Activity Log
-
-char devName[8]; // name of upstream device GPS|IRID|SBE
-
-// SB39 data over the serial line
-static char *SB39receive; // Pointer of received input from SB39 TD
-static char *SB39send;    // Section to send to LARA main
 
 // short         CustomSYPCR = WDT419s | HaltMonEnable | BusMonEnable | BMT32;
 //#define CUSTOM_SYPCR
-void OpenSB39Port(bool on);
-void SB39Data();
-void OpenPAMPort(bool on);
-void OpenIRIDGPSPort(bool on);
-void OpenCOM4Port(bool on);
+void OpenSbePt(bool on);
+void OpenIridPt(bool on);
+void OpenBuoyPt(bool on);
 static void Irq5RxISR(void);
 static void Irq2RxISR(void);
 IEV_C_PROTO(CharRuptHandler);
-
 short getByte(TUPort *tup);
 
-long TURxGetBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
-short TURxGetByte(TUPort *tup, bool block);
-long TUTxPutBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
-bool TUTxPutByte(TUPort *tup, ushort data, bool block);
+char *LogFile = {"activity.log"}; 
+bool run=true; 
+struct { char *name, char c, bool power, short pin, TUPort *port } dev[3] = {
+  { {"BUOY"}, 'B', false, COM4PWR, NULL },
+  { {"SBE"}, 'S', false, SBEPWR, NULL },
+  { {"IRID"}, 'I', false, A3LAPWR, NULL } }
+short devID; // ID of upstream device, 1-2
+TUPort *devPort; // port of upstream device
 
 
 /******************************************************************************\
 **	main
 \******************************************************************************/
 int main() {
-  TUPort* buoy, dev;       // dev is iridium, sbe, or buoy (loopback and default)
-  short ch, errbits;
-  short binaryCount=0; // count of binary chars to pass thru
-  bool run=true, command=binary=false;
-  char *deviceName[16]='buoy';
+  short ch, command=0;
+  int binary=0; // count of binary chars to pass thru
+  bool commandMode=binaryMode=false;
+  TUPort* buoy;
 
   // set up hw
   init();
-  buoy=COM4Port;
-  dev=buoy;  // default at init is loopback
+  buoy=dev[BUOY].port;
+  // initial connection is SBE
+  power('S', true);
+  connect('S');
 
-  // TickleSWSR();                                      // another reprieve
-  // RTCDelayMicroSeconds(5500L);
-
-  // Enable the COM4 IRQ5 interrupt
-  PinBus(IRQ5);                  // ??
-  PinIO(IRQ5);
   // run remains true, exit via biosreset{topicodos}
   while (run) {
     // look for chars on both sides, process
     // read bytes not blocks, to see any rs232 errs
-    //
+    // note: using vars buoy,devport is faster than dev[id].port
     // get all from dev upstream
-    while (TURxQueuedCount(dev)) {
-      ch=getByte(dev);
+    while (TURxQueuedCount(devPort)) {
+      ch=getByte(devPort);
       TURxPutByte(buoy, ch, true); // block if queue is full
-      // rs232 errors?
-      if (err) rs232check(err, deviceName);
     } // char from device
 
     // get all from buoy
@@ -146,7 +134,7 @@ int main() {
       ch=getByte(buoy);
       // binaryMode, commandMode, new command, character
       if (binaryMode) {
-        TURxPutByte(dev, ch, true);
+        TURxPutByte(devPort, ch, true);
         if (--binary<1) binaryMode=false;
       // endif (binaryMode)
       } else if (commandMode) {
@@ -155,15 +143,16 @@ int main() {
             antennaSwitch(ch);
             break;
           case 2: // ^B Binary byte
-            TURxPutByte(dev, ch, true);
+            TURxPutByte(devPort, ch, true);
             break;
-          case 3: // ^C Connect G|I|S
-            connect(ch);
+          case 3: // ^C Connect I|S
+            up=connect(ch);
             break;
-          case 4: // ^D powerDown G|I|S|A
-            power(ch, 0);
+          case 4: // ^D powerDown I|S
+            power(ch, false);
             break;
           case 5: // ^E binary lEngth (2byte short)
+            // convert last byte and next byte to a integer, 0-64K
             binary=ch<<8 + getByte(buoy);
             binaryMode=true;
             break;
@@ -181,7 +170,7 @@ int main() {
       // endif (ch<8)
       } else { 
         // regular char
-        TURxPutByte(dev, ch, true);
+        TURxPutByte(devPort, ch, true);
       }
     } // while buoy
 
@@ -203,154 +192,45 @@ int main() {
 } // main()
 
 
-/***********/
-      // CTRL b to communicate with SBE39plus
-      if (chin == 2) {
-        if (SB39Port == 0)
-          OpenSB39Port(true); // Open SBE39 port
-        flogf("SBE39plus mode\n");
-        chin = 0x0A; // clear chin
-        DBG(RTCElapsedTimerSetup(&tmtset));
-        while (chin > 7) {     // 25 us  //printable ASCII
-          // receive data from SB39
-          if (tgetq(SB39Port)) {
-            TUTxPutByte(COM4Port, tgetc(SB39Port), true);
-            DBG(cputc(chin)); // debug grab it and show it
-          }
-          if (tgetq(COM4Port)) { // we've got data at COM4 port from the main
-            chin = tgetc(COM4Port);
-            if (chin > 7) { // printable ASCII
-              TUTxPutByte(SB39Port, chin, true);
-              DBG(cputc(chin)); // Debug
-            }
-          }
-          DBG(flogf("Elapsed time %ld us\n", RTCElapsedTime(&tmtset)));
-          test = 1;
-        }
-      } // end of SB39plus session
-      TURxFlush(COM4Port);
 
-      // IRID/GPS sesssion starts
-      if (chin == 6 || chin == 4) { // CTRL f for GPS or CTRL D Iridium
-        if (IRIDGPSPort == 0)
-          OpenIRIDGPSPort(true);
-        if (chin == 6) {
-          flogf("GPS mode\n");
-          PIOClear(1); // Antenna switch to GPS
-          tiflush(COM4Port);
-        } else if (chin == 4) {
-          flogf("Iridium mode\n");
-          PIOSet(1); // Antenna SW to Iridium
-          tiflush(COM4Port);
-        }
-        chin = 0x10; // replace with ASCII > 7
 
-        // There is a chance that Iridium modem sends NULL char (=0)
-        while (chin > 7 ||
-               chin < 2) {        // handle both GPS and Iridium serial stream
-          if (tgetq(IRIDGPSPort)) // receive char from IRID/GPS
-          {
-            chin = tgetc(IRIDGPSPort);
-            TUTxPutByte(COM4Port, chin, true);
-
-            // DBG(cputc(chin));// grab it and show it
-          }
-          if (tgetq(COM4Port)) { // we've got data COM4 port
-            chin = tgetc(COM4Port);
-            if (chin > 7) { // normal ASCII
-              TUTxPutByte(IRIDGPSPort, chin, true);
-
-              // DBG(cputc(chin));
-            }
-          }
-        }
-      } // IRID/GPS session ends
-    }
-  } else
-    flogf("Did not get CTLR char. Exit.\n");
-  if (SB39Port != 0)
-    OpenSB39Port(false);
-  if (IRIDGPSPort != 0)
-    OpenIRIDGPSPort(false);
-  if (COM4Port != 0)
-    OpenCOM4Port(false);
-  TURelease();
-  PIOClear(COM4PWR);
-  PIOClear(ADCPWR);
-  cdrain();
-  coflush();
-  free(SB39send);
-  free(SB39receive);
-  return result;
-} //____ main() ____//
-
-void OpenSB39Port(bool on) {
+/*
+ * OpenSbePt(true)
+ */
+void OpenSbePt(bool on) {
   long baud = 9600L;
   short sb39rxch, sb39txch;
 
   // uMPC
   if (on) {
-    PIOSet(SB39PWR); // turn on SB39 serial term power
-    sb39rxch = TPUChanFromPin(SB39RX);
-    sb39txch = TPUChanFromPin(SB39TX);
+    PIOSet(SBEPWR); // turn on SBE serial term power
+    sb39rxch = TPUChanFromPin(SBERX);
+    sb39txch = TPUChanFromPin(SBETX);
 
     // RTCDelayMicroSeconds(500000L);
 
-    // Define SB39 TD tuporst
-    SB39Port = TUOpen(sb39rxch, sb39txch, baud, 0);
+    // Define SBE TD tuporst
+    SbePt = TUOpen(sb39rxch, sb39txch, baud, 0);
     RTCDelayMicroSeconds(100000L);
-    if (SB39Port == 0 && on) // SB39
-      flogf("\n!!! Error opening SB39 channel...");
+    if (SbePt == 0 && on) // SBE
+      flogf("\n!!! Error opening SBE channel...");
   } else if (!on) {
-    PIOClear(SB39PWR); // SB39 TD
+    PIOClear(SBEPWR); // SBE TD
     putflush();
-    TUClose(SB39Port);
+    TUClose(SbePt);
 
     // TURelease();
   }
-} /*OpenSB39Port(bool on) */
+} /*OpenSbePt(bool on) */
+
 
 /*************************************************************************
-* OpenPAMPort(bool on)
-* If on=true, open the com.
-* If on=false, close the com.
-**************************************************************************/
-void OpenPAMPort(bool on) {
-  long baud = 19200L;
-  short pamrxch, pamtxch;
-  if (on) {
-
-    // TUInit(calloc, free);//Need to be executed only once
-    PIOSet(PAMPWR);       // PAM COM ON
-    PIOClear(PAMZEROBIT); // PAM1 select
-    PIOClear(PAMONEBIT);  // PAM1 select
-    pamrxch = TPUChanFromPin(PAMRX);
-    pamtxch = TPUChanFromPin(PAMTX);
-    RTCDelayMicroSeconds(1000000L);
-
-    // Define PAM tuporst
-    PAMPort = TUOpen(pamrxch, pamtxch, baud, 0);
-    RTCDelayMicroSeconds(100000L);
-    TUTxFlush(PAMPort);
-    TURxFlush(PAMPort);
-    RTCDelayMicroSeconds(1000000L);
-    if (PAMPort == 0 && on) // SB39
-      flogf("\n!!! Error opening PAM channel...");
-  } else if (!on) {
-    TUClose(PAMPort);
-    PIOClear(PAMPWR); // Shut down PAM COM
-    flogf("Close PAM term\n");
-    putflush();
-  }
-} /*OpenPAMPort(bool on) */
-
-/*************************************************************************
-* OpenIRIDGPSPort(bool on)
+* OpenIridPt(bool on)
 * If on=true, open the com.
 * If on=false, close the com.
 * IRQ3
 **************************************************************************/
-void OpenIRIDGPSPort(bool on) {
+void OpenIridPt(bool on) {
   long baud = 19200L;
   short iridrxch, iridtxch;
   if (on)
@@ -370,30 +250,30 @@ void OpenIRIDGPSPort(bool on) {
     RTCDelayMicroSeconds(1000000L); // wait for IRID/GPS unit to warm up
 
     // Define PAM tuporst
-    IRIDGPSPort = TUOpen(iridrxch, iridtxch, baud, 0);
+    IridPt = TUOpen(iridrxch, iridtxch, baud, 0);
     RTCDelayMicroSeconds(100000L);
-    TUTxFlush(IRIDGPSPort);
-    TURxFlush(IRIDGPSPort);
+    TUTxFlush(IridPt);
+    TURxFlush(IridPt);
     RTCDelayMicroSeconds(1000000L);
-    if (IRIDGPSPort == 0 && on) // IRID
+    if (IridPt == 0 && on) // IRID
       flogf("\n!!! Error opening IRIDGPS channel...");
   } else if (!on) {
-    TUClose(IRIDGPSPort);
-    IRIDGPSPort = 0;
+    TUClose(IridPt);
+    IridPt = 0;
     PIOClear(A3LAPWR); // Shut down IRID PWR
     flogf("Close IRIDGPS term\n");
     putflush();
   }
-} /*OpenIRIDGPSPort(bool on) */
+} /*OpenIridPt(bool on) */
 
 /*************************************************************************
-* OpenCOM4Port(bool on) for uMPC. On MPC it is for AMODEM com
+* OpenBuoyPt(bool on) for uMPC. On MPC it is for AMODEM com
 * If on=true, open the com.
 * If on=false, close the com.
 * Uses IRQ5
 **************************************************************************/
-void OpenCOM4Port(bool on) {
-  long baud = 19200L;
+void OpenBuoyPt(bool on) {
+  long baud = BAUDRATE;
   short com4rxch, com4txch;
   if (on)
     flogf("Opening the high speed COM4 port\n");
@@ -405,92 +285,21 @@ void OpenCOM4Port(bool on) {
     PIORead(IRQ5);
 
     // Define COM4 tuport
-    COM4Port = TUOpen(com4rxch, com4txch, baud, 0);
+    BuoyPt = TUOpen(com4rxch, com4txch, baud, 0);
     RTCDelayMicroSeconds(100000L);
-    TUTxFlush(COM4Port);
-    TURxFlush(COM4Port);
+    TUTxFlush(BuoyPt);
+    TURxFlush(BuoyPt);
     RTCDelayMicroSeconds(100000L);
-    if (COM4Port == 0 && on) // COM4
+    if (BuoyPt == 0 && on) // COM4
       flogf("\n!!! Error opening COM4 port...");
   } else if (!on) {
-    TUClose(COM4Port);
+    TUClose(BuoyPt);
     PIOClear(COM4PWR); // Shut down COM4 device
     flogf("Close COM4 port\n");
     putflush();
   }
-} /*OpenCOM4Port(bool on) */
+} /*OpenBuoyPt(bool on) */
 
-/******************************************************************************\
-** void SB39Data()
-\******************************************************************************/
-void SB39Data() {
-  char charin = ' ';
-  int i = 0, count = 0;
-  float depth, temp;
-  bool log = false;
-  char *first_junk;
-  char *split_temp;
-  char *split_pres;
-
-  // char* split_cond;
-  char *split_date;
-  char *split_time;
-  char string_to_send[128];
-
-  // memset(SB39receive, 0, 128*sizeof(char));
-  memset(string_to_send, 0, 128 * sizeof(char));
-  while (count < 50 && i < 128) {
-    charin = TURxGetByteWithTimeout(SB39Port, 20);
-    if (charin == -1)
-      count++;
-
-    else {
-      SB39receive[i] = charin;
-      i++;
-    }
-  }
-
-  // Example
-  //  25.6035,  0.046, 09 May 2017, 16:20:58
-  //<Executed/>
-  // flogf("%d chars\n", i);
-  sprintf(string_to_send, "%s", SB39receive + 5);
-  cprintf("new %s\n", string_to_send);
-  uprintf("%s\n", SB39receive);
-  first_junk = strtok(string_to_send, " ");
-  split_temp = strtok(NULL, " ,");
-
-  // split_temp = strtok(SB39receive, " ,");
-  split_pres = strtok(NULL, " ,");
-
-  // date
-  split_date = strtok(NULL, ",");
-  split_time = strtok(NULL, "\n\r");
-  memset(SB39send, 0, 128 * sizeof(char));
-  sprintf(SB39send, "$ATD %s, %s, %s, %s*", split_temp, split_pres, split_date,
-          split_time);
-  count = 0;
-  for (i = 1; i <= 128; ++i) {
-    if (SB39send[i] != '*') {
-      ++count;
-    } else
-      break;
-  }
-  count += 2;
-  flogf("Char to send to LARA:%d, %s\n", count, SB39send);
-  flogf("Temp %s\n", split_temp);
-  flogf("depth %s\n", split_pres);
-  flogf("date %s\n", split_date);
-  flogf("time %s\n", split_time);
-  temp = atof(split_temp);
-  flogf("T =%9.4f\n", temp);
-  depth = atof(split_pres);
-  flogf("D =%9.3f\n");
-  putflush();
-
-  // TUTxPrintf(PAMPort, "%s\n", writestring);
-  // TUTxWaitCompletion(PAMPort);
-} // SB39Data()
 
 /*************************************************************************\
 **  static void Irq2ISR(void)
@@ -541,9 +350,10 @@ IEV_C_FUNCT(CharRuptHandler) {
  * help() - help message to console
  */
 void help() {
+  // Identify the progam and build
   char *ProgramDescription = {
       "\n"
-      "Serial interface program to control and communiate with SB39 and "
+      "Serial interface program to control and communiate with SBE and "
       "Iridium/GPS.\n"
       "Buoy is downstream, connecting to com4 at %d BAUD\n"
       " ^A Antenna G|I \n"
@@ -563,38 +373,50 @@ void help() {
   printf(ProgramDescription, BAUD);
 } // help()
 
+/*
+ * init() - initialize hardware, open com ports
+ */
 void init() {
   // I am here because the main eletronics powered this unit up and *.app
   // program started.
-  // Identify the progam and build
   // Make sure unnecessary devices are powered down
   PIOClear(A3LAPWR);
-  PIOClear(SB39PWR);
+  PIOClear(SBEPWR);
   PIOClear(COM4PWR);
   PIOClear(PAMPWR);
   PIOClear(ADCPWR);
   CSSetSysAccessSpeeds(nsFlashStd, nsRAMStd, nsCFStd, WTMODE);
   TMGSetSpeed(SYSCLK);
-  SB39receive = calloc(128, sizeof(uchar));
-  SB39send = calloc(128, sizeof(uchar));
 
   // Initialize activity logging
   Initflog(LogFile, true);
-  PreRun();
 
   // Initialize to open TPU UART
   TUInit(calloc, free);
 
   // Open the com ports
-  OpenSB39Port(true); // Open SBE39 port
-  OpenCOM4Port(true); // Open COM4 to prepart to talk to the main elec
-  connectCOM4andSB39 = true;
+  OpenIridPt(true);
+  OpenSbePt(true); // Open SBE39 port
+  OpenBuoyPt(true); // Open COM4 to prepart to talk to the main elec
 
+  // Enable the COM4 IRQ5 interrupt
+  PinBus(IRQ5);                  // ??
+  PinIO(IRQ5);
   // Install the COM4 IRQ5 interrupt handlers from RS232 RX input.
   IEVInsertAsmFunct(&CharRuptHandler,
                     level5InterruptAutovector); // COM4 IRQ5 handler
-  TURxFlush(COM4Port);
-  TUTxFlush(COM4Port);
+  TURxFlush(BuoyPt);
+  TUTxFlush(BuoyPt);
+} // init()
+
+/*
+ * status() - console <- "connected:A3LA A3LA:on SBE:on"
+ */
+void status() {
+  cprintf("connected:%s iridgps:%s sbe:%s\n",
+    dev[devID].name,
+    dev[A3LA].power ? "on" : "off",
+    dev[SBE].power ? "on" : "off");
 }
 
 /*
@@ -613,32 +435,50 @@ short getByte(TUPort *tup) {
 } // getByte()
 
 /*
- * antennaSwitch(ch) - change antenna and device name
+ * antennaSwitch(ch) - change antenna=G|I, else return current state
  */
 void antennaSwitch(char c) {
-  // global char *devName
+  // global short antSwitch
+  short id;
   switch(c) {
-    case 'G': PIOClear(1); devName=gpsName; break;
-    case 'I': PIOSet(1); devName=iridName; break;
-    strcpy(devName, "IRID");
+    case 'G': PIOClear(ANTSW); break;
+    case 'I': PIOSet(ANTSW); break;
   }
 } // antennaSwitch()
 
 /*
- * connect(G|I|S) - make gps, irid, sbe be the upstream device
+ * char2id('G') - returns id 0-2, no match -1
  */
-void connect(c) {
-  // global TUP *dev
-  switch (c) {
-    case 'G','I':
-      dev=IRIDGPSPort;
-    case 'G': devName=gpsName; break;
-    case 'I': devName=iridName; break;
-    case 'S':
+short char2id(short ch) {
+  switch (ch) {
+    case 'I': return IRID;
+    case 'S': return SBE;
+    case 'B': return BUOY;
+    default: return -1;
+  }
+} // char2id()
+  
 
 /*
- * power(G|I|S|A, on) - power components on/off
- * power off A=ant means shutdown
+ * connect(I|S) - make a3la, sbe be the upstream device
  */
-void power(short c, on) {
-}
+char connect(char c) {
+  // global short devID, TUPort *devPort
+  devID=char2id(c);
+  // power up if not
+  if (! dev[devID].power) power(c, true);
+  devPort=dev[devID].port; 
+} // connect()
+
+/*
+ * power(I|S, on) - power device on/off
+ */
+void power(short c, bool on) {
+  short pin, id;
+  id=char2id(c);
+  pin=dev[id].pin;
+  switch (on) {
+    case 0: PIOClear(pin); break;
+    case 1: PIOSet(pin); break;
+  }
+} // power()
