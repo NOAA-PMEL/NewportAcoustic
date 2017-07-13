@@ -68,7 +68,7 @@ Power is applied to the wispr board and after the program starts it waits
 for GPS time and location. That's when we send it.
 \*************************************************************************/
 void WISPRPower(bool power) {
-
+  // must call OpenTUPort_WISPR first
   if (power) {
 
     flogf("\n%s|WISPR: ON", Time(NULL));
