@@ -20,7 +20,7 @@ AD_Check	MPC/ADS/ADS.c	/^bool AD_Check() {$/;"	f
 AD_Log	MPC/ADS/ADS.c	/^void AD_Log(void) {$/;"	f
 AD_Write	MPC/ADS/ADS.c	/^void AD_Write(ushort *AveragedEnergy) {$/;"	f
 AMDMSettings	MPC/MPC_SETTINGS/Settings.c	/^Settings AMDMSettings[] = {AMODEMMAXUPLOAD_NAME,$/;"	v
-AMODEMBAUD	MPC/WINCH/Winch.h	25;"	d
+AMODEMBAUD	MPC/WINCH/Winch.h	20;"	d
 AMODEMBLOCKSIZE_DEFAULT	MPC/MPC_SETTINGS/Settings.h	201;"	d
 AMODEMBLOCKSIZE_DESC	MPC/MPC_SETTINGS/Settings.h	202;"	d
 AMODEMBLOCKSIZE_NAME	MPC/MPC_SETTINGS/Settings.h	200;"	d
@@ -30,9 +30,9 @@ AMODEMMAXUPLOAD_NAME	MPC/MPC_SETTINGS/Settings.h	195;"	d
 AMODEMOFFSET_DEFAULT	MPC/MPC_SETTINGS/Settings.h	191;"	d
 AMODEMOFFSET_DESC	MPC/MPC_SETTINGS/Settings.h	192;"	d
 AMODEMOFFSET_NAME	MPC/MPC_SETTINGS/Settings.h	190;"	d
-AMODEMPWR	MPC/WINCH/Winch.h	22;"	d
-AMODEMRX	MPC/WINCH/Winch.h	23;"	d
-AMODEMTX	MPC/WINCH/Winch.h	24;"	d
+AMODEMPWR	LARA/PLATFORM.h	23;"	d
+AMODEMRX	LARA/PLATFORM.h	33;"	d
+AMODEMTX	LARA/PLATFORM.h	34;"	d
 AModemCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable AModemCmdTable[] =$/;"	v
 AModem_Data	MPC/WINCH/Winch.c	/^void AModem_Data(void) {$/;"	f
 ANTLEN	MPC/WINCH/Winch.h	/^  short ANTLEN; \/\/ Length from CTD to antenna. More specifically: From CTD Depth$/;"	m	struct:__anon6
@@ -54,13 +54,13 @@ BATLOG	MPC/ADS/ADS.h	/^  short BATLOG;    \/\/ t logging change in battery capac
 BATTERYCAPACITY_DEFAULT	MPC/MPC_SETTINGS/Settings.h	79;"	d
 BATTERYCAPACITY_DESC	MPC/MPC_SETTINGS/Settings.h	80;"	d
 BATTERYCAPACITY_NAME	MPC/MPC_SETTINGS/Settings.h	77;"	d
-BATTERYLOG	LARA/PLATFORM.h	125;"	d
+BATTERYLOG	LARA/PLATFORM.h	159;"	d
 BATTERYLOGGER_DEFAULT	MPC/MPC_SETTINGS/Settings.h	73;"	d
 BATTERYLOGGER_DESC	MPC/MPC_SETTINGS/Settings.h	74;"	d
 BATTERYLOGGER_NAME	MPC/MPC_SETTINGS/Settings.h	72;"	d
-BAUD	MPC/CTD/CTD.h	16;"	d
-BAUD	MPC/WISPR/WISPR.h	49;"	d
-BITSHIFT	LARA/PLATFORM.h	134;"	d
+BAUD	MPC/CTD/CTD.h	17;"	d
+BAUD	MPC/WISPR/WISPR.h	43;"	d
+BITSHIFT	LARA/PLATFORM.h	168;"	d
 BLUETOOTH_DEFAULT	MPC/MPC_SETTINGS/Settings.h	186;"	d
 BLUETOOTH_DESC	MPC/MPC_SETTINGS/Settings.h	187;"	d
 BLUETOOTH_NAME	MPC/MPC_SETTINGS/Settings.h	185;"	d
@@ -79,16 +79,16 @@ CALLMODE_DEFAULT	MPC/MPC_SETTINGS/Settings.h	130;"	d
 CALLMODE_DESC	MPC/MPC_SETTINGS/Settings.h	131;"	d
 CALLMODE_NAME	MPC/MPC_SETTINGS/Settings.h	129;"	d
 CFXNum	MPC/MPC_SETTINGS/Settings.c	/^char CFXNum[6];               \/\/ 5 digits + terminating zero$/;"	v
-CLK	LARA/PLATFORM.h	115;"	d
-CLK	LARA/PLATFORM.h	117;"	d
-CONSOLEINPUT	LARA/PLATFORM.h	52;"	d
+CLK	LARA/PLATFORM.h	149;"	d
+CLK	LARA/PLATFORM.h	151;"	d
+CONSOLEINPUT	LARA/PLATFORM.h	86;"	d
 CTD	MPC/CTD/CTD.c	/^CTDParameters CTD;$/;"	v
 CTDCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable CTDCmdTable[] =$/;"	v
 CTDLogFile	MPC/CTD/CTD.c	/^char CTDLogFile[] = "c:00000000.ctd";$/;"	v
-CTDParameters	MPC/CTD/CTD.h	/^} CTDParameters;/;"	t	typeref:struct:__anon3
+CTDParameters	MPC/CTD/CTD.h	/^} CTDParameters;$/;"	t	typeref:struct:__anon3
 CTDPort	MPC/CTD/CTD.c	/^TUPort *CTDPort;$/;"	v
 CTDSAMPLES	LARA/PLATFORM.h	/^  short CTDSAMPLES;$/;"	m	struct:__anon1
-CTDSENSOR	LARA/PLATFORM.h	47;"	d
+CTDSENSOR	LARA/PLATFORM.h	81;"	d
 CTDSamples	MPC/CTD/CTD.c	/^short CTDSamples;$/;"	v
 CTDSettings	MPC/MPC_SETTINGS/Settings.c	/^Settings CTDSettings[] = {$/;"	v
 CTDSleep	LARA/LARA.c	/^void CTDSleep(void) {$/;"	f
@@ -127,11 +127,11 @@ DATAXINT	MPC/MPC_Global/MPC_Global.h	/^  short DATAXINT; \/\/ VEE:DATAXINTERVAL_
 DATAXINTERVAL_DEFAULT	MPC/MPC_SETTINGS/Settings.h	66;"	d
 DATAXINTERVAL_DESC	MPC/MPC_SETTINGS/Settings.h	67;"	d
 DATAXINTERVAL_NAME	MPC/MPC_SETTINGS/Settings.h	65;"	d
-DBG	LARA/PLATFORM.h	94;"	d
-DBG	LARA/PLATFORM.h	96;"	d
-DBG2	LARA/PLATFORM.h	100;"	d
-DBG2	LARA/PLATFORM.h	102;"	d
-DEBUG	LARA/PLATFORM.h	42;"	d
+DBG	LARA/PLATFORM.h	128;"	d
+DBG	LARA/PLATFORM.h	130;"	d
+DBG2	LARA/PLATFORM.h	134;"	d
+DBG2	LARA/PLATFORM.h	136;"	d
+DEBUG	LARA/PLATFORM.h	76;"	d
 DELAY	MPC/WINCH/Winch.h	/^  short DELAY; \/\/ Time in seconds post TUTxAcousticModem when the Winch actually$/;"	m	struct:__anon6
 DEPTH	LARA/PLATFORM.h	/^  float DEPTH;     \/\/ Most recent depth measurement from CTD$/;"	m	struct:__anon1
 DESCENTCALLS	MPC/WINCH/Winch.h	/^  short DESCENTCALLS;$/;"	m	struct:__anon7
@@ -196,20 +196,20 @@ HangUp	MPC/GPSIRID/GPSIRID.c	/^bool HangUp(void) {$/;"	f
 IEV_C_FUNCT	LARA/LARA.c	/^IEV_C_FUNCT(ExtFinishPulseRuptHandler) {$/;"	f
 IEV_C_FUNCT	MPC/ADS/ADS.c	/^IEV_C_FUNCT($/;"	f
 IEV_C_FUNCT	MPC/ADS/ADS.c	/^IEV_C_FUNCT(ADTimingRuptHandler) \/\/ implied (IEVStack *ievstack:__a0) parameter$/;"	f
-INITIAL_BATTERY_CAPACITY	LARA/PLATFORM.h	130;"	d
+INITIAL_BATTERY_CAPACITY	LARA/PLATFORM.h	164;"	d
 IRID	MPC/GPSIRID/GPSIRID.c	/^IridiumParameters IRID;$/;"	v
 IRIDBAUD	MPC/GPSIRID/GPSIRID.h	36;"	d
 IRIDFileHandle	MPC/GPSIRID/GPSIRID.c	/^static int IRIDFileHandle;$/;"	v	file:
 IRIDFilename	MPC/GPSIRID/GPSIRID.c	/^static char IRIDFilename[sizeof "c:00000000.dat"];$/;"	v	file:
 IRIDGPS	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS() {$/;"	f
-IRIDGPSCOM	MPC/GPSIRID/GPSIRID.h	40;"	d
-IRIDGPSPWR	MPC/GPSIRID/GPSIRID.h	39;"	d
+IRIDGPSCOM	LARA/PLATFORM.h	25;"	d
+IRIDGPSPWR	LARA/PLATFORM.h	24;"	d
 IRIDGPSPort	MPC/GPSIRID/GPSIRID.c	/^TUPort *IRIDGPSPort;$/;"	v
-IRIDGPSRX	MPC/GPSIRID/GPSIRID.h	41;"	d
-IRIDGPSTX	MPC/GPSIRID/GPSIRID.h	42;"	d
+IRIDGPSRX	LARA/PLATFORM.h	32;"	d
+IRIDGPSTX	LARA/PLATFORM.h	31;"	d
 IRIDGPS_RX	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS_RX, IRIDGPS_TX;$/;"	v
 IRIDGPS_TX	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS_RX, IRIDGPS_TX;$/;"	v
-IRIDIUM	LARA/PLATFORM.h	46;"	d
+IRIDIUM	LARA/PLATFORM.h	80;"	d
 IRIDPHONE_DEFAULT	MPC/MPC_SETTINGS/Settings.h	91;"	d
 IRIDPHONE_DESC	MPC/MPC_SETTINGS/Settings.h	92;"	d
 IRIDPHONE_NAME	MPC/MPC_SETTINGS/Settings.h	90;"	d
@@ -257,16 +257,16 @@ MAXUPL	MPC/GPSIRID/GPSIRID.h	/^  short MAXUPL;   \/\/ Max upload try per call$/;
 MAXUPLOAD_DEFAULT	MPC/MPC_SETTINGS/Settings.h	104;"	d
 MAXUPLOAD_DESC	MPC/MPC_SETTINGS/Settings.h	105;"	d
 MAXUPLOAD_NAME	MPC/MPC_SETTINGS/Settings.h	103;"	d
-MAX_BLOCK_SIZE	LARA/PLATFORM.h	62;"	d
-MAX_DATAX_INTERVAL	LARA/PLATFORM.h	64;"	d
-MAX_DETECTIONS	LARA/PLATFORM.h	70;"	d
-MAX_DETECTION_INTERVAL	LARA/PLATFORM.h	61;"	d
-MAX_DUTYCYCLE	LARA/PLATFORM.h	72;"	d
-MAX_GPS_CHANGE	LARA/PLATFORM.h	57;"	d
+MAX_BLOCK_SIZE	LARA/PLATFORM.h	96;"	d
+MAX_DATAX_INTERVAL	LARA/PLATFORM.h	98;"	d
+MAX_DETECTIONS	LARA/PLATFORM.h	104;"	d
+MAX_DETECTION_INTERVAL	LARA/PLATFORM.h	95;"	d
+MAX_DUTYCYCLE	LARA/PLATFORM.h	106;"	d
+MAX_GPS_CHANGE	LARA/PLATFORM.h	91;"	d
 MAX_RESENT	MPC/GPSIRID/GPSIRID.c	57;"	d	file:
-MAX_STARTUPS	LARA/PLATFORM.h	59;"	d
-MAX_UPLOAD	LARA/PLATFORM.h	58;"	d
-MINIMUM_BATTERY_CAPACITY	LARA/PLATFORM.h	131;"	d
+MAX_STARTUPS	LARA/PLATFORM.h	93;"	d
+MAX_UPLOAD	LARA/PLATFORM.h	92;"	d
+MINIMUM_BATTERY_CAPACITY	LARA/PLATFORM.h	165;"	d
 MINSIGQ	MPC/GPSIRID/GPSIRID.h	/^  short MINSIGQ;  \/\/ Min Irid signal quality to proceed$/;"	m	struct:__anon4
 MINSIGQ_DEFAULT	MPC/MPC_SETTINGS/Settings.h	96;"	d
 MINSIGQ_DESC	MPC/MPC_SETTINGS/Settings.h	97;"	d
@@ -275,13 +275,13 @@ MINSYSVOLT_DEFAULT	MPC/MPC_SETTINGS/Settings.h	85;"	d
 MINSYSVOLT_DESC	MPC/MPC_SETTINGS/Settings.h	86;"	d
 MINSYSVOLT_NAME	MPC/MPC_SETTINGS/Settings.h	84;"	d
 MINVOLT	MPC/ADS/ADS.h	/^  char MINVOLT[6]; \/\/-v %.2f  minimum system voltage$/;"	m	struct:__anon2
-MIN_BATTERY_VOLTAGE	LARA/PLATFORM.h	128;"	d
-MIN_DATAX_INTERVAL	LARA/PLATFORM.h	63;"	d
-MIN_DETECTION_INTERVAL	LARA/PLATFORM.h	60;"	d
-MIN_DUTYCYCLE	LARA/PLATFORM.h	71;"	d
-MIN_FREESPACE	LARA/PLATFORM.h	73;"	d
-MIN_OFF_DEPTH	LARA/PLATFORM.h	77;"	d
-MIN_ON_DEPTH	LARA/PLATFORM.h	78;"	d
+MIN_BATTERY_VOLTAGE	LARA/PLATFORM.h	162;"	d
+MIN_DATAX_INTERVAL	LARA/PLATFORM.h	97;"	d
+MIN_DETECTION_INTERVAL	LARA/PLATFORM.h	94;"	d
+MIN_DUTYCYCLE	LARA/PLATFORM.h	105;"	d
+MIN_FREESPACE	LARA/PLATFORM.h	107;"	d
+MIN_OFF_DEPTH	LARA/PLATFORM.h	111;"	d
+MIN_ON_DEPTH	LARA/PLATFORM.h	112;"	d
 MOORDEPTH	LARA/PLATFORM.h	/^  float MOORDEPTH; \/\/ Depth confirmation at beginning of LARA.PHASE==1. Averaged$/;"	m	struct:__anon1
 MPC	LARA/LARA.c	/^SystemParameters MPC;$/;"	v
 Make_Directory	MPC/MPC_Global/MPC.c	/^void Make_Directory(char *path) {$/;"	f
@@ -313,7 +313,7 @@ NIGKSettings	MPC/MPC_SETTINGS/Settings.c	/^Settings NIGKSettings[] = {NIGKDELAY_
 NIGKTARGETDEPTH_DEFAULT	MPC/MPC_SETTINGS/Settings.h	217;"	d
 NIGKTARGETDEPTH_DESC	MPC/MPC_SETTINGS/Settings.h	218;"	d
 NIGKTARGETDEPTH_NAME	MPC/MPC_SETTINGS/Settings.h	216;"	d
-NIGKWINCH	LARA/PLATFORM.h	54;"	d
+NIGKWINCH	LARA/PLATFORM.h	88;"	d
 NIGK_MIN_DEPTH	MPC/WINCH/Winch.h	19;"	d
 NUM	MPC/WISPR/WISPR.h	/^  short NUM;    \/\/ Depends on the number of WISPR Boards installed$/;"	m	struct:__anon5
 NUMCOM	MPC/GPSIRID/GPSIRID.c	56;"	d	file:
@@ -346,8 +346,8 @@ PLTFRMID	MPC/MPC_Global/MPC_Global.h	/^  char PLTFRMID[6];  \/\/ rudicsland$/;"	
 PLTFRMID_DEFAULT	MPC/MPC_SETTINGS/Settings.h	27;"	d
 PLTFRMID_DESC	MPC/MPC_SETTINGS/Settings.h	28;"	d
 PLTFRMID_NAME	MPC/MPC_SETTINGS/Settings.h	26;"	d
-POWERERROR	LARA/PLATFORM.h	127;"	d
-POWERLOGGING	LARA/PLATFORM.h	40;"	d
+POWERERROR	LARA/PLATFORM.h	161;"	d
+POWERLOGGING	LARA/PLATFORM.h	74;"	d
 POWEROFFDEPTH_DEFAULT	MPC/MPC_SETTINGS/Settings.h	180;"	d
 POWEROFFDEPTH_DESC	MPC/MPC_SETTINGS/Settings.h	181;"	d
 POWEROFFDEPTH_NAME	MPC/MPC_SETTINGS/Settings.h	179;"	d
@@ -359,13 +359,13 @@ PROGNAME	MPC/MPC_Global/MPC_Global.h	/^  char PROGNAME[20]; \/\/ added HM$/;"	m	
 PROG_DEFAULT	MPC/MPC_SETTINGS/Settings.h	19;"	d
 PROG_DESC	MPC/MPC_SETTINGS/Settings.h	20;"	d
 PROG_NAME	MPC/MPC_SETTINGS/Settings.h	18;"	d
-PROG_VERSION	LARA/PLATFORM.h	38;"	d
+PROG_VERSION	LARA/PLATFORM.h	72;"	d
 PROJID	MPC/MPC_Global/MPC_Global.h	/^  char PROJID[6];    \/\/ rudicsland$/;"	m	struct:__anon9
 PROJID_DEFAULT	MPC/MPC_SETTINGS/Settings.h	23;"	d
 PROJID_DESC	MPC/MPC_SETTINGS/Settings.h	24;"	d
 PROJID_NAME	MPC/MPC_SETTINGS/Settings.h	22;"	d
-PWR	LARA/PLATFORM.h	133;"	d
-PWR	LARA/PLATFORM.h	147;"	d
+PWR	LARA/PLATFORM.h	167;"	d
+PWR	LARA/PLATFORM.h	181;"	d
 PWRCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable PWRCmdTable[] =$/;"	v
 ParseStartupParams	MPC/MPC_Global/MPC.c	/^void ParseStartupParams(bool DefaultSettings) {$/;"	f
 PhaseFour	LARA/LARA.c	/^void PhaseFour() {$/;"	f
@@ -384,12 +384,12 @@ PreRun	MPC/MPC_Global/MPC.c	/^void PreRun(void) {$/;"	f
 PrintSystemStatus	LARA/LARA.c	/^char *PrintSystemStatus() {$/;"	f
 ProjID	MPC/GPSIRID/GPSIRID.c	/^static char ProjID[5];$/;"	v	file:
 PutInSleepMode	LARA/LARA.c	/^bool PutInSleepMode = false;$/;"	v
-REALTIME	LARA/PLATFORM.h	53;"	d
+REALTIME	LARA/PLATFORM.h	87;"	d
 RECOVERY	MPC/WINCH/Winch.h	/^  short RECOVERY; \/\/ If 1, call in repeatedly @ specified interval. 'A' reset to$/;"	m	struct:__anon6
 REST	MPC/GPSIRID/GPSIRID.h	/^  short REST;     \/\/ Rest period for Iridium to call again$/;"	m	struct:__anon4
 RRATE	MPC/WINCH/Winch.h	/^  short RRATE;  \/\/ Velocity in meters\/minute of the rise (ascent) rate$/;"	m	struct:__anon6
-RTS	LARA/PLATFORM.h	86;"	d
-RTS	LARA/PLATFORM.h	88;"	d
+RTS	LARA/PLATFORM.h	120;"	d
+RTS	LARA/PLATFORM.h	122;"	d
 RecallTimeout	MPC/GPSIRID/GPSIRID.c	55;"	d	file:
 Receive_Command	MPC/GPSIRID/GPSIRID.c	/^int Receive_Command(int len) {$/;"	f
 ResetDefaultSettings	MPC/MPC_SETTINGS/Settings.c	/^void ResetDefaultSettings(Settings *VEESettings) {$/;"	f
@@ -410,9 +410,9 @@ STATUS	LARA/PLATFORM.h	/^  short STATUS;$/;"	m	struct:__anon1
 STOPCALLS	MPC/WINCH/Winch.h	/^  short STOPCALLS;$/;"	m	struct:__anon7
 STOPRCV	MPC/WINCH/Winch.h	/^  short STOPRCV;$/;"	m	struct:__anon7
 SURFACED	LARA/PLATFORM.h	/^  bool SURFACED; \/\/ Set to true when Antenna is estimated to be protruding from$/;"	m	struct:__anon1
-SYSCLK	LARA/PLATFORM.h	67;"	d
+SYSCLK	LARA/PLATFORM.h	101;"	d
 SYSSettings	MPC/MPC_SETTINGS/Settings.c	/^Settings SYSSettings[] = {PROG_NAME,$/;"	v
-SYSTEMDIAGNOSTICS	LARA/PLATFORM.h	44;"	d
+SYSTEMDIAGNOSTICS	LARA/PLATFORM.h	78;"	d
 SamplePWR	MPC/MPC_SETTINGS/Settings.c	/^void SamplePWR() { printf("\\nVoltage: %5.2f", Voltage_Now()); }$/;"	f
 SatComOpen	MPC/GPSIRID/GPSIRID.c	/^bool SatComOpen = false;$/;"	v
 SaveParams	MPC/MPC_Global/MPC.c	/^bool SaveParams(const char *Command) {$/;"	f
@@ -448,13 +448,15 @@ StopPWRCmd	MPC/MPC_SETTINGS/Settings.c	/^void StopPWRCmd() {$/;"	f
 StringSearch	MPC/GPSIRID/GPSIRID.c	/^short StringSearch(char *inString, char *Template, uchar *compstring) {$/;"	f
 SummedVelocity	MPC/CTD/CTD.c	/^float SummedVelocity;$/;"	v
 Surfaced	MPC/WINCH/Winch.c	/^bool Surfaced;$/;"	v
-SwitchAntenna	MPC/GPSIRID/GPSIRID.c	/^short SwitchAntenna(char *r) {$/;"	f
+SwitchAntenna	MPC/GPSIRID/GPSIRID.c	/^short SwitchAntenna(char r) {$/;"	f
+SwitchTD	MPC/CTD/CTD.c	/^void SwitchTD(char c) {$/;"	f
 SyncMode	MPC/CTD/CTD.c	/^bool SyncMode;$/;"	v
 SystemCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable SystemCmdTable[] =$/;"	v
 SystemParameters	MPC/MPC_Global/MPC_Global.h	/^} SystemParameters;$/;"	t	typeref:struct:__anon9
 SystemSettings	MPC/MPC_SETTINGS/Settings.c	/^void SystemSettings() {$/;"	f
 SystemStatus	LARA/PLATFORM.h	/^} SystemStatus;$/;"	t	typeref:struct:__anon1
 System_Timer	MPC/MPC_Global/MPC.c	/^int System_Timer() {$/;"	f
+TDCOM	LARA/PLATFORM.h	26;"	d
 TDEPTH	LARA/PLATFORM.h	/^  short TDEPTH; \/\/$/;"	m	struct:__anon1
 TDEPTH	MPC/WINCH/Winch.h	/^  short TDEPTH; \/\/ CTD depth at optimal position for iridium\/gps comms (Antenna$/;"	m	struct:__anon6
 TOPDEPTH	LARA/PLATFORM.h	/^  float TOPDEPTH;$/;"	m	struct:__anon1
@@ -479,13 +481,13 @@ WINCH	MPC/WINCH/Winch.c	/^WinchCalls WINCH;$/;"	v
 WINCHCALLS	MPC/WINCH/Winch.h	/^  short WINCHCALLS;$/;"	m	struct:__anon7
 WINCHParameters	MPC/WINCH/Winch.h	/^} WINCHParameters;$/;"	t	typeref:struct:__anon6
 WISP	MPC/WISPR/WISPR.c	/^WISPRParameters WISP;$/;"	v
-WISPR	LARA/PLATFORM.h	45;"	d
+WISPR	LARA/PLATFORM.h	79;"	d
 WISPRCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable WISPRCmdTable[] =$/;"	v
 WISPRDFP	MPC/WISPR/WISPR.c	/^void WISPRDFP() {$/;"	f
 WISPRDet	MPC/WISPR/WISPR.c	/^void WISPRDet(int dtx) {$/;"	f
 WISPRExit	MPC/WISPR/WISPR.c	/^bool WISPRExit() {$/;"	f
 WISPRExpectedReturn	MPC/WISPR/WISPR.c	/^bool WISPRExpectedReturn(short expected, bool reboot) {$/;"	f
-WISPRFOUR	MPC/WISPR/WISPR.h	43;"	d
+WISPRFOUR	LARA/PLATFORM.h	28;"	d
 WISPRFreeSpace	MPC/WISPR/WISPR.c	/^float WISPRFreeSpace = 0.0;$/;"	v
 WISPRGAIN_DEFAULT	MPC/MPC_SETTINGS/Settings.h	150;"	d
 WISPRGAIN_DESC	MPC/MPC_SETTINGS/Settings.h	151;"	d
@@ -496,29 +498,29 @@ WISPRGain	MPC/WISPR/WISPR.c	/^void WISPRGain(short c) {$/;"	f
 WISPRMODE_DEFAULT	MPC/MPC_SETTINGS/Settings.h	166;"	d
 WISPRMODE_DESC	MPC/MPC_SETTINGS/Settings.h	167;"	d
 WISPRMODE_NAME	MPC/MPC_SETTINGS/Settings.h	165;"	d
-WISPRNUMBER	LARA/PLATFORM.h	69;"	d
+WISPRNUMBER	LARA/PLATFORM.h	103;"	d
 WISPRNUM_DEFAULT	MPC/MPC_SETTINGS/Settings.h	155;"	d
 WISPRNUM_DESC	MPC/MPC_SETTINGS/Settings.h	156;"	d
 WISPRNUM_NAME	MPC/MPC_SETTINGS/Settings.h	154;"	d
-WISPRONE	MPC/WISPR/WISPR.h	40;"	d
+WISPRONE	LARA/PLATFORM.h	29;"	d
 WISPROff	MPC/MPC_SETTINGS/Settings.c	/^void WISPROff() {$/;"	f
 WISPROn	MPC/MPC_SETTINGS/Settings.c	/^void WISPROn() {$/;"	f
 WISPRParameters	MPC/WISPR/WISPR.h	/^} WISPRParameters;$/;"	t	typeref:struct:__anon5
 WISPRPower	MPC/WISPR/WISPR.c	/^void WISPRPower(bool power) {$/;"	f
 WISPRSafeShutdown	MPC/WISPR/WISPR.c	/^void WISPRSafeShutdown() {$/;"	f
 WISPRTFP	MPC/WISPR/WISPR.c	/^void WISPRTFP() {$/;"	f
-WISPRTHREE	MPC/WISPR/WISPR.h	42;"	d
-WISPRTWO	MPC/WISPR/WISPR.h	41;"	d
+WISPRTHREE	LARA/PLATFORM.h	27;"	d
+WISPRTWO	LARA/PLATFORM.h	30;"	d
 WISPRWriteFile	MPC/WISPR/WISPR.c	/^void WISPRWriteFile(int uploadfilehandle) {$/;"	f
 WISPR_Data	MPC/WISPR/WISPR.c	/^short WISPR_Data() {$/;"	f
 WISPR_On	MPC/WISPR/WISPR.c	/^bool WISPR_On;$/;"	v
-WISPR_PWR_OFF	MPC/WISPR/WISPR.h	46;"	d
-WISPR_PWR_ON	MPC/WISPR/WISPR.h	45;"	d
+WISPR_PWR_OFF	LARA/PLATFORM.h	36;"	d
+WISPR_PWR_ON	LARA/PLATFORM.h	35;"	d
 WISPR_Status	MPC/WISPR/WISPR.c	/^bool WISPR_Status() { return WISPR_On; }$/;"	f
 WISPSettings	MPC/MPC_SETTINGS/Settings.c	/^Settings WISPSettings[] = {WISPRNUM_NAME,$/;"	v
-WTMODE	LARA/PLATFORM.h	66;"	d
+WTMODE	LARA/PLATFORM.h	100;"	d
 WaitForWinch	LARA/LARA.c	/^void WaitForWinch(short expectedBuoyMode) {$/;"	f
-WinchCalls	MPC/WINCH/Winch.h	/^} WinchCalls;/;"	t	typeref:struct:__anon7
+WinchCalls	MPC/WINCH/Winch.h	/^} WinchCalls;$/;"	t	typeref:struct:__anon7
 WinchConsole	MPC/WINCH/Winch.c	/^void WinchConsole() {$/;"	f
 Winch_Ascend	MPC/WINCH/Winch.c	/^ulong Winch_Ascend(void) {$/;"	f
 Winch_Descend	MPC/WINCH/Winch.c	/^ulong Winch_Descend(void) {$/;"	f

@@ -13,23 +13,23 @@
  * Winch.h:#define AMODEMPWR 21
  * Winch.h:#define AMODEMRX 33
  * Winch.h:#define AMODEMTX 35
- * CTD.h:#define TDCOM 23 // com1 shared, must match GPSIRID.h#IRIDGPSCOM
- * GPSIRID.h:#define IRIDGPSPWR 22 // Iridium Power pin (1=ON, 0=OFF)
- * GPSIRID.h:#define IRIDGPSCOM 23 // com1 shared, must match CTD.h#TDCOM
- * GPSIRID.h:#define IRIDGPSRX 32
- * GPSIRID.h:#define IRIDGPSTX 31
+ * CTD.h:#define TDCOM 23 // com1 shared, must match GPSIRID.h#ANTMODCOM
+ * GPSIRID.h:#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+ * GPSIRID.h:#define ANTMODCOM 23 // com1 shared, must match CTD.h#TDCOM
+ * GPSIRID.h:#define ANTMODRX 32
+ * GPSIRID.h:#define ANTMODTX 31
  */
 
 #define AMODEMPWR 21
-#define IRIDGPSPWR 22 // Iridium Power pin (1=ON, 0=OFF)
-#define IRIDGPSCOM 23 // com1 shared, must match 
+#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+#define ANTMODCOM 23 // com1 shared, must match 
 #define TDCOM 23 // com1 shared, must match 
 #define WISPRTHREE 24
 #define WISPRFOUR 25
 #define WISPRONE 29
 #define WISPRTWO 30
-#define IRIDGPSTX 31
-#define IRIDGPSRX 32
+#define ANTMODTX 31
+#define ANTMODRX 32
 #define AMODEMRX 33
 #define AMODEMTX 35
 #define WISPR_PWR_ON 37
