@@ -1,0 +1,10 @@
+flow thru code from P3
+close ctd, wispr
+IRIDGPS() . UploadFiles . Connect_SendFile_RecCmd . PHonePin . InitModem
+ . SendFile 
+
+
+
+
+whatsup with GlobalRestart?
+when does Connect_SendFile_RecCmd call SendFile(exists=false)?
