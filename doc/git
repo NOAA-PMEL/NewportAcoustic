@@ -1,0 +1,205 @@
+Thu, Feb 16, 2017  2:36:15 PM
+.1 https://longair.net/blog/2009/04/16/git-fetch-and-merge/
+If you want to create a local branch based on a remote-tracking branch
+(i.e. in order to actually work on it) you can do that with git
+branch –track or git checkout –track -b, (note, -track is implied by 
+origin/branch, not needed here) which is similar but it
+also switches your working tree to the newly created local branch. For
+example, if you see in git branch -r that there’s a remote-tracking
+branch called origin/refactored that you want, you would use the command:
+
+    git checkout -b mybranch origin/ourbranch
+
+Fri, Jan 13, 2017  9:06:27 AM
+.0 get account on git-hub
+  eugene.burger will add you to PMEL and Acoustic groups
+  brian.kahn will add you to NewportAcoustic repo
+.1 install git with defaults
+.2 {right} git-bash here in code dir, e.g. Documents\codeCF2
+.3 setup
+  git config --global user.name "Brian Kahn"
+  git config --global user.email "brian.kahn@noaa.gov"
+.4 ssh. copy .ssh/id_rsa or
+  ssh-keygen -t rsa -b 4096 -C "brian.kahn@noaa.gov"
+  eval $(ssh-agent -s)
+  ssh-add ~/.ssh/id_rsa
+  clip < ~/.ssh/id_rsa.pub
+# add to account on github
+  git --version
+  ssh -T git@github.com
+  git remote -v
+
+vi ~/.ssh/config
+
+host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/id_rsa_github
+ User git
+
+.5 clone repo
+  git clone git@github.com:NOAA-PMEL/NewportAcoustic.git
+.6 codewarrior
+.. dos format by default
+Edit -> Preferences... : Editor Settings : Default File Format = Unix
+
+Wed, Jan 18, 2017  8:41:26 AM
+. learning git
+.. flow
+
+.. pull fetch
+git pull does a git fetch followed by a git merge.  You can do a
+git fetch at any time to update your remote-tracking branches under
+refs/remotes/<remote>/.  This operation never changes any of your own
+local branches under refs/heads, and is safe to do without changing
+your working copy. I have even heard of people running git fetch
+periodically in a cron job in the background (although I wouldn't
+recommend doing this).  A git pull is what you would do to bring a
+local branch up-to-date with its remote version, while also updating
+your other remote-tracking branches.
+
+Thu, Jan 19, 2017 10:48:43 AM
+. update - don't have to remove DBG or \$ if using clang not indent
+. to prep for formatting, remove DBG () macro by #ifdef DEBUG
+.. vi  $( grep -rl DBG * | grep '.c$' )
+/DBG (
+%
+s\n#endif\n
+ ... repeat n % . for all
+: 1,$s/DBG (/\r#ifdef DEBUG\r/g
+
+.. vi
+  vi $(egrep -rl --include="*.[ch]" 'DBG \(|[^*]\\$| \\ ')
+/[^*]\\$/
+/ \\ /
+/DBG (/
+%
+s\n#endif\n
+ ... repeat n % . for all
+
+.. sed
+find . -name "*.c" -print0 | xargs -0 sed -i~~ 'N;s/^\n#endif/#endif/;P;D'
+find . -name "*.c" -print0 | xargs -0 sed -i~~ 'N;s/^\n#ifdef DEBUG/#ifdef DEBUG/;P;D'
+find . -name "*.c" -print0 | xargs -0 sed -i~~ 'N;s/#ifdef DEBUG\n$/#ifdef DEBUG/;P;D'
+.. format
+indent $(find . -name "*.[ch]")
+
+
+Fri, Jan 20, 2017 11:36:04 AM
+.1 cygwin git over ssh
+vi ~/.ssh/config
+
+host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/id_rsa_github
+ User git
+
+.2 where cloned from?
+  git remote show origin
+.3 detached head
+http://stackoverflow.com/questions/5772192/how-can-i-reconcile-detached-head-with-master-origin
+HEAD is the symbolic name for the currently checked out commit. When HEAD is not detached (the “normal”1 situation: you have a branch checked out), HEAD actually points to a branch’s “ref” and the branch points to the commit. HEAD is thus “attached” to a branch. When you make a new commit, the branch that HEAD points to is updated to point to the new commit. HEAD follows automatically since it just points to the branch.
+
+    git symbolic-ref HEAD yields refs/heads/master
+    The branch named “master” is checked out.
+    git rev-parse refs/heads/master yield 17a02998078923f2d62811326d130de991d1a95a
+    That commit is the current tip or “head” of the master branch.
+    git rev-parse HEAD also yields 17a02998078923f2d62811326d130de991d1a95a
+    This is what it means to be a “symbolic ref”. It points to an object through some other reference.
+    (Symbolic refs were originally implemented as symbolic links, but later changed to plain files with extra interpretation so that they could be used on platforms that do not have symlinks.)
+
+We have HEAD → refs/heads/master → 17a02998078923f2d62811326d130de991d1a95a
+
+When HEAD is detached, it points directly to a commit—instead of indirectly pointing to one through a branch. You can think of a detached HEAD as being on an unnamed branch.
+
+    git symbolic-ref HEAD fails with fatal: ref HEAD is not a symbolic ref
+    git rev-parse HEAD yields 17a02998078923f2d62811326d130de991d1a95a
+    Since it is not a symbolic ref, it must point directly to the commit itself.
+
+We have HEAD → 17a02998078923f2d62811326d130de991d1a95a
+
+The important thing to remember with a detached HEAD is that if the commit it points to is otherwise unreferenced (no other ref can reach it), then it will become “dangling” when you checkout some other commit. Eventually, such dangling commits will be pruned through the garbage collection process (by default, they are kept for at least 2 weeks and may be kept longer by being referenced by HEAD’s reflog).
+
+1 It is perfectly fine to do “normal” work with a detached HEAD, you just have to keep track of what you are doing to avoid having to fish dropped history out of the reflog.
+
+The intermediate steps of an interactive rebase are done with a detached HEAD (partially to avoid polluting the active branch’s reflog). If you finish the full rebase operation, it will update your original branch with the cumulative result of the rebase operation and reattach HEAD to the original branch. My guess is that you never fully completed the rebase process; this will leave you with a detached HEAD pointing to the commit that was most recently processed by the rebase operation.
+
+To recover from your situation, you should create a branch that points to the commit currently pointed to by your detached HEAD:
+
+git branch temp
+git checkout temp
+
+(these two commands can be abbreviated as git checkout -b temp)
+
+This will reattach your HEAD to the new temp branch.
+
+Next, you should compare the current commit (and its history) with the normal branch on which you expected to be working:
+
+git log --graph --decorate --pretty=oneline --abbrev-commit master origin/master temp
+git diff master temp
+git diff origin/master temp
+
+(You will probably want to experiment with the log options: add -p, leave off --pretty=… to see the whole log message, etc.)
+
+If your new temp branch looks good, you may want to update (e.g.) master to point to it:
+
+git branch -f master temp
+git checkout master
+
+(these two commands can be abbreviated as git checkout -B master temp)
+
+You can then delete the temporary branch:
+
+git branch -d temp
+
+Finally, you will probably want to push the reestablished history:
+
+git push origin master
+
+You may need to add --force to the end of this command to push if the remote branch can not be “fast-forwarded” to the new commit (i.e. you dropped, or rewrote some existing commit, or otherwise rewrote some bit of history).
+
+If you were in the middle of a rebase operation you should probably clean it up. You can check whether a rebase was in process by looking for the directory .git/rebase-merge/. You can manually clean up the in-progress rebase by just deleting that directory (e.g. if you no longer remember the purpose and context of the active rebase operation). Usually you would use git rebase --abort, but that does some extra resetting that you probably want to avoid (it moves HEAD back to the original branch and resets it back to the original commit, which will undo some of the work we did above).
+
+Thu, Jan 26, 2017 12:53:08 PM
+. git vim
+.. bind clang 
+.. find function
+gd for earliest func/var decl
+*  for next use of this word
+. git log
+ git log --pretty=format:"%h %s" --graph
+
+Mon, Jan 30, 2017  2:55:08 PM
+. setup git and cyg tools
+.. cygwin-setup
+python3 p3-setup-tools clang-format{vim,git} git 
+.. ssh 
+~/.ssh/id_rsa_git
+~/.ssh/config
+.. git setup
+  git config --global user.name "Brian Kahn"
+  git config --global user.email "brian.kahn@noaa.gov"
+.. repo
+mkdir -p /cygdrive/c/Users/kahn/Documents/codeCF2
+ln -s !$ ~
+cd ~/codeCF2
+git clone git@github.com:NOAA-PMEL/NewportAcoustic.git
+
+Next, you should compare the current commit (and its history) with the normal branch on which you expected to be working:
+
+git log --graph --decorate --pretty=oneline --abbrev-commit master origin/master temp
+git diff master temp
+git diff origin/master temp
+
+(You will probably want to experiment with the log options: add -p, leave off --pretty=… to see the whole log message, etc.)
+
+If your new temp branch looks good, you may want to update (e.g.) master to point to it:
+
+. gitting around 
+ $ git branch --unset-upstream # Remove a current tracking relationship 
+ $ git branch --set-upstream-to origin/branchname
+ $ git push -u origin feature # Link a branch to an upstream branch 
+ $ git push --all # push all tracking branches
+ $ git pull –rebase
+ $ git fetch origin; git rebase −p origin/develop  # better than pull
+ $ git update-index --assume-unchanged file # for .mcp files
+ $ git update-index --skip-worktree file

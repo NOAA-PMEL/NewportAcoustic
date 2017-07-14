@@ -1,0 +1,14 @@
+color desert
+set autoindent
+set tabstop=8
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+set incsearch
+set nohlsearch
+set comments=
+set tagrelative
+set tags=./.tags,.tags;/
+set tags+=/home/kahn/cf2/tags.h.cf2
+map <C-K> :pyf /usr/share/vim/vimfiles/syntax/clang-format.py<cr>
+imap <C-K> <c-o>:pyf /usr/share/vim/vimfiles/syntax/clang-format.py<cr>
