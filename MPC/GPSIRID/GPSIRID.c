@@ -133,6 +133,7 @@ sleep before
 //
 //   Block size should be 1024 or 2048
 //   Cyclic Redundancy Check, CRC-CCITT(0x1D0F)
+//   return: -1 on hw fail, -2 "lostCarrier" on any upload fail, else UploadFiles result
 *********************************************************************************/
 short IRIDGPS() {
 
@@ -164,20 +165,22 @@ short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
-  short antsw;
   //	long fnum;
+#if PLATFORM != LARA
+  short antsw;
+  antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
+  if (antsw == 1)
+    SwitchAntenna('I');
+  else
+    PinMirror(1);
+#endif
+
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
   // three global vars - not used anywhere ??
   strcpy(ProjID, MPC.PROJID);
   strcpy(PltfrmID, MPC.PLTFRMID);
   strcpy(PhoneNum, IRID.PHONE);
-  antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
-
-  if (antsw == 1)
-    SwitchAntenna('I');
-  else
-    PinMirror(1);
 
   // Prepare current file name
   // Find highest .dat file number
@@ -299,6 +302,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
   // Figure out file size and how many blocks need to be sent
   stat(IRIDFilename, &info);
   // Only need to do this once... Unless we Power off the modem.
+  // ?? who does it if the modem is cycled? Too bad iridium pin check is broken.
   PhonePin();
 
   // Register, call and check SQ, connect the Rudics and login PMEL:
@@ -1202,7 +1206,7 @@ short Send_File(bool FileExist, long filelength) {
     DBG(flogf("\n\t|Check First Bitmap: %s", bitmap); putflush();)
 
     Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
-  }
+  } // FileExist
   Delay = (short)LastBlkLength / 1000;
   if (Delay == 0)
     Delay = 1;

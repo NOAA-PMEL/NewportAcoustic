@@ -14,35 +14,35 @@
 *        On surface Phase 3 && BuoyMode 0
 *        Descending Phase 4 && BuoyMode 2
 **
- Console(char)
-  LARA.PHASE case 1:
-    case 'i': WISPRPower(true);
-    case 'e': WISPRSafeShutdown();
-    case 'd': WISPRDet(c);
-    case 'f': WISPRDFP();
-    case 'w': ChangeWISPR(c);
-    case 'p': LARA.PHASE = c;
-    case 'x': LARA.ON = false;
-    case '2': LARA.DATA = LARA.DATA ? false : true;
-  LARA.PHASE case 2: case 4:
-    case 'w': WinchConsole();
-    case 'p': LARA.PHASE = c;
-    case 't': CTD_Sample();
-    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
-    case 'a': PrintSystemStatus();
-    case 's': LARA.SURFACED = true;
-  LARA.PHASE case 3:
-    case 'x': LARA.ON = false; // exit from GPSIRID
-    case 'p': LARA.PHASE = c;
-**
-
-WISPR BOARD
-** TPU 6    27 PAM1 WISPR TX
-** TPU 7    28 PAM1 WISPR RX
-** TPU 8    29 1= turns on MAX3222
-** TPU 9    30 0= enables MAX3222
-
-Interrupts:
+* Console(char)
+*  LARA.PHASE case 1:
+*    case 'i': WISPRPower(true);
+*    case 'e': WISPRSafeShutdown();
+*    case 'd': WISPRDet(c);
+*    case 'f': WISPRDFP();
+*    case 'w': ChangeWISPR(c);
+*    case 'p': LARA.PHASE = c;
+*    case 'x': LARA.ON = false;
+*    case '2': LARA.DATA = LARA.DATA ? false : true;
+*  LARA.PHASE case 2: case 4:
+*    case 'w': WinchConsole();
+*    case 'p': LARA.PHASE = c;
+*    case 't': CTD_Sample();
+*    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+*    case 'a': PrintSystemStatus();
+*    case 's': LARA.SURFACED = true;
+*  LARA.PHASE case 3:
+*    case 'x': LARA.ON = false; // exit from GPSIRID
+*    case 'p': LARA.PHASE = c;
+***
+*
+*WISPR BOARD
+*** TPU 6    27 PAM1 WISPR TX
+*** TPU 7    28 PAM1 WISPR RX
+*** TPU 8    29 1= turns on MAX3222
+*** TPU 9    30 0= enables MAX3222
+*
+*Interrupts:
 **
 ** IRQ2 Wakes up from the sleep mode while waiting for ASC string from COM2
 ** IRQ3
@@ -631,9 +631,11 @@ void PhaseThree() {
 
     // attempts>2 ?? irrelevant in the logic flow. where set?
     // attempts++ and checked in result==-1
-    if (result >= 1 || attempts > 4) 
+    if (result >= 1 || attempts > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
+      // ?? check this at bottom of loop?
+    }
     if (result == 1 || result == 2) { 
       // Upload Success / Fake Commands
       IridiumCalls++;
