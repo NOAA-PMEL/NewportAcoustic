@@ -1,0 +1,13 @@
+Serial interface program to control and 
+ communicate with SBE and Iridium/GPS.
+Buoy is connected to com4 at 9600 BAUD
+ ^A Antenna G|I 
+ ^B Binary byte 
+ ^C Connect I|S 
+ ^D powerDown I|S
+ ^E binary lEngth
+ ^F binary 2bytes (TBD)
+ ^G unused 
+On console (com1): s=status x=exit *=this message
+status: 
+"connected:SBE antenna:G iridgps:off sbe:on command:1"
