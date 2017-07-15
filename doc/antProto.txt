@@ -11,3 +11,12 @@ Buoy is connected to com4 at 9600 BAUD
 On console (com1): s=status x=exit *=this message
 status: 
 "connected:SBE antenna:G iridgps:off sbe:on command:1"
+
+
+v1.0
+ * SwitchAntenna
+ * Switch antenna module between SBE39 TD, Iridium and GPS.
+ * send ^b to connect SB39.Type 'ts' to get the T-D from SB39plus.
+ * send ^f to connect GPS. Antenna SW is GPS side.
+ * send ^d to connect Iridium/GPS. Antenna to IRID side.
+ * send ^e to exit.

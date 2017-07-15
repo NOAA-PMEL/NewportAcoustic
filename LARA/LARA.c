@@ -227,7 +227,7 @@ void main() {
 void shutdown() {
   WISPRSafeShutdown();
 
-  PIOClear(IRIDGPSPWR); // Make sure Iridium is Off
+  PIOClear(ANTMODPWR); // Make sure Iridium is Off
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
 
@@ -248,7 +248,7 @@ void InitializeLARA(ulong *PwrOn) {
   bool check = false;
 
   PIOMirrorList(mirrorpins);
-  PIOClear(IRIDGPSPWR); // Make sure iridium is off...
+  PIOClear(ANTMODPWR); // Make sure iridium is off...
   PIOSet(26);
   // Get the system settings running
   SetupHardware();

@@ -108,20 +108,21 @@ char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
 short SwitchAntenna(char);
+short SelectModule(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
 DBG( void ConsoleIrid(); ) // check console for interrupt, redirect 
 
 // IRIDUM TUPORT Setup
-TUPort *IRIDGPSPort;
-short IRIDGPS_RX, IRIDGPS_TX;
+TUPort *AntModPort;
+short ANTMOD_RX, ANTMOD_TX;
 
 char *inputstring;
 char *first;
 //
 /********************************************************************************\
-** IRIDGPS3.0 12/15/2015-AT
+** GPSIRID-3.0 12/15/2015-AT
 **
 ** Incorporating Sleep Mode, So this communications protocol will be run in
 stages.
@@ -140,24 +141,24 @@ short IRIDGPS() {
   short TX_Result;
 
   if (!PowerOn_GPS()) {
-    OpenTUPort_IRIDGPS(false);
+    OpenTUPort_AntMod(false);
     return -1;
   }
 
   TX_Result = UploadFiles();
   if (TX_Result >= 1) {
-    flogf("\n\t|IRIDGPS SUccess");
-    OpenTUPort_IRIDGPS(false);
+    flogf("\n\t|ANTMOD SUccess");
+    OpenTUPort_AntMod(false);
     return TX_Result;
   }
 
   else {
     flogf("\nLOST CARRIER");
-    OpenTUPort_IRIDGPS(false);
+    OpenTUPort_AntMod(false);
     return -2;
   }
 
-} //____ GPSIRID() ____//
+} //____ IRIDGPS() ____//
 /*********************************************************************************\
 ** UploadFiles();
 \*********************************************************************************/
@@ -203,7 +204,7 @@ bool PowerOn_GPS() {
   antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
 
   // Open the GPS/IRID satellite com...
-  OpenTUPort_IRIDGPS(true);
+  OpenTUPort_AntMod(true);
 
   // First get the GPS
   if (antsw == 1)
@@ -218,32 +219,38 @@ bool PowerOn_GPS() {
     return false;
 }
 /**********************************************************************************\
- * SwitchAntenna
+ * SwitchAntenna(G|I|S)
  * Switch antenna module between SBE39 TD, Iridium and GPS.  
- * send ^b to connect SB39.Type 'ts' to get the T-D from SB39plus.
- * send ^f to connect GPS. Antenna SW is GPS side.
- * send ^d to connect Iridium/GPS. Antenna to IRID side.
- * send ^e to exit.
+ * ^A Antenna G|I * ^B Binary byte * ^C Connect I|S * ^D powerDown I|S * ^E binary lEngth
 \**********************************************************************************/
 short SwitchAntenna(char r) {
-  ushort code;
+  char a, d;
+  DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
+  // select antMod vs SBE16, switch antMod device
+  SelectModule('A');
   switch (r) {
-    case 'G': { code=0x06; break; }
-    case 'I': { code=0x04; break; }
-    case 'S': { code=0x02; break; }
+    case 'G': { a='G'; d='I'; break; }
+    case 'I': { a='I'; d='I'; break; }
+    case 'S': { a='0'; d='S'; break; }
     default: { // bad case
       flogf("\nError SwitchAntenna(%c): bad choice", r);
       return -1;
     }
   }
-  DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
 
-  TUTxFlush(IRIDGPSPort);
-  TURxFlush(IRIDGPSPort);
-  TUTxPutByte(IRIDGPSPort, code, true);  // block, wait for send
-  RTCDelayMicroSeconds(1500000L); // wait 1.5 sec to settle antenna switch noise
+  TUTxPutByte(AntModPort, d, true);  // device G I S
+  if (a) {
+    TUTxPutByte(AntModPort, a, true);  // antenna, G I
+    RTCDelayMicroSeconds(1000000L); // wait 1 sec to settle antenna switch noise
+  }
   return 0;
 } //____ SwitchAntenna ____//
+
+/***
+ * SelectModule(A|S) - select antMod vs SBE16
+ */
+short SelectModule(char m) {
+} // SelectModule()
 
 /******************************************************************************\
 ** Connect_SendFile_RecCmd
@@ -407,7 +414,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
     ACK = false; // Reset
   }
 
-  // OpenTUPort_IRIDGPS(false);
+  // OpenTUPort_AntMod(false);
 
   if (NewCMDS)
     TX_Success = 3;
@@ -537,7 +544,7 @@ bool GetUTCSeconds() {
   ulong time_now = 0;
 
   time = (char *)calloc(24, sizeof(char));
-  TURxFlush(IRIDGPSPort);
+  TURxFlush(AntModPort);
   SendString("AT+PD");
   strncpy(time, GetGPSInput("PD", NULL), 10);
   CLK(start_clock = clock();)
@@ -647,24 +654,22 @@ bool CompareCoordinates(char *LAT, char *LONG) {
 /******************************************************************************\
 ** Close COM2 for Iridium/GPS unit and power down
 \******************************************************************************/
-void OpenTUPort_IRIDGPS(bool on) {
+void OpenTUPort_AntMod(bool on) {
 
   short wait = 10000;
   int warm;
 
-  DBG(flogf("  ..OpenTUPort_IRIDGPS() ");)
+  DBG(flogf("  ..OpenTUPort_AntMod() ");)
   if (on) {
-    IRIDGPS_RX = TPUChanFromPin(32);
-    IRIDGPS_TX = TPUChanFromPin(31);
+    ANTMOD_RX = TPUChanFromPin(32);
+    ANTMOD_TX = TPUChanFromPin(31);
 
     // Power ON
-    PIOSet(IRIDGPSPWR);
-    PIOSet(IRIDGPSCOM);
-    IRIDGPSPort = TUOpen(IRIDGPS_RX, IRIDGPS_TX, 19200, 0);
-    // exercise antenna switch
-    // SwitchAntenna('I');
-    // SwitchAntenna('G');
-    if (IRIDGPSPort == 0)
+    PIOSet(ANTMODPWR);
+    PIOSet(ANTMODCOM);
+    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 19200, 0);
+
+    if (AntModPort == 0)
       flogf("\n\t|Bad IridiumPort");
 
     SwitchAntenna('G');
@@ -672,19 +677,19 @@ void OpenTUPort_IRIDGPS(bool on) {
     flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);
     putflush();
     CIOdrain();
-    TUTxFlush(IRIDGPSPort);
+    TUTxFlush(AntModPort);
 
     inputstring = (char *)calloc(128, 1);
     first = (char *)calloc(128, 1);
 
     Delay_AD_Log(warm);
 
-    TURxFlush(IRIDGPSPort);
+    TURxFlush(AntModPort);
     SatComOpen = true;
 
   } else if (!on) {
 
-    flogf("\n%s|PowerDownCloseComIRIDGPS() ", Time(NULL));
+    flogf("\n%s|PowerDownCloseComANTMOD() ", Time(NULL));
     putflush();
     CIOdrain();
     SendString("AT*P");
@@ -692,9 +697,9 @@ void OpenTUPort_IRIDGPS(bool on) {
 
     Delay_AD_Log(3);
 
-    PIOClear(IRIDGPSCOM);
-    PIOClear(IRIDGPSPWR);
-    TUClose(IRIDGPSPort);
+    PIOClear(ANTMODCOM);
+    PIOClear(ANTMODPWR);
+    TUClose(AntModPort);
 
     SatComOpen = false;
   }
@@ -743,7 +748,7 @@ bool InitModem(int status) {
   flogf("\n%s|Modem Initialization", Time(NULL));
 
   if (!SatComOpen) {
-    OpenTUPort_IRIDGPS(true);
+    OpenTUPort_AntMod(true);
     PhonePin();
   }
   ACK = false;
@@ -948,8 +953,8 @@ short SignalQuality(short *signal_quality) {
 
   SendString("AT+CSQ");
   RTCDelayMicroSeconds(10000L);
-  TURxFlush(IRIDGPSPort);
-  TURxGetByteWithTimeout(IRIDGPSPort, 5000);
+  TURxFlush(AntModPort);
+  TURxGetByteWithTimeout(AntModPort, 5000);
   RTCDelayMicroSeconds(3000000L);
 
   GetIRIDInput("CSQ:", 5, NULL, &sig, 20000);
@@ -964,11 +969,11 @@ short SignalQuality(short *signal_quality) {
 ** void SendString()
 \******************************************************************************/
 void SendString(const char *StringIn) {
-  TUTxFlush(IRIDGPSPort);
-  TURxFlush(IRIDGPSPort);
+  TUTxFlush(AntModPort);
+  TURxFlush(AntModPort);
   DBG(flogf("\n\t|SendString(%s)", StringIn); putflush(); CIOdrain();)
-  TUTxPrintf(IRIDGPSPort, "%s\r", StringIn);
-  TUTxWaitCompletion(IRIDGPSPort);
+  TUTxPrintf(AntModPort, "%s\r", StringIn);
+  TUTxWaitCompletion(AntModPort);
   // ?? RTCDelayMicroSeconds(20000L);
 
 } //_____ SendString() _____//
@@ -1074,19 +1079,19 @@ bool Acknowledge() {
           (uchar)(crc2 & 0x00FF), proj[0], proj[1], proj[2], proj[3], proj[4],
           proj[5], proj[6], proj[7]);
 
-  TUTxFlush(IRIDGPSPort);
-  TURxFlush(IRIDGPSPort);
+  TUTxFlush(AntModPort);
+  TURxFlush(AntModPort);
   Delay_AD_Log(1);
 
   while (Ack == false && Num_ACK < AckMax) { // Repeat
 
     AD_Check();
-    TUTxPrintf(IRIDGPSPort, "%s\n\r", buf);
-    TUTxWaitCompletion(IRIDGPSPort);
+    TUTxPrintf(AntModPort, "%s\n\r", buf);
+    TUTxWaitCompletion(AntModPort);
 
     TickleSWSR(); // another reprieve
-                  // TUTxPrintf(IRIDGPSPort, "%s", buf);
-    // TUTxWaitCompletion(IRIDGPSPort);
+                  // TUTxPrintf(AntModPort, "%s", buf);
+    // TUTxWaitCompletion(AntModPort);
     Status = GetIRIDInput("ACK", 3, NULL, NULL, wait);
     if (Status == 1) {
       flogf("\n\t|ACK Received");
@@ -1113,12 +1118,12 @@ bool Acknowledge() {
       RTCDelayMicroSeconds(20000L);
     } else {
 
-      TUTxFlush(IRIDGPSPort);
-      TURxFlush(IRIDGPSPort);
+      TUTxFlush(AntModPort);
+      TURxFlush(AntModPort);
 
-      TUTxPrintf(IRIDGPSPort,
+      TUTxPrintf(AntModPort,
                  "+++"); // Exit in-call data mode to check phone status.
-      TUTxWaitCompletion(IRIDGPSPort);
+      TUTxWaitCompletion(AntModPort);
       RTCDelayMicroSeconds(25000L);
       if (GetIRIDInput("OK", 2, NULL, NULL, 3500) == 1) {
         StatusCheck();
@@ -1341,11 +1346,11 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
       AD_Check();
 
-      TUTxFlush(IRIDGPSPort);
-      TURxFlush(IRIDGPSPort);
-      TUTxPutBlock(IRIDGPSPort, buf, mlength,
-                   TUBlockDuration(IRIDGPSPort, mlength));
-      TUTxWaitCompletion(IRIDGPSPort);
+      TUTxFlush(AntModPort);
+      TURxFlush(AntModPort);
+      TUTxPutBlock(AntModPort, buf, mlength,
+                   TUBlockDuration(AntModPort, mlength));
+      TUTxWaitCompletion(AntModPort);
       RTCDelayMicroSeconds(mlength * 2000L);
     }
     free(buf);
@@ -1354,10 +1359,10 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     flogf("\nERROR  |Send_Blocks: File Close error: %d", errno);
   DBG(else flogf("\n\t|Send_Blocks: IRID Closed");)
 
-  if (tgetq(IRIDGPSPort))
-    cprintf("\n**** queue in TUPort: %d", tgetq(IRIDGPSPort));
+  if (tgetq(AntModPort))
+    cprintf("\n**** queue in TUPort: %d", tgetq(AntModPort));
 
-  TURxFlush(IRIDGPSPort);
+  TURxFlush(AntModPort);
   cdrain();
   coflush();
 
@@ -1479,16 +1484,16 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   AD_Check();
 
   Delay_AD_Log(1);
-  inputstring[0] = TURxGetByteWithTimeout(IRIDGPSPort, 15000);
+  inputstring[0] = TURxGetByteWithTimeout(AntModPort, 15000);
   Delay_AD_Log(1);
-  qsize = (long)tgetq(IRIDGPSPort);
+  qsize = (long)tgetq(AntModPort);
 
   DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain(); coflush();)
   RTCDelayMicroSeconds(10000L);
   if (qsize < 7) {
-    inputstring[1] = TURxGetByteWithTimeout(IRIDGPSPort, 3000);
+    inputstring[1] = TURxGetByteWithTimeout(AntModPort, 3000);
     k = 2;
-    qsize = (long)tgetq(IRIDGPSPort);
+    qsize = (long)tgetq(AntModPort);
     DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain(); coflush();)
   }
 
@@ -1497,8 +1502,8 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       cdrain(); coflush();)
   AD_Check();
 
-  lenreturn = TURxGetBlock(IRIDGPSPort, inputstring + k, qsize,
-                           TUBlockDuration(IRIDGPSPort, qsize));
+  lenreturn = TURxGetBlock(AntModPort, inputstring + k, qsize,
+                           TUBlockDuration(AntModPort, qsize));
 
   len = strspn(inputstring, "\r\ncmdsoneNO C");
   DBG(flogf("\n\t|Len of command characters: %d of %ld", len, lenreturn);)
@@ -1533,10 +1538,10 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
     RTCDelayMicroSeconds(10000L);
     return 1;
   } else if (resent) { //@@@ Received from RUDICS, Need to Resend
-    hbuf[hbuf_size] = TURxGetByteWithTimeout(IRIDGPSPort, 5000);
-    qsize = tgetq(IRIDGPSPort);
+    hbuf[hbuf_size] = TURxGetByteWithTimeout(AntModPort, 5000);
+    qsize = tgetq(AntModPort);
     for (i = hbuf_size + 1; i < qsize; i++) { // Get other 11-bytes from header
-      hbuf[i] = TURxGetByteWithTimeout(IRIDGPSPort, 300);
+      hbuf[i] = TURxGetByteWithTimeout(AntModPort, 300);
       if (hbuf[i] == '-1') {
         DBG(flogf("\n\t|resent buffer incomplete: %s", hbuf);) return -3;
       } // If any of the 11 are bad, return fail
@@ -1613,11 +1618,11 @@ int Receive_Command(int len) {
 
   AD_Check();
   while (queue == 0 && count < 3) {
-    queue = tgetq(IRIDGPSPort);
+    queue = tgetq(AntModPort);
     if (queue > 0) {
       DBG(flogf("\n\t|strlen of inputstring: %d", len);)
-      TURxGetBlock(IRIDGPSPort, inputstring + len, queue,
-                   TUBlockDuration(IRIDGPSPort, queue));
+      TURxGetBlock(AntModPort, inputstring + len, queue,
+                   TUBlockDuration(AntModPort, queue));
       break;
     }
     count++;
@@ -1711,11 +1716,11 @@ bool HangUp(void) {
       flogf("\n\t|Sending +++");
       cdrain();
       coflush();
-      TUTxFlush(IRIDGPSPort);
-      TURxFlush(IRIDGPSPort);
+      TUTxFlush(AntModPort);
+      TURxFlush(AntModPort);
 
-      TUTxPrintf(IRIDGPSPort, "+++");
-      TUTxWaitCompletion(IRIDGPSPort);
+      TUTxPrintf(AntModPort, "+++");
+      TUTxWaitCompletion(AntModPort);
       RTCDelayMicroSeconds(25000L);
 
       GetIRIDInput("OK", 2, NULL, NULL, wait);
@@ -1764,12 +1769,12 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   // Wait up to wait milliseconds to grab next byte from iridium/gps
   // 3.25.14 up to possibly 20 seconds...
   TickleSWSR(); // another reprieve
-  inputstring[0] = TURxGetByteWithTimeout(IRIDGPSPort, wait);
+  inputstring[0] = TURxGetByteWithTimeout(AntModPort, wait);
   RTCDelayMicroSeconds(100000L);
 
-  len = (long)tgetq(IRIDGPSPort);
-  lenreturn = TURxGetBlock(IRIDGPSPort, inputstring + 1, len,
-                           TUBlockDuration(IRIDGPSPort, len));
+  len = (long)tgetq(AntModPort);
+  lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
+                           TUBlockDuration(AntModPort, len));
   if (len == 0)
     return 0;
 
@@ -1889,7 +1894,7 @@ short StringSearch(char *inString, char *Template, uchar *compstring) {
 } //____ IRIDString Search() ____//
 /*******************************************************************************\
 ** char* GetGPSInput()
-** 1: Grabs whatever IRIDGPS data is incoming from the turport
+** 1: Grabs whatever ANTMOD data is incoming from the turport
 ** 2: Can look for a character "chars" such as ':' and then grab the number
 (numchars) proceeding chars
 ** 2.1:  From within here, we can see if we need to return a short pointer for
@@ -1909,17 +1914,17 @@ char *GetGPSInput(char *chars, int *numsats) {
   memset(first, 0, 128);
 
   inputstring[0] = TURxGetByteWithTimeout(
-      IRIDGPSPort, 5000); // Wait for first character to come in.
+      AntModPort, 5000); // Wait for first character to come in.
 
   RTCDelayMicroSeconds(50000L);
-  len = (long)tgetq(IRIDGPSPort);
+  len = (long)tgetq(AntModPort);
   RTCDelayMicroSeconds(20000L);
   // ?? why flush here
   cdrain();
   coflush();
 
-  lenreturn = TURxGetBlock(IRIDGPSPort, inputstring + 1, len,
-                           TUBlockDuration(IRIDGPSPort, len));
+  lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
+                           TUBlockDuration(AntModPort, len));
   DBG(flogf("\nGPS<< %s", inputstring);)
 
   if (chars != NULL) {
@@ -1951,8 +1956,8 @@ char *GetGPSInput(char *chars, int *numsats) {
     coflush();
   }
   DBG(flogf("\n\t|first string: %s", first);)
-  TURxFlush(IRIDGPSPort);
-  TUTxFlush(IRIDGPSPort);
+  TURxFlush(AntModPort);
+  TUTxFlush(AntModPort);
 
   return first;
 
