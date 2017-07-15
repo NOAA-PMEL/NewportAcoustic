@@ -1,0 +1,110 @@
+./LARA/LARA3.0/LARA3.0.mcp 
+./LARA/LARA3.0/LARA3.0_Data/CWSettingsWindows.stg 
+./LARA/LARA3.0/LARA3.0_Data/LARA3.0/TargetDataWindows.tdt 
+./LARA/LARA3.1/LARA3.1.mcp 
+./MPC Program Common Files/ADS/ADS3.2/ADS.c 
+./MPC Program Common Files/ADS/ADS3.2/ADS.h 
+./RAOS/RAOS4.2/RAOS System Timing4.0.xlsx 
+./SG/SG3.0/Seaglider.c 
+./SG/SG3.0/SG3.0.mcp 
+./SG/SG3.0/SG3.0_Data/CWSettingsWindows.stg 
+./SG/SG3.0/SG3.0_Data/SG3.0/TargetDataWindows.tdt 
+
+find . -type f | while read i; do cmp "$i" "/cygdrive/j/Turpin/CF2 Programming/$i"; done
+./LARA/LARA3.0/LARA3.0.mcp /cygdrive/j/Turpin/CF2 Programming/./LARA/LARA3.0/LARA3.0.mcp differ: byte 2538, line 3
+./LARA/LARA3.0/LARA3.0_Data/CWSettingsWindows.stg /cygdrive/j/Turpin/CF2 Programming/./LARA/LARA3.0/LARA3.0_Data/CWSettingsWindows.stg differ: byte 1964, line 2
+./LARA/LARA3.0/LARA3.0_Data/LARA3.0/TargetDataWindows.tdt /cygdrive/j/Turpin/CF2 Programming/./LARA/LARA3.0/LARA3.0_Data/LARA3.0/TargetDataWindows.tdt differ: byte 5981, line 9
+./LARA/LARA3.1/LARA3.1.mcp /cygdrive/j/Turpin/CF2 Programming/./LARA/LARA3.1/LARA3.1.mcp differ: byte 2542, line 3
+./MPC Program Common Files/ADS/ADS3.2/ADS.c /cygdrive/j/Turpin/CF2 Programming/./MPC Program Common Files/ADS/ADS3.2/ADS.c differ: byte 3389, line 97
+./MPC Program Common Files/ADS/ADS3.2/ADS.h /cygdrive/j/Turpin/CF2 Programming/./MPC Program Common Files/ADS/ADS3.2/ADS.h differ: byte 380, line 8
+./RAOS/RAOS4.2/RAOS System Timing4.0.xlsx /cygdrive/j/Turpin/CF2 Programming/./RAOS/RAOS4.2/RAOS System Timing4.0.xlsx differ: byte 19, line 1
+cmp: /cygdrive/j/Turpin/CF2 Programming/./SG/Logdev User Guide RevD.pdf: No such file or directory
+./SG/SG3.0/Seaglider.c /cygdrive/j/Turpin/CF2 Programming/./SG/SG3.0/Seaglider.c differ: byte 96, line 2
+./SG/SG3.0/SG3.0.mcp /cygdrive/j/Turpin/CF2 Programming/./SG/SG3.0/SG3.0.mcp differ: byte 2062, line 4
+./SG/SG3.0/SG3.0_Data/CWSettingsWindows.stg /cygdrive/j/Turpin/CF2 Programming/./SG/SG3.0/SG3.0_Data/CWSettingsWindows.stg differ: byte 2001, line 2
+./SG/SG3.0/SG3.0_Data/SG3.0/TargetDataWindows.tdt /cygdrive/j/Turpin/CF2 Programming/./SG/SG3.0/SG3.0_Data/SG3.0/TargetDataWindows.tdt differ: byte 8943, line 8
+
+
+Tue, Jan 10, 2017  9:39:51 AM
+.0 files and paths:
+.0.1 file names with xx@xx seem to be saved versions, i will discard
+.0.2 any idea what the resource fork and *Data/ are from? not in all .mpc dirs
+.0.3 ?? highest rev is the current version except for lara3.1?
+.0.3.1 what is useful in lara3.1? 
+.0.3.2 what deployment is it aimed at?
+.1 Why is there phase3 logic in while loop? is PhaseThree() called elsewhere?
+.2 ?? lara.on=false <-- Console() <-- cgetq() <-- attached to laptop
+.3 interrupt vectors. what are the stack layers, why do we set it every sleep?
+.4 initlara
+.4.1 called at power on, why don't we know the state? when is power on?
+.4.2 when MPC.STARTUPS>0 what else is known true? 
+.4.3 file system state at boot, could files be open?
+.5 sleep
+.5.1 compare sleep() vs sleepUntilWoken()
+.5.2 where is PutInSleepMode tested/used? i only see it set.
+
+AUH3.0 is in the works, never tested.
+LARA3.1 hasn't been tested. It was to be the successor of 3.0, which
+has been tested and deployed.  All the MPC Program Common Files are
+most recent. I believe all of those were used to compile the LARA3.0
+RUN &APP files.
+
+RAOS4.2 was tested, needs a little work with Acoustic Modem Testing.
+SG3.0 I believe is the most recent firmware for the CF2 for glider deployments.
+
+Thu, Jan 26, 2017  5:06:43 PM
+.1 using python as test jig
+.. pip install pyserial 
+cyg install py3 py3-setup-tools
+easy-install pip
+pip install pyserial
+.. python serial
+import serial
+import time
+ser = serial.Serial('COM3', 9600, timeout=0)
+while 1:
+    try:
+        print ser.readline()
+        time.sleep(1)
+    except ser.SerialTimeoutException:
+        print('Data could not be read')
+    time.sleep(1)
+..
+
+Tue, Jun 13, 2017  2:16:54 PM
+ ln -s "/cygdrive/c/Program Files (x86)/Persistor/MotoCross Support/CFX/Headers/"
+$ kahn@BRUTAL 04:54:59 ~/cf2 $
+ ctags -o /home/kahn/cf2/tags.h.cf2 $(find ~/cf2/headers/*/Headers -name '*.h')
+
+ vi .vim/vimrc
+set tags+=/home/kahn/cf2/tags.h.cf2
+
+Wed, Jun 21, 2017  9:00:29 AM
+.1 looking in lara.c ...
+.2 gitting around
+ $ git branch --unset-upstream # Remove a current tracking relationship 
+ $ git push -u origin feature # Link a branch to an upstream branch 
+ $ git push --all  # push all tracking branches
+.3 Console(char) 
+  LARA.PHASE case 1:
+    case 'i': WISPRPower(true);
+    case 'e': WISPRSafeShutdown();
+    case 'd': WISPRDet(c);
+    case 'f': WISPRDFP();
+    case 'w': ChangeWISPR(c);
+    case 'p': LARA.PHASE = c;
+    case '1': LARA.ON = false;
+    case '2': LARA.DATA = LARA.DATA ? false : true;
+  LARA.PHASE case 2: case 4:
+    case 'w': WinchConsole();
+    case 'p': LARA.PHASE = c;
+    case 't': CTD_Sample();
+    case '1': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+    case 'a': PrintSystemStatus();
+    case 's': LARA.SURFACED = true;
+  LARA.PHASE case 3:
+    case '1': LARA.ON = false; // exit from GPSIRID
+    case 'p': LARA.PHASE = c;
+.4 python
+ python -i -c 'from emul import *'
+ python -m serial.tools.list_ports
