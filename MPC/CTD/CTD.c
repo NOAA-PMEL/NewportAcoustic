@@ -581,6 +581,7 @@ void SwitchTD(char c) {
   else if (c == 'B') PIOClear(TDCOM);
   else flogf("\nError: SwitchTD(%c) bad choice", c);
 } //__ SwitchTD() __//
+
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
 ** ?? calloc/free may not match, should these be globals?
@@ -590,9 +591,9 @@ void OpenTUPort_CTD(bool on) {
   short CTD_RX, CTD_TX;
   flogf("\n\t|%s CTD TUPort", on ? "Open" : "Close");
   if (on) {
-    CTD_RX = TPUChanFromPin(32);
-    CTD_TX = TPUChanFromPin(31);
-    PIOSet(22);
+    CTD_RX = TPUChanFromPin(ANTMODRX);
+    CTD_TX = TPUChanFromPin(ANTMODTX);
+    PIOSet(ANTMODPWR);
     // use buoy CTD
     SwitchTD('B'); 
     CTDPort = TUOpen(CTD_RX, CTD_TX, BAUD, 0);
@@ -612,6 +613,7 @@ void OpenTUPort_CTD(bool on) {
   return;
 
 } //____ OpenTUPort_CTD() ____//
+
 /******************************************************************************\
 ** void GetCTDSettings();
 \******************************************************************************/
@@ -623,6 +625,7 @@ void GetCTDSettings() {
   DBG(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
 
 } //____ GetCTDSettings() ____//
+
 /******************************************************************************\
 ** float CTD_AverageDepth(int)
         -Usually Called while waiting for Winch Response.

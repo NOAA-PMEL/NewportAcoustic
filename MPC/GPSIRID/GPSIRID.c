@@ -661,13 +661,13 @@ void OpenTUPort_AntMod(bool on) {
 
   DBG(flogf("  ..OpenTUPort_AntMod() ");)
   if (on) {
-    ANTMOD_RX = TPUChanFromPin(32);
-    ANTMOD_TX = TPUChanFromPin(31);
+    ANTMOD_RX = TPUChanFromPin(ANTMODRX);
+    ANTMOD_TX = TPUChanFromPin(ANTMODTX);
 
     // Power ON
     PIOSet(ANTMODPWR);
     PIOSet(ANTMODCOM);
-    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 19200, 0);
+    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 9600L, 0);
 
     if (AntModPort == 0)
       flogf("\n\t|Bad IridiumPort");
@@ -690,8 +690,6 @@ void OpenTUPort_AntMod(bool on) {
   } else if (!on) {
 
     flogf("\n%s|PowerDownCloseComANTMOD() ", Time(NULL));
-    putflush();
-    CIOdrain();
     SendString("AT*P");
     GetIRIDInput("OK", 2, NULL, NULL, wait);
 

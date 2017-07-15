@@ -36,6 +36,12 @@ AMODEMTX	LARA/PLATFORM.h	34;"	d
 AModemCmdTable	MPC/MPC_SETTINGS/Settings.c	/^CmdTable AModemCmdTable[] =$/;"	v
 AModem_Data	MPC/WINCH/Winch.c	/^void AModem_Data(void) {$/;"	f
 ANTLEN	MPC/WINCH/Winch.h	/^  short ANTLEN; \/\/ Length from CTD to antenna. More specifically: From CTD Depth$/;"	m	struct:__anon6
+ANTMODCOM	LARA/PLATFORM.h	25;"	d
+ANTMODPWR	LARA/PLATFORM.h	24;"	d
+ANTMODRX	LARA/PLATFORM.h	32;"	d
+ANTMODTX	LARA/PLATFORM.h	31;"	d
+ANTMOD_RX	MPC/GPSIRID/GPSIRID.c	/^short ANTMOD_RX, ANTMOD_TX;$/;"	v
+ANTMOD_TX	MPC/GPSIRID/GPSIRID.c	/^short ANTMOD_RX, ANTMOD_TX;$/;"	v
 ANTSW	MPC/GPSIRID/GPSIRID.h	/^  short ANTSW;    \/\/=1: antenna switch; =0: no antenna switch$/;"	m	struct:__anon4
 ANTSWPIN	MPC/GPSIRID/GPSIRID.c	54;"	d	file:
 ANTSW_DEFAULT	MPC/MPC_SETTINGS/Settings.h	109;"	d
@@ -47,6 +53,7 @@ ASCENTTIME	LARA/PLATFORM.h	/^  short ASCENTTIME;$/;"	m	struct:__anon1
 AVGVEL	LARA/PLATFORM.h	/^  float AVGVEL;$/;"	m	struct:__anon1
 Acknowledge	MPC/GPSIRID/GPSIRID.c	/^bool Acknowledge() {$/;"	f
 AllDirsCmd	MPC/MPC_SETTINGS/Settings.c	/^char *AllDirsCmd(CmdInfoPtr) {$/;"	f
+AntModPort	MPC/GPSIRID/GPSIRID.c	/^TUPort *AntModPort;$/;"	v
 AppendDetections	MPC/WISPR/WISPR.c	/^void AppendDetections(char *DTXString, int FileDescriptor) {$/;"	f
 Append_Files	MPC/MPC_Global/MPC.c	/^bool Append_Files(int Dest, const char *SourceFileName, bool erase,$/;"	f
 BATCAP	MPC/ADS/ADS.h	/^  char BATCAP[9];$/;"	m	struct:__anon2
@@ -202,13 +209,6 @@ IRIDBAUD	MPC/GPSIRID/GPSIRID.h	36;"	d
 IRIDFileHandle	MPC/GPSIRID/GPSIRID.c	/^static int IRIDFileHandle;$/;"	v	file:
 IRIDFilename	MPC/GPSIRID/GPSIRID.c	/^static char IRIDFilename[sizeof "c:00000000.dat"];$/;"	v	file:
 IRIDGPS	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS() {$/;"	f
-IRIDGPSCOM	LARA/PLATFORM.h	25;"	d
-IRIDGPSPWR	LARA/PLATFORM.h	24;"	d
-IRIDGPSPort	MPC/GPSIRID/GPSIRID.c	/^TUPort *IRIDGPSPort;$/;"	v
-IRIDGPSRX	LARA/PLATFORM.h	32;"	d
-IRIDGPSTX	LARA/PLATFORM.h	31;"	d
-IRIDGPS_RX	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS_RX, IRIDGPS_TX;$/;"	v
-IRIDGPS_TX	MPC/GPSIRID/GPSIRID.c	/^short IRIDGPS_RX, IRIDGPS_TX;$/;"	v
 IRIDIUM	LARA/PLATFORM.h	80;"	d
 IRIDPHONE_DEFAULT	MPC/MPC_SETTINGS/Settings.h	91;"	d
 IRIDPHONE_DESC	MPC/MPC_SETTINGS/Settings.h	92;"	d
@@ -327,8 +327,8 @@ OFFSET_DESC	MPC/MPC_SETTINGS/Settings.h	119;"	d
 OFFSET_NAME	MPC/MPC_SETTINGS/Settings.h	117;"	d
 ON	LARA/PLATFORM.h	/^  bool ON;       \/\/ While "ON", continue running program$/;"	m	struct:__anon1
 ONDEPTH	MPC/MPC_Global/MPC_Global.h	/^  short ONDEPTH;  \/\/ Depth at which SG powers on during the descent.$/;"	m	struct:__anon10
+OpenTUPort_AntMod	MPC/GPSIRID/GPSIRID.c	/^void OpenTUPort_AntMod(bool on) {$/;"	f
 OpenTUPort_CTD	MPC/CTD/CTD.c	/^void OpenTUPort_CTD(bool on) {$/;"	f
-OpenTUPort_IRIDGPS	MPC/GPSIRID/GPSIRID.c	/^void OpenTUPort_IRIDGPS(bool on) {$/;"	f
 OpenTUPort_NIGK	MPC/WINCH/Winch.c	/^void OpenTUPort_NIGK(bool on) {$/;"	f
 OpenTUPort_WISPR	MPC/WISPR/WISPR.c	/^void OpenTUPort_WISPR(bool on) {$/;"	f
 Open_Avg_File	MPC/ADS/ADS.c	/^void Open_Avg_File(long counter) {$/;"	f
@@ -418,6 +418,7 @@ SatComOpen	MPC/GPSIRID/GPSIRID.c	/^bool SatComOpen = false;$/;"	v
 SaveParams	MPC/MPC_Global/MPC.c	/^bool SaveParams(const char *Command) {$/;"	f
 Sea_Ice_Algorithm	MPC/CTD/CTD.c	/^int Sea_Ice_Algorithm() {$/;"	f
 SeagliderParameters	MPC/MPC_Global/MPC_Global.h	/^} SeagliderParameters;$/;"	t	typeref:struct:__anon10
+SelectModule	MPC/GPSIRID/GPSIRID.c	/^short SelectModule(char m) {$/;"	f
 SendString	MPC/GPSIRID/GPSIRID.c	/^void SendString(const char *StringIn) {$/;"	f
 SendWISPRGPS	MPC/WISPR/WISPR.c	/^bool SendWISPRGPS = false;$/;"	v
 Send_Blocks	MPC/GPSIRID/GPSIRID.c	/^int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,$/;"	f
