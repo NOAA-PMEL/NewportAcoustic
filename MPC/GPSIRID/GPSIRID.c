@@ -750,12 +750,13 @@ bool InitModem(int status) {
     PhonePin();
   }
   ACK = false;
+  // bizarre switch without break
   switch (status) {
   case 0:
     ret = PhoneStatus();
     if (ret == 0)
       status++;
-    else if (ret == -1128)
+    else if (ret == -1128) // ??
       return InitModem(4);
     else
       return false;
@@ -1301,6 +1302,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   uchar mlen[2];
   int crc_calc;
   long bytesread;
+  const short dataheader = 12; // add 2 bytes for binary command to ant
 
   DBG2(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
@@ -1311,34 +1313,37 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     AD_Check();
     if (BlkNum == NumOfBlks)
       BlockLength = LastBlkLength; // If Last Blcok, get length of last block
-    mlength = BlockLength + 10;    // PMEL IRID block size + 5
+    mlength = BlockLength + dataheader;    // PMEL IRID block size + 5
     blklen = BlockLength + 5;
     mlen[0] = (blklen & 0xFF00) >> 8; // Convert an integer to
     mlen[1] = (blklen & 0x00FF);      // 2-byte uchar.
 
-    buf = (uchar *)malloc(blklen + 10);
+    buf = (uchar *)malloc(blklen + dataheader);
     memset(buf, 0, (blklen + 5) * (sizeof buf[0])); // Flush the buffer
 
-    bytesread = read(IRIDFileHandle, buf + 10, BlockLength);
+    bytesread = read(IRIDFileHandle, buf + dataheader, BlockLength);
     DBG(flogf("\n\t|Bytes Read: %ld", bytesread); cdrain(); coflush();)
     if (bitmap[64 - BlkNum] != '0') { // Send in reverse order
       AD_Check();
-      buf[5] = mlen[0]; // Block length
-      buf[6] = mlen[1];
-      buf[7] = 'T'; // Data type
-      buf[8] = (uchar)BlkNum;
-      buf[9] = (uchar)NumOfBlks;
+      buf[7] = mlen[0]; // Block length
+      buf[8] = mlen[1];
+      buf[9] = 'T'; // Data type
+      buf[10] = (uchar)BlkNum;
+      buf[11] = (uchar)NumOfBlks;
 
       crc_calc = Calc_Crc(buf + 5, blklen); // PMEL site crc include first 5
                                             // byte //this one works currently
                                             // 11/18/2013
       DBG(flogf("\n\t|crc: %#4x, blknum: %d", crc_calc, BlkNum); putflush();
           CIOdrain(); RTCDelayMicroSeconds(20000L);)
-      buf[0] = '@';
-      buf[1] = '@';
+      // first 2 bytes give us 10 binary through AntMod
+      buf[0] = 5; // ^E
+      buf[1] = 10; // 10 bytes
       buf[2] = '@';
-      buf[3] = (uchar)((crc_calc & 0xFF00) >> 8);
-      buf[4] = (uchar)((crc_calc & 0x00FF));
+      buf[3] = '@';
+      buf[4] = '@';
+      buf[5] = (uchar)((crc_calc & 0xFF00) >> 8);
+      buf[6] = (uchar)((crc_calc & 0x00FF));
       DBG(flogf("\n\t|SENDING BLK #%d %ld BYTES", BlkNum, mlength); putflush();
           CIOdrain(); RTCDelayMicroSeconds(14000L);)
 
