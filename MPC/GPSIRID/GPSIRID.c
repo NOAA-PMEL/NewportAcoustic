@@ -82,6 +82,7 @@ static int IRIDFileHandle;
 static short IRIDStatus;
 static char IRIDFilename[sizeof "c:00000000.dat"];
 
+void OpenTUPort_CTD(bool); // CTD.c
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
 short Connect_SendFile_RecCmd(const char *);
@@ -108,7 +109,7 @@ char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
 short SwitchAntenna(char);
-short SelectModule(char);
+void SelectModule(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
@@ -166,15 +167,7 @@ short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
-  //	long fnum;
-#if PLATFORM != LARA
-  short antsw;
-  antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
-  if (antsw == 1)
-    SwitchAntenna('I');
-  else
-    PinMirror(1);
-#endif
+  SwitchAntenna('I');
 
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
@@ -198,23 +191,12 @@ short UploadFiles() {
 ** PowerOn_GPS()
 \*********************************************************************************/
 bool PowerOn_GPS() {
-
-  short antsw;
-
-  antsw = IRID.ANTSW; // 1=antenna switch is used, 0 no switching is necessary
-
   // Open the GPS/IRID satellite com...
   OpenTUPort_AntMod(true);
-
-  // First get the GPS
-  if (antsw == 1)
-    SwitchAntenna('G');
-  else
-    PinMirror(1);
+  SwitchAntenna('G');
 
   if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
     return true;
-
   else
     return false;
 }
@@ -227,7 +209,6 @@ short SwitchAntenna(char r) {
   char a, d;
   DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
   // select antMod vs SBE16, switch antMod device
-  SelectModule('A');
   switch (r) {
     case 'G': { a='G'; d='I'; break; }
     case 'I': { a='I'; d='I'; break; }
@@ -249,7 +230,13 @@ short SwitchAntenna(char r) {
 /***
  * SelectModule(A|S) - select antMod vs SBE16
  */
-short SelectModule(char m) {
+void SelectModule(char m) {
+  // this is way overkill but should work
+  switch (m) {
+    case 'A': OpenTUPort_CTD(false); OpenTUPort_AntMod(true); break;
+    case 'S': OpenTUPort_AntMod(false); OpenTUPort_CTD(true); break;
+    default: flogf("\nError SelectModule(%c)", m);
+  }
 } // SelectModule()
 
 /******************************************************************************\
@@ -672,7 +659,6 @@ void OpenTUPort_AntMod(bool on) {
     if (AntModPort == 0)
       flogf("\n\t|Bad IridiumPort");
 
-    SwitchAntenna('G');
     warm = IRID.WARMUP;
     flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);
     putflush();
@@ -754,10 +740,9 @@ bool InitModem(int status) {
   switch (status) {
   case 0:
     ret = PhoneStatus();
-    if (ret == 0)
+    if (ret == 0) // ready
       status++;
-    else if (ret == -1128) // ??
-      return InitModem(4);
+    // should wait if ringing or in data call ??
     else
       return false;
   case 1:
@@ -852,8 +837,8 @@ short CallStatus() {
 **       4  Data Call In Progress
 **
 ** Check whether a call is in progress or if commands are accepted.
-** Returns 0 if "Ready", "Data Call Ringing", " Data Call In Progress".
-** Returns -1 if "Unavailable" or "Unknown."
+** CPAS status, which is 0 if "Ready"
+** Returns -1 CPAS query fails, i.e. CarrierLoss/Error
 ** Oregon State University, 2/15/2015
 \******************************************************************************/
 short PhoneStatus() {
@@ -892,7 +877,7 @@ short PhoneStatus() {
   cdrain();
   coflush();
 
-  return status;
+  return -1;
 
 } //____ PhoneStatus() ____//
 /******************************************************************************\
@@ -1074,9 +1059,13 @@ bool Acknowledge() {
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
-  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c", (uchar)((crc1 >> 8) & 0x00FF),
-          (uchar)(crc2 & 0x00FF), proj[0], proj[1], proj[2], proj[3], proj[4],
-          proj[5], proj[6], proj[7]);
+  // add two header bytes to put antMod into binary mode 
+  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c%c%c", 
+          // binary 10 bytes
+          (char)5, (char)10,
+          (char)((crc1 >> 8) & 0x00FF), (char)(crc2 & 0x00FF), 
+          proj[0], proj[1], proj[2], proj[3], 
+          proj[4], proj[5], proj[6], proj[7]);
 
   TUTxFlush(AntModPort);
   TURxFlush(AntModPort);
@@ -1302,7 +1291,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   uchar mlen[2];
   int crc_calc;
   long bytesread;
-  const short dataheader = 12; // add 2 bytes for binary command to ant
+  const short dataheader = 12; // 10 bytes + 2 bytes for binary command 
 
   DBG2(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
@@ -1336,7 +1325,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
                                             // 11/18/2013
       DBG(flogf("\n\t|crc: %#4x, blknum: %d", crc_calc, BlkNum); putflush();
           CIOdrain(); RTCDelayMicroSeconds(20000L);)
-      // first 2 bytes give us 10 binary through AntMod
+      // add two header bytes to put antMod into binary mode 
       buf[0] = 5; // ^E
       buf[1] = 10; // 10 bytes
       buf[2] = '@';
@@ -1748,7 +1737,7 @@ bool HangUp(void) {
 **    SigQual, and returns
 ** 4: Compares Iridium buf[] to compstring. If it sees the same string,
 **
-** @RETURN: if match: 1, no match: 0 and loss of carrier: -1.
+** @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
 ** 2/27/2015
 \*******************************************************************************/
 short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
