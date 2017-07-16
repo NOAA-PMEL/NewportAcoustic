@@ -1053,7 +1053,8 @@ bool Acknowledge() {
   short wait = 2500; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
-  unsigned char buf[13], proj[8];
+  unsigned char buf[15], proj[8];
+  // add two header bytes to put antMod into binary mode 
 
   // Flush IO Buffers
   flogf("\n%s|Acknowledge(%4s%4s)", Time(NULL), MPC.PROJID, MPC.PLTFRMID);
@@ -1061,10 +1062,9 @@ bool Acknowledge() {
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
-  // add two header bytes to put antMod into binary mode 
-  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c%c%c", 
-          // binary 10 bytes
-          (char)5, (char)10,
+  sprintf(buf, "%c%c???%c%c%c%c%c%c%c%c%c%c", 
+          // binary 13 bytes
+          (char)5, (char)13,
           (char)((crc1 >> 8) & 0x00FF), (char)(crc2 & 0x00FF), 
           proj[0], proj[1], proj[2], proj[3], 
           proj[4], proj[5], proj[6], proj[7]);
