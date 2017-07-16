@@ -219,9 +219,11 @@ short SwitchAntenna(char r) {
     }
   }
 
-  TUTxPutByte(AntModPort, d, true);  // device G I S
+  TUTxPutByte(AntModPort, 3, true);  // connect
+  TUTxPutByte(AntModPort, d, true);  // I S
   if (a) {
-    TUTxPutByte(AntModPort, a, true);  // antenna, G I
+    TUTxPutByte(AntModPort, 1, true);  // antenna
+    TUTxPutByte(AntModPort, a, true);  // G I
     RTCDelayMicroSeconds(1000000L); // wait 1 sec to settle antenna switch noise
   }
   return 0;
