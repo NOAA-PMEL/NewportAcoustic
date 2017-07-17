@@ -117,7 +117,7 @@ TUPort *buoy=NULL, *devPort=NULL; // dev port of connnected upstream device
 void main() {
   short ch, command=0;
   int binary=0; // count of binary chars to pass thru
-  bool commandMode=false, binaryMode=false;
+  bool allout=false, commandMode=false, binaryMode=false;
 
   // set up hw
   init();
@@ -134,6 +134,7 @@ void main() {
     while (devPort && TURxQueuedCount(devPort)) {
       ch=getByte(devPort);
       TUTxPutByte(buoy, ch, true); // block if queue is full
+      DBG( if (allout) cputc(ch);)
     } // char from device
 
     // get all from buoy
@@ -184,6 +185,7 @@ void main() {
         // regular char
         TUTxPutByte(devPort, ch, true);
       }
+      DBG( if (allout) cputc(ch);)
     } // while buoy
 
     // console
@@ -196,6 +198,8 @@ void main() {
           BIOSResetToPicoDOS(); break;
         case 's':
           status(command); break;
+        case 'a':
+          allout = !allout;
         default:
           help();
       } // switch (ch)
@@ -381,6 +385,7 @@ void help() {
       " ^F unused \n"
       " ^G unused \n"
       "On console (com1):\n s=status x=exit *=this message\n"
+      DBG("  if debug, a=allout (print all)\n")
       };
 
   printf("\nProgram: %s: 2.1-%f, %s %s \n", __FILE__, (float)VERSION, __DATE__,
