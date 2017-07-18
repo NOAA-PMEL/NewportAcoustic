@@ -72,7 +72,7 @@
 //#define       SYSCLK   8000           // choose: 160 to 32000 (kHz)
 #define SYSCLK 16000            // choose: 160 to 32000 (kHz)
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
-#define BUOY_BAUD 9600L
+#define BUOY_BAUD 19200L
 #define IRID_BAUD 19200L
 
 #define BUOY 0
@@ -99,7 +99,7 @@ void init();
 void help();
 void status(short command);
 void antennaSwitch(char c);
-void printchar(char c, char d);
+void printchar(char c);
 void prerun();
 
 char *LogFile = {"activity.log"}; 
@@ -119,7 +119,8 @@ TUPort *buoy=NULL, *devPort=NULL; // dev port of connnected upstream device
 void main() {
   short ch, command=0;
   int binary=0; // count of binary chars to pass thru
-  bool allout=false, commandMode=false, binaryMode=false;
+  bool echoDn=false;
+  bool echoUp=false;
 
   // escape to pico
   prerun();
@@ -129,8 +130,8 @@ void main() {
   power('S', true);
   connect('S');
 
-  // run remains true, exit via biosreset{topicodos}
-  while (run) {
+  // exit via biosreset{topicodos}
+  while (true) {
     // look for chars on both sides, process
     // read bytes not blocks, to see any rs232 errs
     // note: using vars buoy,devport is faster than dev[id].port
@@ -138,59 +139,54 @@ void main() {
     if (devPort && TURxQueuedCount(devPort)) {
       ch=getByte(devPort);
       TUTxPutByte(buoy, ch, true); // block if queue is full
-      DBG( if (allout) printchar(ch, '<'); )
+      DBG( if (echoDn) printchar(ch); )
     } // char from device
 
     // get all from buoy
     if (buoy && TURxQueuedCount(buoy)) {
       ch=getByte(buoy);
       // binaryMode, commandMode, new command, character
-      if (binaryMode) {
+      if (binary>0) {
         TUTxPutByte(devPort, ch, true);
-        if (--binary<1) binaryMode=false;
-        DBG(printf(binary ? "." : ".\n"); putflush();)
+        binary--;
+        // if (--binary<1) binaryMode=false;
+        DBG(printf(binary ? "." : ".\n"); )
       // endif (binaryMode)
-      } else if (commandMode) {
+      } else if (command>0) {
         switch (command) { // set by previous byte
-          case 1: // ^A Antenna G|I
-            antennaSwitch(ch);
-            break;
-          case 2: // ^B Binary byte
-            TUTxPutByte(devPort, ch, true);
-            break;
-          case 3: // ^C Connect I|S
-            connect(ch);
+          case 5: // ^E binary lEngth 1Byte
+            binary=ch;
+            // binaryMode=true;
             break;
           case 4: // ^D powerDown I|S
             power(ch, false);
             break;
-          case 5: // ^E binary lEngth 1Byte
-            // up to 64K not needed for this version
-            // convert last byte and next byte to a integer, 0-64K
-            // binary=ch<<8 + getByte(buoy);
-            binary=ch;
-            binaryMode=true;
-            // DBG(ch=binary;)
+          case 3: // ^C Connect I|S
+            connect(ch);
             break;
-          case 6: // ^F unused
-          case 7: // ^G unused
+          case 2: // ^B Binary byte
+            TUTxPutByte(devPort, ch, true);
+            break;
+          case 1: // ^A Antenna G|I
+            antennaSwitch(ch);
+            break;
           default: // uhoh
             flogf("ERR: illegal command %d\n", command);
             return; // exit
         } // switch (command)
         DBG(printf("cmd:%d arg:%d\n", command, ch);)
-        commandMode=false;
+        // commandMode=false;
         command=0;
       // endif (commandMode)
       } else if (ch<8) {
-          commandMode=true;
+          // commandMode=true;
           command=ch;
       // endif (ch<8)
       } else { 
         // regular char
         TUTxPutByte(devPort, ch, true);
       }
-      DBG( if (allout) printchar(ch, '>'); )
+      DBG( if (echoUp) printchar(ch); )
     } // if buoy
 
     // console
@@ -202,9 +198,13 @@ void main() {
           BIOSResetToPicoDOS(); break;
         case 's':
           status(command); break;
-        case 'a':
-          allout = !allout; 
-          cprintf("\nallout: %s\n", allout ? "on" : "off"); 
+        case 'd':
+          echoDn = !echoDn; 
+          cprintf("\nechoDn: %s\n", echoDn ? "on" : "off"); 
+          break;
+        case 'u':
+          echoUp = !echoUp; 
+          cprintf("\nechoUp: %s\n", echoUp ? "on" : "off"); 
           break;
         default:
           help();
@@ -387,11 +387,11 @@ void help() {
       " ^B Binary byte \n"
       " ^C Connect G|I|S \n"
       " ^D powerDown G|I|S|A \n"
-      " ^E binary lEngth (2byte short) \n"
+      " ^E binary lEngth (1byte short) \n"
       " ^F unused \n"
       " ^G unused \n"
       "On console (com1):\n s=status x=exit *=this message\n"
-      DBG("  if debug, a=allout (print all)\n")
+      DBG("  if debug, d=echo Downstream, u=echo Upstream\n")
       };
 
   printf("\nProgram: %s: 2.1-%f, %s %s \n", __FILE__, (float)VERSION, __DATE__,
@@ -540,10 +540,11 @@ short power(short c, bool onoff) {
 } // power()
 
 // print ascii or hex for non-printables
-void printchar(char c, char d) {
+void printchar(char c) {
+  // < or >
   if ((c>=32)&&(c<=126)) // printable
-    printf("%c%c", d, c);
-  else printf("%c%02x", d, c);
+    printf("%c", c);
+  else printf("x%02X", c);
   if (c==10) printf("\n");
 }
 
