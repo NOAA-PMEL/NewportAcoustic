@@ -99,6 +99,8 @@ void init();
 void help();
 void status(short command);
 void antennaSwitch(char c);
+void printchar(char c, char d);
+void prerun();
 
 char *LogFile = {"activity.log"}; 
 char antSw;
@@ -119,6 +121,8 @@ void main() {
   int binary=0; // count of binary chars to pass thru
   bool allout=false, commandMode=false, binaryMode=false;
 
+  // escape to pico
+  prerun();
   // set up hw
   init();
   // initial connection is SBE
@@ -131,14 +135,14 @@ void main() {
     // read bytes not blocks, to see any rs232 errs
     // note: using vars buoy,devport is faster than dev[id].port
     // get all from dev upstream
-    while (devPort && TURxQueuedCount(devPort)) {
+    if (devPort && TURxQueuedCount(devPort)) {
       ch=getByte(devPort);
       TUTxPutByte(buoy, ch, true); // block if queue is full
-      DBG( if (allout) cputc(ch);)
+      DBG( if (allout) printchar(ch, '<'); )
     } // char from device
 
     // get all from buoy
-    while (buoy && TURxQueuedCount(buoy)) {
+    if (buoy && TURxQueuedCount(buoy)) {
       ch=getByte(buoy);
       // binaryMode, commandMode, new command, character
       if (binaryMode) {
@@ -169,9 +173,10 @@ void main() {
             // DBG(ch=binary;)
             break;
           case 6: // ^F unused
-            break;
           case 7: // ^G unused
-            break;
+          default: // uhoh
+            flogf("ERR: illegal command %d\n", command);
+            return; // exit
         } // switch (command)
         DBG(printf("cmd:%d arg:%d\n", command, ch);)
         commandMode=false;
@@ -185,21 +190,22 @@ void main() {
         // regular char
         TUTxPutByte(devPort, ch, true);
       }
-      DBG( if (allout) cputc(ch);)
-    } // while buoy
+      DBG( if (allout) printchar(ch, '>'); )
+    } // if buoy
 
     // console
     if (SCIRxQueuedCount()) {
-      // probably going out to PICO
       ch=SCIRxGetChar();
-      // SCIR is masked ch=ch & 0x00FF;
+      // SCIR is auto masked ch & 0x00FF;
       switch (ch) {
         case 'x': 
           BIOSResetToPicoDOS(); break;
         case 's':
           status(command); break;
         case 'a':
-          allout = !allout;
+          allout = !allout; 
+          cprintf("\nallout: %s\n", allout ? "on" : "off"); 
+          break;
         default:
           help();
       } // switch (ch)
@@ -486,13 +492,19 @@ short char2id(short ch) {
  * connect(I|S) - make a3la or sbe be the upstream device
  */
 void connect(char c) {
+  short id;
   // global short devID, TUPort *devPort
-  devID=char2id(c);
+  id=char2id(c);
+  if (id == -1) {
+    flogf( "ERR connect(%c) '%d'\n", c, (short)c);
+    return;
+  }
   // power up if not
-  if (! dev[devID].power) 
+  if (! dev[id].power) 
     power(c, true);
   // for efficiency in char handling
-  devPort=dev[devID].port; 
+  devPort=dev[id].port; 
+  devID=id;
 } // connect()
 
 /*
@@ -503,6 +515,10 @@ short power(short c, bool onoff) {
   short id;
   TUPort *r;
   id=char2id(c);
+  if (id == -1) {
+    flogf( "ERR connect(%c) '%d'\n", c, (short)c);
+    return -1;
+  }
   DBG(printf("dev:%c devid:%d onoff:%d\n", c, id, onoff);)
   if (dev[id].power == onoff) return 1;
   switch (c) {
@@ -522,3 +538,25 @@ short power(short c, bool onoff) {
   dev[id].port=r;  // currently also done in Open*Pt
   return 0;
 } // power()
+
+// print ascii or hex for non-printables
+void printchar(char c, char d) {
+  if ((c>=32)&&(c<=126)) // printable
+    printf("%c%c", d, c);
+  else printf("%c%02x", d, c);
+  if (c==10) printf("\n");
+}
+
+// short count, exit, first thing
+void prerun() {
+  short i=3;
+  SCIRxFlush();
+  cprintf("Exit to Pico? ");
+  while (i--) {
+    RTCDelayMicroSeconds(1000000L);
+    if (SCIRxGetByte(false) != RxD_NO_DATA) BIOSResetToPicoDOS();
+    cprintf(" %d", i);
+    coflush();
+  }
+  cprintf("\n");
+}
