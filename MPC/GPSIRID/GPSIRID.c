@@ -656,16 +656,16 @@ void OpenTUPort_AntMod(bool on) {
     // Power ON
     PIOSet(ANTMODPWR);
     PIOSet(ANTMODCOM);
-    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 9600L, 0);
+    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 19200L, 0);
 
     if (AntModPort == 0)
       flogf("\n\t|Bad IridiumPort");
 
     warm = IRID.WARMUP;
     flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);
-    putflush();
-    CIOdrain();
+    putflush(); CIOdrain();
     TUTxFlush(AntModPort);
+    SwitchAntenna('G');
 
     inputstring = (char *)calloc(128, 1);
     first = (char *)calloc(128, 1);
