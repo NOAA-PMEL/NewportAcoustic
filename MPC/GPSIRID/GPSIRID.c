@@ -1321,10 +1321,8 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       buf[9] = 'T'; // Data type
       buf[10] = (uchar)BlkNum;
       buf[11] = (uchar)NumOfBlks;
-
-      crc_calc = Calc_Crc(buf + 5, blklen); // PMEL site crc include first 5
-                                            // byte //this one works currently
-                                            // 11/18/2013
+      // +5 -> +7 due to extra 2 bytes ^E binary
+      crc_calc = Calc_Crc(buf + 7, blklen); // PMEL site crc include first 5
       DBG(flogf("\n\t|crc: %#4x, blknum: %d", crc_calc, BlkNum); putflush();
           CIOdrain(); RTCDelayMicroSeconds(20000L);)
       // add two header bytes to put antMod into binary mode 
