@@ -593,10 +593,10 @@ void PhaseTwo() {
 \****************************************************************************/
 void PhaseThree() {
   short result = 0;
-  int attempts = 0;
+  int gpsFails = 0;
   float depth;
   short count = 0;
-  static short IridiumCalls = 0;
+  static short IridCallsNoParams = 0;
   short secs;
   ulong AscentTime;
   ulong AscentStop;
@@ -616,56 +616,61 @@ void PhaseThree() {
     DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
     result = IRIDGPS(); 
 
-    if (NIGK.RECOVERY) {
-      if (MPC.DATAXINT != 30) {
-        MPC.DATAXINT = 30;
-        VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-      } //dataxint
-      LARA.PHASE = 1;
-      break;
-    } // recovery
     if (GlobalRestart) { 
       // Added 9.28.2016 after first deployment Lake W.
       ParseStartupParams(true); 
     } 
 
-    // attempts>2 ?? irrelevant in the logic flow. where set?
-    // attempts++ and checked in result==-1
-    if (result >= 1 || attempts > 4) {
+    // gpsFails>2 ?? irrelevant in the logic flow. where set?
+    // gpsFails++ and checked in result==-1
+    if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
       // ?? check this at bottom of loop?
     }
     if (result == 1 || result == 2) { 
-      // Upload Success / Fake Commands
-      IridiumCalls++;
-      flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
-      if (IridiumCalls > 3) {
+      // Upload Success / Commands
+      IridCallsNoParams++; // call sessions w/o Params
+      flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
+      if (IridCallsNoParams > 3) {
         // calls > 3 implies ?? 
         // Load default parameters in "default.cfg" file
         ParseStartupParams(true); 
         // checked here because ??
       } // calls>3
-    } // Upload Success / Fake Commands
+    } // Upload Success / Commands
     else if (result == 3) { 
       // Real Commands
       ParseStartupParams(false);
-      IridiumCalls = 0;
-      flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
+      IridCallsNoParams = 0;
+      flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
     } // Real Commands
+    else if (result == -2) {
+      // GPS Success, IRID Fail
+      flogf("\n\t|PhaseThree(): Failed Iridium Transfer");
+      IridCallsNoParams++;
+      if (IridCallsNoParams > 3) {
+        IridCallsNoParams = 0;
+        ParseStartupParams(true);
+      } // calls>3
+      LARA.PHASE = 4;
+      break;
+    } // GPS Success, IRID Fail
     else if (result == -1) {
+      gpsFails++;
       // Bad GPS- GPS fails usually from bad reception.
-      flogf("\n\t|PhaseThree(); Failed GPS attempt: %d", attempts);
-      if (attempts >= 5) {
+      flogf("\n\t|PhaseThree(): Failed GPS attempt: %d", gpsFails);
+      if (gpsFails >= 5) {
         flogf("\n\t|Exiting PhaseThree()");
+        // ?? close ports?
         break;
       } // >=5
+      // does GPSIRID close antenna tup?
       OpenTUPort_NIGK(true);
       OpenTUPort_CTD(true);
 
       // Set LARA System back to !Surfaced so CTD will take measurements.
       LARA.SURFACED = false;
-      attempts++;
       LARA.TDEPTH -= 5;
 
       LARA.DEPTH = CTD_AverageDepth(1, NULL);
@@ -678,7 +683,7 @@ void PhaseThree() {
       // ?? are we trying to go up?
       if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
         LARA.TDEPTH = NIGK_MIN_DEPTH;
-        attempts = 5;
+        gpsFails = 5;
       }
       AscentTime = Winch_Ascend();
       // Wait for Acoustic Modem, Get Response. Go into timer loop.
@@ -705,27 +710,12 @@ void PhaseThree() {
       OpenTUPort_CTD(false);
       OpenTUPort_NIGK(false);
     } // Bad GPS- GPS fails usually from bad reception
-    else if (result == -2) {
-      // GPS Success, IRID Fail
-      flogf("\n\t|PhaseThree(): Failed Iridium Transfer");
-      IridiumCalls++;
-      if (IridiumCalls > 3) {
-        IridiumCalls = 0;
-        ParseStartupParams(true);
-      } // calls>3
-      if (NIGK.RECOVERY) {
-        if (MPC.DATAXINT != 30) {
-          MPC.DATAXINT = 30;
-          VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-        } // datax
-        LARA.PHASE = 1;
-        break;
-      } // recovery
-      LARA.PHASE = 4;
-      break;
-    } // GPS Success, IRID Fail
   } // while result<=0
 
+  // in recovery, stay on surface 
+  if (NIGK.RECOVERY) LARA.PHASE = 1; 
+  // NIGK.RECOVERY may be cleared by Params load 
+  
   GlobalRestart = false;
   MPC.FILENUM++;
   sprintf(filenum, "%08ld", MPC.FILENUM);
@@ -736,6 +726,7 @@ void PhaseThree() {
 
   OpenTUPort_CTD(true);
 
+  // why here ??
   if (WISP.DUTYCYCL > 50) {
     OpenTUPort_WISPR(true);
     WISPRPower(true);

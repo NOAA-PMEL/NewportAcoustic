@@ -269,7 +269,8 @@ it,
 **            -1, Garbled
 **             0, resent request received. This should not happen.
 **             1, "done" received
-**             2  "cmds" received. Either Senddata or real command is coming
+**             2  "cmds" received. Either Senddata or other non-params
+**             3  parameters
 ** Can upload up to ComMax (=10) files per connection
 **
 \******************************************************************************/
@@ -303,7 +304,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
 
   // Register, call and check SQ, connect the Rudics and login PMEL:
   while (icall <= IRID.MAXCALLS && FileExist) {
-
+    // not really init - whole connect sequence
     ACK = InitModem(status);
 
     // ACK received from PMEL. Send a file & check the land resp.
@@ -312,14 +313,13 @@ short Connect_SendFile_RecCmd(const char *filename) {
 
       TX_Success = Send_File(FileExist, info.st_size);
       // TX_Success=-4, Garbled Response
-      //				 -3, No Response From Land
-      //				 -2, Lost carrier
-      //           -1, Garbled
-      //            0, resent request received. This should not happen.
-      //            1, "done" received.
-      //            2  "SendData" received. Either Senddata or real command is
-      //            coming
-      //				  3, Real Commands
+      //	-3, No Response From Land
+      //	-2, Lost carrier
+      //        -1, Garbled
+      //         0, resent request received. This should not happen.
+      //         1, "done" received.
+      //         2  "SendData" received. Either Senddata or other non-param
+      //	 3, Real Commands
 
       AD_Check();
 
@@ -1053,8 +1053,7 @@ bool Acknowledge() {
   short wait = 2500; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
-  unsigned char buf[15], proj[8];
-  // add two header bytes to put antMod into binary mode 
+  unsigned char buf[13], proj[8];
 
   // Flush IO Buffers
   flogf("\n%s|Acknowledge(%4s%4s)", Time(NULL), MPC.PROJID, MPC.PLTFRMID);
@@ -1062,9 +1061,7 @@ bool Acknowledge() {
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
-  sprintf(buf, "%c%c???%c%c%c%c%c%c%c%c%c%c", 
-          // binary 13 bytes
-          (char)5, (char)13,
+  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c", 
           (char)((crc1 >> 8) & 0x00FF), (char)(crc2 & 0x00FF), 
           proj[0], proj[1], proj[2], proj[3], 
           proj[4], proj[5], proj[6], proj[7]);
@@ -1076,6 +1073,8 @@ bool Acknowledge() {
   while (Ack == false && Num_ACK < AckMax) { // Repeat
 
     AD_Check();
+    // antMod binary mode for header
+    TUTxPrintf(AntModPort, "%c%c", (char)5, (char)13 );
     TUTxPrintf(AntModPort, "%s\n\r", buf);
     TUTxWaitCompletion(AntModPort);
 
@@ -1293,7 +1292,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   uchar mlen[2];
   int crc_calc;
   long bytesread;
-  const short dataheader = 12; // 10 bytes + 2 bytes for binary command 
+  const short dataheader = 10; 
 
   DBG2(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
@@ -1316,23 +1315,19 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     DBG(flogf("\n\t|Bytes Read: %ld", bytesread); cdrain(); coflush();)
     if (bitmap[64 - BlkNum] != '0') { // Send in reverse order
       AD_Check();
-      buf[7] = mlen[0]; // Block length
-      buf[8] = mlen[1];
-      buf[9] = 'T'; // Data type
-      buf[10] = (uchar)BlkNum;
-      buf[11] = (uchar)NumOfBlks;
-      // +5 -> +7 due to extra 2 bytes ^E binary
-      crc_calc = Calc_Crc(buf + 7, blklen); // PMEL site crc include first 5
+      buf[5] = mlen[0]; // Block length
+      buf[6] = mlen[1];
+      buf[7] = 'T'; // Data type
+      buf[8] = (uchar)BlkNum;
+      buf[9] = (uchar)NumOfBlks;
+      crc_calc = Calc_Crc(buf + 5, blklen); // PMEL site crc include first 5
       DBG(flogf("\n\t|crc: %#4x, blknum: %d", crc_calc, BlkNum); putflush();
           CIOdrain(); RTCDelayMicroSeconds(20000L);)
-      // add two header bytes to put antMod into binary mode 
-      buf[0] = 5; // ^E
-      buf[1] = 10; // 10 bytes
+      buf[0] = '@';
+      buf[1] = '@';
       buf[2] = '@';
-      buf[3] = '@';
-      buf[4] = '@';
-      buf[5] = (uchar)((crc_calc & 0xFF00) >> 8);
-      buf[6] = (uchar)((crc_calc & 0x00FF));
+      buf[3] = (uchar)((crc_calc & 0xFF00) >> 8);
+      buf[4] = (uchar)((crc_calc & 0x00FF));
       DBG(flogf("\n\t|SENDING BLK #%d %ld BYTES", BlkNum, mlength); putflush();
           CIOdrain(); RTCDelayMicroSeconds(14000L);)
 
@@ -1340,6 +1335,8 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
       TUTxFlush(AntModPort);
       TURxFlush(AntModPort);
+      // antMod binary mode for header
+      TUTxPrintf(AntModPort, "%c%c", (char)5, (char)10 );
       TUTxPutBlock(AntModPort, buf, mlength,
                    TUBlockDuration(AntModPort, mlength));
       TUTxWaitCompletion(AntModPort);
