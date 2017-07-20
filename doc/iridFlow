@@ -1,7 +1,8 @@
 flow thru code from P3
 close ctd, wispr
-IRIDGPS() . UploadFiles . Connect_SendFile_RecCmd . PHonePin . InitModem
- . SendFile 
+IRIDGPS() . UploadFiles . Connect_SendFile_RecCmd . PHonePin . InitModem(0) 
+  .. SatComOpen .. CallStatus .. CheckSignal .. Call_Land .. Acknowledge (projid)
+ . Send_File . Send_Blocks (dataid+data)
 
 
 

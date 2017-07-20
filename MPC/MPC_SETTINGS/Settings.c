@@ -750,7 +750,7 @@ void SetupIridiumCmd() {
 
   char *ProgramDescription = {"\n"
                               "Type HELP to view commands\n"};
-  // OpenTUPort_IRIDGPS(true);
+  // OpenTUPort_AntMod(true);
   // printf(ProgramDescription);
   SettingsPointer = IRIDSettings;
   CmdStdSetup(&cia, IridiumCmdTable, 0);
@@ -763,7 +763,7 @@ void SetupIridiumCmd() {
     fflush(stdout);
   }
 
-  // OpenTUPort_IRIDGPS(false);
+  // OpenTUPort_AntMod(false);
   SystemSettings();
 }
 #endif
