@@ -599,8 +599,8 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   Source = open(SourceFileName, O_RDONLY);
   if (Source <= 0) {
     flogf("\nERROR  |AppendFiles() %s open errno: %d", SourceFileName, errno);
-    if (errno != 0)
-      return false;
+    // ?? if (errno != 0)
+    return false;
   }
   DBG(else flogf("\n\t|Append_Files() %s opened", SourceFileName);)
 
@@ -801,8 +801,8 @@ bool SaveParams(const char *Command) {
   RTCDelayMicroSeconds(25000);
   if (paramfilehandle <= 0) {
     flogf("\nERROR  |SYSTEM.CFG open errno: %d", errno);
-    if (errno != 0)
-      return false;
+    // ?? if (errno != 0)
+    return false;
   }
   DBG(else flogf("\n\t|SYSTEM.CFG Opened"); cdrain(); coflush();)
 

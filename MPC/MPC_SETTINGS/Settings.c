@@ -211,6 +211,10 @@ Settings IRIDSettings[] = {ANTSW_NAME,
                            CALLMODE_DEFAULT,
                            CALLMODE_DESC,
                            "",
+                           LOWFIRST_NAME,
+                           LOWFIRST_DEFAULT,
+                           LOWFIRST_DESC,
+                           "",
                            0,
                            0,
                            0,
@@ -746,7 +750,7 @@ void SetupIridiumCmd() {
 
   char *ProgramDescription = {"\n"
                               "Type HELP to view commands\n"};
-  // OpenTUPort_IRIDGPS(true);
+  // OpenTUPort_AntMod(true);
   // printf(ProgramDescription);
   SettingsPointer = IRIDSettings;
   CmdStdSetup(&cia, IridiumCmdTable, 0);
@@ -759,7 +763,7 @@ void SetupIridiumCmd() {
     fflush(stdout);
   }
 
-  // OpenTUPort_IRIDGPS(false);
+  // OpenTUPort_AntMod(false);
   SystemSettings();
 }
 #endif

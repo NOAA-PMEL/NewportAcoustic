@@ -6,34 +6,56 @@
 **
 **	September 2016  Alex Turpin
 *****************************************************************************
-**	LARA.PHASE Parameter:
+* PLATFORM.h:  
+* short PHASE; // 1=AUH, 2=Ascent, 3=Surface Communication, 4= Descent
+* short BUOYMODE;  // 0=stopped 1=ascend 2=descend 3=careful ascent
+*        At depth and no velocity. Phase 1 && BuoyMode 0
+*        Ascending Phase 2 && BuoyMode 1
+*        On surface Phase 3 && BuoyMode 0
+*        Descending Phase 4 && BuoyMode 2
 **
-**
-**
-
-WISPR BOARD
-** TPU 6    27 PAM1 WISPR TX
-** TPU 7    28 PAM1 WISPR RX
-** TPU 8    29 1= turns on MAX3222
-** TPU 9    30 0= enables MAX3222
-
-Interrupts:
+* Console(char)
+*  LARA.PHASE case 1:
+*    case 'i': WISPRPower(true);
+*    case 'e': WISPRSafeShutdown();
+*    case 'd': WISPRDet(c);
+*    case 'f': WISPRDFP();
+*    case 'w': ChangeWISPR(c);
+*    case 'p': LARA.PHASE = c;
+*    case 'x': LARA.ON = false;
+*    case '2': LARA.DATA = LARA.DATA ? false : true;
+*  LARA.PHASE case 2: case 4:
+*    case 'w': WinchConsole();
+*    case 'p': LARA.PHASE = c;
+*    case 't': CTD_Sample();
+*    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+*    case 'a': PrintSystemStatus();
+*    case 's': LARA.SURFACED = true;
+*  LARA.PHASE case 3:
+*    case 'x': LARA.ON = false; // exit from GPSIRID
+*    case 'p': LARA.PHASE = c;
+***
+*
+*WISPR BOARD
+*** TPU 6    27 PAM1 WISPR TX
+*** TPU 7    28 PAM1 WISPR RX
+*** TPU 8    29 1= turns on MAX3222
+*** TPU 9    30 0= enables MAX3222
+*
+*Interrupts:
 **
 ** IRQ2 Wakes up from the sleep mode while waiting for ASC string from COM2
 ** IRQ3
 ** IRQ5 Interrupt to stop the program
 **
 *****************************************************************************
-**	Before deploying, set CF2 time and SM2 time, format SD cards, replace
-SM2 and CF2 clock batteries
+** Before deploying, set CF2 time and SM2 time, format SD cards, 
+** replace SM2 and CF2 clock batteries
 ** erase activity.log, set status=0, set startups=0,
-**	verify boottime is correct, verify pwrondepth and pwroffdepth are
-correct,
+** verify boottime is correct, verify pwrondepth and pwroffdepth are correct,
 ** make sure you have the correct mA multiplier set in the mAh calculation in
-status 5
-** for the SM2 settings that you are using(compression, kHz, etc.) as power
-consumption
-** varies between those settings
+** status 5 for the SM2 settings that you are using (compression, kHz, etc.)
+** as power consumption varies between those settings
 **
 \******************************************************************************/
 
@@ -106,6 +128,7 @@ IEV_C_PROTO(ExtFinishPulseRuptHandler);
 // Define unused pins here
 uchar mirrorpins[] = {15, 16, 17, 18, 19, 26, 36, 0};
 
+void shutdown();
 void InitializeLARA(ulong *);
 
 void PhaseOne();
@@ -123,6 +146,7 @@ void WaitForWinch(short);
 void SleepUntilWoken();
 bool GlobalRestart;
 bool PutInSleepMode = false;
+static char *returnstr;
 static char uploadfile[] =
     "c:00000000.dat"; // 12.9.2015 Can this be a static char?
 // static char *WriteBuffer;
@@ -136,8 +160,10 @@ void main() {
   ulong PwrOn, PwrOff;
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
-  // uploadfile.
-  WriteBuffer = (char *)calloc(256, sizeof(char));
+  // uploadfile. Never released.
+  WriteBuffer = (char *)calloc(1024, sizeof(char));
+  // str for anyone to use, i.e. printSystemStatus
+  returnstr = (char *)calloc(1024, sizeof(char));
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -148,9 +174,8 @@ void main() {
   if (WISP.DUTYCYCL == 100)
     WISPRPower(true);
 
-  // Main Loop. Always running unless interrupted by User input of '1' followed
-  // by 'y'. Or, if We have reached a full shutdown: below absolute minimum
-  // voltage.
+  // Main Loop. Always running unless interrupted by User input of 'x' 
+  // if We have reached a full shutdown: below absolute minimum voltage.
   while (LARA.ON) {
 
     switch (LARA.PHASE) {
@@ -169,15 +194,18 @@ void main() {
     case 3:
       Time(&PwrOff);
       PwrOff -= PwrOn;
+      // global: static char uploadfile[] = "c:00000000.dat
+      // VEEPROM: SystemParameters MPC;
       sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
       cprintf("\n\t|File Number: %08ld", MPC.FILENUM);
+      // writefile 1) MPC 2) Winch Info 3) Winch Status
+      // v
       WriteFile(PwrOff);
       // Init New LogFile
       Time(&PwrOn);
 
       PhaseThree();
-
-      CTD_Start_Up(true);
+      CTD_Start_Up(true); // ?? why start here
       CTD_SyncMode();
       break;
 
@@ -186,18 +214,27 @@ void main() {
       PhaseFour();
       break;
     }
-  }
+  } // while lara.on
+
+  free(WriteBuffer);
+  free(returnstr);
+  shutdown();
+} //____ Main() ____/
+
+/***
+ * shutdown
+ */
+void shutdown() {
   WISPRSafeShutdown();
 
-  PIOClear(23); // Make sure Iridium is Off
+  PIOClear(ANTMODPWR); // Make sure Iridium is Off
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
-  free(WriteBuffer);
 
   SleepUntilWoken();
   BIOSReset();
+}
 
-} //____ Main() ____/
 /*********************************************************************************\
 ** InitializeAUH
 \*********************************************************************************/
@@ -211,7 +248,7 @@ void InitializeLARA(ulong *PwrOn) {
   bool check = false;
 
   PIOMirrorList(mirrorpins);
-  PIOClear(23); // Make sure iridium is off...
+  PIOClear(ANTMODPWR); // Make sure iridium is off...
   PIOSet(26);
   // Get the system settings running
   SetupHardware();
@@ -266,8 +303,6 @@ void InitializeLARA(ulong *PwrOn) {
   Free_Disk_Space(); // Does finding the free space of a large CF card cause
                      // program to crash? or Hang?
 
-  CTD_CreateFile(MPC.FILENUM);
-
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {
     MPC.FILENUM--;
@@ -306,6 +341,8 @@ void InitializeLARA(ulong *PwrOn) {
     LARA.LOWPOWER = false;
 
   // SETUP CTD
+  CTD_CreateFile(MPC.FILENUM);
+  DBG2( flogf("\n .. setup ctd"); )
   OpenTUPort_CTD(true);
   CTD_Start_Up(true);
   CTD_SyncMode();
@@ -408,7 +445,7 @@ void InitializeLARA(ulong *PwrOn) {
   VEEStoreShort(STARTUPS_NAME, MPC.STARTUPS);
   if (MPC.STARTUPS >= MPC.STARTMAX) {
     WISPRSafeShutdown();
-    PinClear(23);
+    PinClear(22);
     PinClear(21);
     PinClear(26);
     SleepUntilWoken();
@@ -550,85 +587,90 @@ void PhaseTwo() {
 } //____ PhaseTwo ____//
 /****************************************************************************\
 ** Phase Three
-** Testing iridium/gps connection. If failed, release winch cable another meter
-or two.
+** Testing iridium/gps connection. 
+** If failed, release winch cable another meter or two.
 ** repeat to minimum CTD depth.
 \****************************************************************************/
 void PhaseThree() {
   short result = 0;
-  int attempts = 0;
+  int gpsFails = 0;
   float depth;
   short count = 0;
-  static short IridiumCalls = 0;
+  static short IridCallsNoParams = 0;
   short secs;
   ulong AscentTime;
   ulong AscentStop;
   char filenum[9] = "00000000";
   flogf("\n\t|PHASE THREE");
 
+  // close ctd, turn off wispr, close wispr
   OpenTUPort_CTD(false);
   if (WISPR_Status()) {
     WISPRSafeShutdown();
   }
   OpenTUPort_WISPR(false);
 
-  while (result <= 0) {
-    result = IRIDGPS(GlobalRestart); //-1=false gps, -2=false irid, 1=success 2=
-                                     //fake cmds 3 = real cmds
+  while (result <= 0) { 
+    // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
+    // DBG( Incoming_Data();)
+    DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
+    result = IRIDGPS(); 
 
-    // IRIDIUM Succe>=ful
-    if (result >= 1 || attempts > 2) {
+    if (GlobalRestart) { 
+      // Added 9.28.2016 after first deployment Lake W.
+      ParseStartupParams(true); 
+    } 
+
+    // gpsFails>2 ?? irrelevant in the logic flow. where set?
+    // gpsFails++ and checked in result==-1
+    if (result >= 1 || gpsFails > 4) {
+      // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
-      if (result == 1 || result == 2) { // Upload Success, Fake Commands
-        IridiumCalls++;
-        flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
-        if (IridiumCalls > 3) {
-          ParseStartupParams(
-              true); // Load default parameters in "default.cfg" file
-          if (NIGK.RECOVERY) {
-            if (MPC.DATAXINT != 30) {
-              MPC.DATAXINT = 30;
-              VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-            }
-            LARA.PHASE = 1;
-            break;
-          }
-        }
-        if (GlobalRestart)
-          ParseStartupParams(
-              true); // Added 9.28.2016 after first deployment Lake W.
-      }
-
-      else if (result == 3) { // Real Commands
-        ParseStartupParams(false);
-        IridiumCalls = 0;
-        flogf("\n\t|Successful IRID Call: %d", IridiumCalls);
-        if (NIGK.RECOVERY) {
-          if (MPC.DATAXINT != 30) {
-            MPC.DATAXINT = 30;
-            VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-          }
-          LARA.PHASE = 1;
-          break;
-        }
-      } else if (GlobalRestart)
-        ParseStartupParams(
-            true); // Added 9.28.2016 after first deployment Lake W.
-
+      // ?? check this at bottom of loop?
     }
-    // Bad GPS- GPS fails usually from bad reception.
+    if (result == 1 || result == 2) { 
+      // Upload Success / Commands
+      IridCallsNoParams++; // call sessions w/o Params
+      flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
+      if (IridCallsNoParams > 3) {
+        // calls > 3 implies ?? 
+        // Load default parameters in "default.cfg" file
+        ParseStartupParams(true); 
+        // checked here because ??
+      } // calls>3
+    } // Upload Success / Commands
+    else if (result == 3) { 
+      // Real Commands
+      ParseStartupParams(false);
+      IridCallsNoParams = 0;
+      flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
+    } // Real Commands
+    else if (result == -2) {
+      // GPS Success, IRID Fail
+      flogf("\n\t|PhaseThree(): Failed Iridium Transfer");
+      IridCallsNoParams++;
+      if (IridCallsNoParams > 3) {
+        IridCallsNoParams = 0;
+        ParseStartupParams(true);
+      } // calls>3
+      LARA.PHASE = 4;
+      break;
+    } // GPS Success, IRID Fail
     else if (result == -1) {
-      flogf("\n\t|PhaseThree(); Failed GPS attempt: %d", attempts);
-      if (attempts >= 5) {
+      gpsFails++;
+      // Bad GPS- GPS fails usually from bad reception.
+      flogf("\n\t|PhaseThree(): Failed GPS attempt: %d", gpsFails);
+      if (gpsFails >= 5) {
         flogf("\n\t|Exiting PhaseThree()");
+        // ?? close ports?
         break;
-      }
+      } // >=5
+      // does GPSIRID close antenna tup?
       OpenTUPort_NIGK(true);
       OpenTUPort_CTD(true);
 
       // Set LARA System back to !Surfaced so CTD will take measurements.
       LARA.SURFACED = false;
-      attempts++;
       LARA.TDEPTH -= 5;
 
       LARA.DEPTH = CTD_AverageDepth(1, NULL);
@@ -638,23 +680,24 @@ void PhaseThree() {
         secs = 10;
       flogf("\n\t|Ascend for %d seconds, %fmeters", secs, depth);
 
+      // ?? are we trying to go up?
       if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
         LARA.TDEPTH = NIGK_MIN_DEPTH;
-        attempts = 5;
+        gpsFails = 5;
       }
       AscentTime = Winch_Ascend();
       // Wait for Acoustic Modem, Get Response. Go into timer loop.
       WaitForWinch(1);
 
       // Count++ every 1/10th of a second.
-      while (LARA.DEPTH > LARA.TDEPTH) {
+      while (LARA.DEPTH > LARA.TDEPTH) { // who changes these??
+        // reading ctd?
         Incoming_Data();
         RTCDelayMicroSeconds(100000L);
         count++;
         // Break on time being exceeded.
-        if ((count / 10) >= secs)
-          break;
-      }
+        if ((count / 10) >= secs) break;
+      } // depth > target
 
       AscentStop = Winch_Stop();
       WaitForWinch(0);
@@ -666,38 +709,24 @@ void PhaseThree() {
       // confirm stop
       OpenTUPort_CTD(false);
       OpenTUPort_NIGK(false);
-    }
-    // GPS Success, IRID Fail
-    else if (result == -2) {
-      flogf("\n\t|PhaseThree(): Failed Iridium Transfer");
-      IridiumCalls++;
-      if (IridiumCalls > 3) {
-        IridiumCalls = 0;
-        ParseStartupParams(true);
-      }
-      if (NIGK.RECOVERY) {
-        if (MPC.DATAXINT != 30) {
-          MPC.DATAXINT = 30;
-          VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
-        }
-        LARA.PHASE = 1;
-        break;
-      }
-      LARA.PHASE = 4;
-      break;
-    }
-  }
+    } // Bad GPS- GPS fails usually from bad reception
+  } // while result<=0
 
+  // in recovery, stay on surface 
+  if (NIGK.RECOVERY) LARA.PHASE = 1; 
+  // NIGK.RECOVERY may be cleared by Params load 
+  
   GlobalRestart = false;
   MPC.FILENUM++;
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(MPC.FILENUM);
+  CTD_CreateFile(MPC.FILENUM); // ??
   LARA.TDEPTH = NIGK.TDEPTH;
 
   OpenTUPort_CTD(true);
 
+  // why here ??
   if (WISP.DUTYCYCL > 50) {
     OpenTUPort_WISPR(true);
     WISPRPower(true);
@@ -803,7 +832,7 @@ void PhaseFour() {
 
 } //____ Phase_Four() ____//
 /****************************************************************************\
-** void Incoming_Data()
+** int Incoming_Data()
 \****************************************************************************/
 int Incoming_Data() {
   bool incoming = true;
@@ -844,7 +873,6 @@ int Incoming_Data() {
         WISPR_Data();
       } else if (tgetq(CTDPort)) {
         CTD_Data();
-
       }
       // Console Wake up.
       else if (cgetq()) {
@@ -862,8 +890,8 @@ int Incoming_Data() {
   case 4:
 
     while (incoming) {
+      // ?? does adcheck need to run between each incoming? how often?
       AD_Check();
-
       if (tgetq(PAMPort)) {
         // DBG(flogf("WISPR Incoming");)
         WISPR_Data();
@@ -920,7 +948,8 @@ int Incoming_Data() {
 ** Platform Specific Console Communication
 \************************************************************************************************************************/
 void Console(char in) {
-
+  // are there side effects from any subroutines?
+  // shutdown from here
   short c;
 
   DBG(flogf("Incoming Char: %c", in);)
@@ -965,9 +994,10 @@ void Console(char in) {
       LARA.PHASE = c;
       break;
 
-    case '1':
-      LARA.ON = false;
+    case 'x':
+      // LARA.ON = false;
       // LARA.DATA = LARA.DATA ? false : true;
+      shutdown();
       break;
     case '2':
       LARA.DATA = LARA.DATA ? false : true;
@@ -993,9 +1023,10 @@ void Console(char in) {
       flogf("\n\t|Take CTD Sample");
       CTD_Sample();
       break;
-    case '1':
-      LARA.ON = false;
-      LARA.DATA = LARA.DATA ? false : true;
+    case 'x':
+      // LARA.ON = false;
+      // LARA.DATA = LARA.DATA ? false : true;
+      shutdown();
       break;
     case 'a':
     case 'A':
@@ -1010,8 +1041,9 @@ void Console(char in) {
 
   case 3:
     switch (in) {
-    case '1':
-      LARA.ON = false; // exit from GPSIRID
+    case 'x':
+      // LARA.ON = false; // exit from GPSIRID
+      shutdown();
       break;
     case 'P':
     case 'p':
@@ -1023,7 +1055,7 @@ void Console(char in) {
     break;
   }
 
-  PutInSleepMode = true;
+  // ?? PutInSleepMode = true;
   return;
 }
 /******************************************************************************\
@@ -1079,7 +1111,7 @@ void Sleep(void) {
 
   PutInSleepMode = false;
 
-  // DBG(flogf(".");)
+  // DBG2(flogf(".");)
   RTCDelayMicroSeconds(10000L);
 
 } //____ Sleep() ____//
@@ -1124,7 +1156,7 @@ void CTDSleep(void) {
                       */
   PutInSleepMode = false;
 
-  //   DBG(flogf(",");)
+  //   DBG2(flogf(",");)
   RTCDelayMicroSeconds(10000L);
 
 } //____ Sleep() ____//
@@ -1231,10 +1263,10 @@ ulong WriteFile(ulong TotalSeconds) {
 
   if (filehandle <= 0) {
     flogf("\nERROR  |WriteFile(): open error: errno: %d", errno);
-    if (errno != 0)
-      return -1;
+    // ?? if (errno != 0)
+    return -1;
   }
-  DBG(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
+  DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
 
   //*** LARA Write ***//
   sprintf(WriteBuffer, "LARA Program Ver:%.1f\naa:bb.cccc North ddd:ee.ffff "
@@ -1246,19 +1278,19 @@ ulong WriteFile(ulong TotalSeconds) {
 
   flogf("\n%s", WriteBuffer);
   bytesWritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-  DBG(flogf("\nBytesWritten: %d", bytesWritten);)
+  DBG2(flogf("\nBytesWritten: %d", bytesWritten);)
 
   // Only comes here if not rebooted.
   if (TotalSeconds != 0) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     RTCDelayMicroSeconds(50000L);
-    memset(WriteBuffer, 0, 256 * sizeof(char));
+    memset(WriteBuffer, 0, 1024 * sizeof(char));
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());
     bytesWritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-    DBG(flogf("\nBytesWritten: %d", bytesWritten);)
+    DBG2(flogf("\nBytesWritten: %d", bytesWritten);)
   }
   // Else, coming from reboot. Name the PowerLogging File.
   else {
@@ -1326,20 +1358,18 @@ ulong WriteFile(ulong TotalSeconds) {
 **	PrintSystemStatus()
 \**************************************************************************************/
 char *PrintSystemStatus() {
-
-  char *returnString;
-  returnString = (char *)calloc(128, sizeof(char));
-  sprintf(returnString, "LARA: "
+  // global returnstr
+  sprintf(returnstr, "LARA: "
                         "%d%d%d%d\nMOORDEPTH:%5.2f\nCURRENTDEPTH:%5."
                         "2f\nTOPDEPTH:%5.2f\nTARGETDPETH:%d\nAVG.VEL:%5."
                         "2f\nCTDSAMPLES:%d\n\0",
           LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
           LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
           LARA.CTDSAMPLES);
-  flogf("\n%s", returnString);
+  flogf("\n%s", returnstr);
   RTCDelayMicroSeconds(100000L);
 
-  return returnString;
+  return returnstr;
 }
 /**************************************************************************************\
 ** WaitForWinch
@@ -1457,3 +1487,4 @@ bool CheckTime(ulong prevTime, short mode, short hour) {
 ** LARA_Recovery()
 \**************************************************************************************/
 void LARA_Recovery() {} //____ LARA_Recovery() ____//
+

@@ -1,0 +1,91 @@
+alex: winch blast of nulls
+alex: power .8A
+alex: batt cap current, new
+
+when ctd times out, bizarro depth numbers
+
+at surface, never gives up on gps fail (e.g. no antenna)
+
+in GPSIRID, never checks for console input
+
+descend phase 4: motor stop before dock, no stop command, goes to phase 1
+
+power: 0.804A, whassup with this?
+write ctd data
+create_dtx_file() c:00000208.dtx opened
+should cf2 be setting date on ctd?
+1680x1050 weird.
+
+ctd: output is crlf, doubled on pulse
+ctd: power off doesn't take ctd out of sleep mode. ctd never turns off. batt?
+ctd: batt fail mode - reset bench config?
+x ctd: input must be cr\r terminated, w/o lf\n
+x ctd: ! remove \n in output to ctd
+
+x what is line terminator to/from winch in winch.c?
+
+what are all the appendfiles / moves at startupt
+
+== .pwr file fail
+Power_Monitor() was returning failed after file open
+==
+06/26/2017 17:15:42|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.790A, 13.86V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+
+== ctd reset
+06/26/2017 17:12:53|Found OK
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+x
+S>
+ERROR|CTD_Data(): got <|> want #, set sync mode
+ . CTD_Sample
+. CTD_Data()
+
+== append errs at start
+        |WISPRWriteFile()
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 17:10:45|COMDos() del c:00000254.dtx
+1 file(s) erased
+
+06/28/2017 00:42:00|GetUTCSeconds(): 06-27-2017|23:40:34.000
+        |Time Difference: 3685
+        |Failed gathering GPS Time
+
+06/29/2017 20:31:42|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+Bad TU Channel: CTDPort...
+=======
+
+07/17/2017 23:41:21|Acknowledge(QUEHLR01)
+	|GetIRIDInput(ACK, )
+	|GetIRIDInput(ACK, )
+	|GetIRIDInput(ACK, )
+	|GetIRIDInput(ACK, )
+	|GetIRIDInput(ACK, )
+	|GetIRIDInput(ACK, )
+	|POWER: 0.244A, 13.79V
+ERROR|AD_Write() c:00000351.pwr open fail. errno: 23
+	|GetIRIDInput(ACK, )
+Got 3 bytes
+GetIRIDInput: 
+	|GetIRID() Buf: 
+	|StringSearch(Count: 2 of 3)
+	|ACK Received
+07/17/2017 23:41:39|Send_File(c:00000350.dat):
+	|664 Bytes, 1 BLKS
+	|Check First Bitmap: K3
+

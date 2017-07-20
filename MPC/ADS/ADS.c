@@ -297,8 +297,8 @@ void AD_Write(ushort *AveragedEnergy) {
   ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND);
   if (ADSFileHandle <= 0) {
     flogf("\nERROR|AD_Write() %s open fail. errno: %d", ADAvgFileName, errno);
-    if (errno != 0)
-      return;
+    // ?? if (errno != 0)
+    return;
   }
   // DBG(   else      flogf("\n\t|AD_Write() %s opened", ADAvgFileName);)
 
@@ -317,6 +317,8 @@ void AD_Write(ushort *AveragedEnergy) {
   if (close(ADSFileHandle) < 0)
     flogf("\nERROR  |AD_Write() %s Close error: %d", ADAvgFileName, errno);
   // DBG(   else      flogf("\n\t|AD_Write() %s Closed", ADAvgFileName);)
+ 
+  // ?? why delay
   RTCDelayMicroSeconds(10000);
 
 } //_____ AD_Write() _____//

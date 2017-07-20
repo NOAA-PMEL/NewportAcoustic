@@ -8,25 +8,26 @@ extern volatile clock_t stop_clock;
 extern bool SystemOn;
 extern int DataTimer;
 extern long SystemFreeSpace;
+// static global - seen only in file where declared
+// static local - retains value between func calls
 static char *WriteBuffer;
 
 /*********************************************************
 ** SYSTEM PARAMETER STRUCTURES
 ***********************************************************/
-// System Parameters//Always defined
+// System Parameters//Always defined // used as MPC.name
 typedef struct {
   char PROGNAME[20]; // added HM
   char LONG[17];     // 123:45.67 West
   char LAT[17];      // 45:67.8900 North
-  char PROJID[6];
-  char PLTFRMID[6];
+  char PROJID[6];    // rudicsland
+  char PLTFRMID[6];  // rudicsland
   char LOGFILE[13]; // File Name: activity.log
-  long FILENUM;
+  long FILENUM; // current number for 00000000.dat
   short STARTUPS;
   short STARTMAX; //-s
   short DETINT;   //-D      //Minutes   //WISPR DET INTERVAL
-  short DATAXINT;
-
+  short DATAXINT; // VEE:DATAXINTERVAL_NAME
 } SystemParameters;
 
 // Seaglider Structure Parameters:

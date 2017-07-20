@@ -1,0 +1,88 @@
+alex: winch blast of nulls
+alex: power .8A
+alex: batt cap current, new
+
+when ctd times out, bizarro depth numbers
+
+at surface, never gives up on gps fail (e.g. no antenna)
+
+in GPSIRID, never checks for console input
+
+descend phase 4: motor stop before dock, no stop command, goes to phase 1
+
+power: 0.804A, whassup with this?
+write ctd data
+create_dtx_file() c:00000208.dtx opened
+should cf2 be setting date on ctd?
+1680x1050 weird.
+
+ctd: output is crlf, doubled on pulse
+ctd: power off doesn't take ctd out of sleep mode. ctd never turns off. batt?
+ctd: batt fail mode - reset bench config?
+x ctd: input must be cr\r terminated, w/o lf\n
+x ctd: ! remove \n in output to ctd
+
+x what is line terminator to/from winch in winch.c?
+
+what are all the appendfiles / moves at startupt
+
+== .pwr file fail
+Power_Monitor() was returning failed after file open
+==
+06/26/2017 17:15:42|Warming up GPS/IRID Unit for 27 Sec
+	|POWER: 0.790A, 13.86V
+ERROR|AD_Write() c:00000255.pwr open fail. errno: 23
+	|GetGPS_SyncRTC()
+	|SendString(AT+PD)
+Grabbing 82 bytes
+
+== ctd reset
+06/26/2017 17:12:53|Found OK
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+ . CTD_AverageDepth
+ . CTD_Sample
+. CTD_Data()
+x
+S>
+ERROR|CTD_Data(): got <|> want #, set sync mode
+ . CTD_Sample
+. CTD_Data()
+
+== append errs at start
+        |WISPRWriteFile()
+WISPRWrite File: Number of Bytes written: 104
+ERROR  |Return upon no file to append
+06/26/2017 17:10:45|COMDos() del c:00000254.dtx
+1 file(s) erased
+
+06/28/2017 00:42:00|GetUTCSeconds(): 06-27-2017|23:40:34.000
+        |Time Difference: 3685
+        |Failed gathering GPS Time
+
+06/29/2017 20:31:42|PowerDownCloseComIRIDGPS() 
+	|SendString(AT*P)
+	|GetIRIDInput(OK, )
+	|PhaseThree(); Failed GPS attempt: 0
+	|Open NIGK Winch TUPort
+	|Open CTD TUPort
+Bad TU Channel: CTDPort...
+=======
+
+
+what is this about?
+Updates from ADS.c version 2.0
+   -Working to make file open more efficient.
+   -Received many errno=0 when fopen return NULL. No idea why. waiting to hear
+back from JG 12.2.2015
+ grep errno * | grep 0
+ADS.c:   -Received many errno=0 when fopen return NULL. No idea why. waiting to hear
+ADS.c:    if (errno != 0)
+LARA.c:    if (errno != 0)
+MPC.c:    if (errno != 0)
+MPC.c:    if (errno != 0)
+WISPR.c:      if (errno != 0)
+
+
+

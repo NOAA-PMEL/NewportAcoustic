@@ -1,6 +1,40 @@
 
 // DEFINE THE TYPE OF PLATFORM
 #define PLATFORM LARA
+
+// pins on MPC board
+/*
+ * WISPR.h:#define WISPRONE 29
+ * WISPR.h:#define WISPRTWO 30
+ * WISPR.h:#define WISPRTHREE 24
+ * WISPR.h:#define WISPRFOUR 25
+ * WISPR.h:#define WISPR_PWR_ON 37
+ * WISPR.h:#define WISPR_PWR_OFF 42
+ * Winch.h:#define AMODEMPWR 21
+ * Winch.h:#define AMODEMRX 33
+ * Winch.h:#define AMODEMTX 35
+ * CTD.h:#define TDCOM 23 // com1 shared, must match GPSIRID.h#ANTMODCOM
+ * GPSIRID.h:#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+ * GPSIRID.h:#define ANTMODCOM 23 // com1 shared, must match CTD.h#TDCOM
+ * GPSIRID.h:#define ANTMODRX 32
+ * GPSIRID.h:#define ANTMODTX 31
+ */
+
+#define AMODEMPWR 21
+#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+#define ANTMODCOM 23 // com1 shared, must match 
+#define TDCOM 23 // com1 shared, must match 
+#define WISPRTHREE 24
+#define WISPRFOUR 25
+#define WISPRONE 29
+#define WISPRTWO 30
+#define ANTMODTX 31
+#define ANTMODRX 32
+#define AMODEMRX 33
+#define AMODEMTX 35
+#define WISPR_PWR_ON 37
+#define WISPR_PWR_OFF 42
+
 // This structure is primarily for system diagnostics logging. Keeping track of
 // phase, alarms, system statuses
 typedef struct {
@@ -35,10 +69,12 @@ void LARA_Recovery();
 //#define RAOB
 
 // LARA PROGRAM
-#define PROG_VERSION 3.2 // Keep this up to date!!!
+#define PROG_VERSION 3.3 // Keep this up to date!!!
 
 #define POWERLOGGING
+// two levels of debug
 #define DEBUG
+// #define DEBUG2
 #define SYSTEMDIAGNOSTICS
 #define WISPR
 #define IRIDIUM
@@ -86,12 +122,20 @@ void LARA_Recovery();
 #define RTS(X)
 #endif
 
+// two levels of debug
 // DEBUG
 #ifdef DEBUG
 #define DBG(X) X
 #else
 #define DBG(X)
 #endif
+// DEBUG2
+#ifdef DEBUG2
+#define DBG2(X) X
+#else
+#define DBG2(X)
+#endif
+
 /*
 //CTD
 #ifdef CTDSENSOR

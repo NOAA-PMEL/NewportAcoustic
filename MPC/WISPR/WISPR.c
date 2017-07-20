@@ -68,7 +68,7 @@ Power is applied to the wispr board and after the program starts it waits
 for GPS time and location. That's when we send it.
 \*************************************************************************/
 void WISPRPower(bool power) {
-
+  // must call OpenTUPort_WISPR first
   if (power) {
 
     flogf("\n%s|WISPR: ON", Time(NULL));
@@ -167,6 +167,7 @@ short WISPR_Data() {
         if (!WISPRExit())
           if (!WISPRExit()) {
             flogf(": Forcing Off");
+            // ?? fetch storm warning
             WISPRPower(false);
           }
         Check_Timers(Return_ADSTIME());
@@ -206,8 +207,8 @@ short WISPR_Data() {
 
     if (WISPRFile <= 0) {
       flogf("\nERROR|WISPR_Data() open errno: %d", errno);
-      if (errno != 0)
-        return -3;
+      // ?? if (errno != 0)
+      return -3;
     }
 
     if ((int)returndouble < dtxrqst)

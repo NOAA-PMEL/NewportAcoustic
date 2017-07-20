@@ -37,13 +37,7 @@ void WISPRGPS();
 void OpenTUPort_WISPR(bool);
 bool WISPRExpectedReturn(short, bool);
 
-#define WISPRONE 29
-#define WISPRTWO 30
-#define WISPRTHREE 24
-#define WISPRFOUR 25
-
-#define WISPR_PWR_ON 37
-#define WISPR_PWR_OFF 42
+// pin defines moved to platform.h
 
 // TUPort Baud Rates
 #define BAUD 9600L

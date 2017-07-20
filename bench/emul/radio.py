@@ -13,7 +13,7 @@ go = ser = None
 #
 name = 'radio'
 eol = '\r'
-port = '/dev/ttyS8'
+port = '/dev/ttyS4'
 baudrate = 19200
 syncmode = 0
 
@@ -28,7 +28,7 @@ def modGlobals(**kwargs):
             glob[i] = j
             logmsg += "%s=%s " % (i, j)
 
-def run():
+def start():
     "start serial and reader thread"
     global ser, go
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
@@ -40,7 +40,6 @@ def run():
 def stop():
     "stop threads, close serial"
     if go: go.clear()
-    if ser: ser.close()
 
 
 def serThread():
@@ -103,5 +102,7 @@ def serThread():
                     + '\r\n' ) 
                 )
             elif l: pass
+    # while go
+    if ser: ser.close()
 
 

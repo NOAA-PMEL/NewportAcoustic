@@ -1,3 +1,7 @@
+/** handling CTD in buoy, seabird SBE 16plus
+ * general note: ctd wants \r only for input
+ * Bug:! TUTxPrint translates \n into \r\n, which sorta kinda works if lucky
+ */
 #include <cfxbios.h> // Persistor BIOS and I/O Definitions
 #include <cfxpico.h> // Persistor PicoDOS Definitions
 #include <MPC_Global.h>
@@ -60,20 +64,24 @@ char CTDLogFile[] = "c:00000000.ctd";
 float descentRate = 0.1923; // m/s
 float ascentRate = 0.26;
 
-char *stringin;
-char *stringout;
-char *writestring;
+// global calloc used by CTD
+static char *stringin;
+static char *stringout;
+
 /*****************************************************************************\
 ** CTD_Start_Up()
+* open port if needed, send break, get prompt, flush; opt settime
 \*****************************************************************************/
 bool CTD_Start_Up(bool settime) {
   bool returnval = false;
 
-  // CTD_CreateFile(MPC.FILENUM);
+  // CTD_CreateFile(MPC.FILENUM);  // called from lara.c
+  DBG( flogf("i\n. CTD_Start_Up"); )
 
   if (CTDPort == NULL)
     OpenTUPort_CTD(true);
 
+  // leave sync mode
   CTD_SampleBreak();
   Delay_AD_Log(1);
 
@@ -143,7 +151,7 @@ void CTD_DateTime() {
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 
-  TUTxPrintf(CTDPort, "DATETIME=%s\n", buffer);
+  TUTxPrintf(CTDPort, "DATETIME=%s\r", buffer);
   RTCDelayMicroSeconds(250000L);
   while (tgetq(CTDPort))
     cprintf("%c", TURxGetByte(CTDPort, true));
@@ -157,20 +165,20 @@ bool CTD_GetPrompt() {
   short count = 0;
   short LastByteInQ;
 
-  memset(stringin, 0, 128 * sizeof(char));
+  memset(stringin, 0, 1024 * sizeof(char));
 
   LastByteInQ = TURxPeekByte(CTDPort, (tgetq(CTDPort) - 1));
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
                                                     // command line for CTDPort
                                                     // or 7 seconds pass
-    TUTxPrintf(CTDPort, "\n");
+    TUTxPrintf(CTDPort, "\r");
     RTCDelayMicroSeconds(1000000);
     LastByteInQ = TURxPeekByte(CTDPort, (tgetq(CTDPort) - 1));
     count++;
   }
 
   if (count == 2) {
-    TURxGetBlock(CTDPort, stringin, 128 * sizeof(uchar), 1000);
+    TURxGetBlock(CTDPort, stringin, 1024 * sizeof(uchar), 1000);
     if (strstr(stringin, "S>") != NULL) {
       cprintf("\nPrompt from CTDBlock");
       TURxFlush(CTDPort);
@@ -190,12 +198,11 @@ bool CTD_GetPrompt() {
 \********************************************************************************/
 void CTD_Sample() {
 
+  DBG2( flogf("\n . CTD_Sample"); )
   if (SyncMode) {
-    // cprintf("pulse");
-    TUTxPrintf(CTDPort, "pulse\n");
+    TUTxPrintf(CTDPort, "x\r");
   } else {
-    // cprintf("ts");
-    TUTxPrintf(CTDPort, "TS\n");
+    TUTxPrintf(CTDPort, "TS\r");
   }
 
   RTCDelayMicroSeconds(250000);
@@ -206,10 +213,10 @@ void CTD_Sample() {
 \********************************************************************************/
 void CTD_SyncMode() {
 
-  TUTxPrintf(CTDPort, "Syncmode=y\n");
+  TUTxPrintf(CTDPort, "Syncmode=y\r");
   TUTxWaitCompletion(CTDPort);
   RTCDelayMicroSeconds(500000);
-  TUTxPrintf(CTDPort, "QS\n");
+  TUTxPrintf(CTDPort, "QS\r");
   TUTxWaitCompletion(CTDPort);
   RTCDelayMicroSeconds(1000000);
 
@@ -375,27 +382,30 @@ int Sea_Ice_Algorithm() {
 } //____ bool Sea_Ice_Algorithm(void) ____/
 /******************************************************************************\
 ** void CTD_data()
+* CTD with fluro, par
+* Temp, conductivity, depth, fluromtr, PAR, salinity, time
+* 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
+* The response is approximately 2 sec.
+* FLS and PAR data in between the depth and salinity. Ignore the conductivity.
 \******************************************************************************/
 bool CTD_Data() {
-  bool log = false;
-  bool prompt = false;
-  bool returnvalue = false;
-  char *split_temp;
-  char *split_pres;
-  char *split_SAL;
-  char *split_date;
-  float temp;
-  char *mon;
-  float SAL;
+  // global stringin CTDLogFile
+  char *strin;  // pointer into stringin
   char charin;
   int filehandle;
   int i = 0, count = 0, byteswritten, month;
+  char *split_temp, *split_cond, *split_pres;
+  char *split_flu, *split_par, *split_sal;
+  float temp, cond, pres, flu, par, sal;
+  char *split_date, *mon;
   struct tm info;
   time_t secs = 0;
 
-  memset(stringin, 0, 128 * sizeof(char));
+  DBG2( flogf("\n. CTD_Data()"); )
 
-  while (count < 3 && i < 128) {
+  memset(stringin, 0, 1024 * sizeof(char));
+  // loop until 3 timeouts; should this be loop until \n ?
+  while (count < 3 && i < 1024) {
     charin = TURxGetByteWithTimeout(CTDPort, 250);
     if (charin == -1)
       count++;
@@ -405,44 +415,55 @@ bool CTD_Data() {
     }
   }
 
-  if (strchr(stringin, '#') != NULL) {
-    log = true;
-  } else if (strchr(stringin, '>') != NULL)
-    prompt = true;
-  else if (strchr(stringin, '<') != NULL)
-    prompt = true;
+  DBG2( flogf("\n%s", stringin);)
 
-  if (prompt) {
-    flogf("\nERROR|CTD_Data(): Received >s rather than #, sending into sleep "
-          "mode.");
-    CTD_SyncMode();
-    Delay_AD_Log(3);
-    TUTxPrintf(CTDPort, "TS\n");
-    TUTxWaitCompletion(CTDPort);
-    return returnvalue;
-  }
+  // expect to see stringin start with ".*# "
+  // do better sanity checking
+  strin = strchr(stringin, '#');
+  if (strin == NULL) {
+    // no data #
+    if ((strchr(stringin, '>') != NULL)
+        || (strchr(stringin, '<') != NULL)) {
+      // prompt
+      flogf("\nERROR|CTD_Data(): got <|> want #, set sync mode");
+      CTD_SyncMode();
+      Delay_AD_Log(3);
+    } else {
+      // no < > #, don't know what
+      flogf("\nERROR|CTD_Data(): No prompt found, reset ctd");
+      CTD_Start_Up(true);
+      CTD_SyncMode();
+    }
+    return false;
+  } // no #
 
   // Split data string up into separate values
   // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
-  strtok(stringin, "# ");
-  split_temp = strtok(NULL, " ");
-  if (split_temp == NULL) {
-    cprintf("\nNo Commas in CTD Data");
-  }
-  strtok(NULL, " "); // erase cond.
-  split_pres = strtok(NULL, " ");
-  split_SAL = strtok(NULL, " ");
-  split_date = strtok(NULL, ",");
+  split_temp = strtok(strin, "#, ");
+  split_cond = strtok(NULL, ", "); 
+  split_pres = strtok(NULL, ", ");
+  split_flu = strtok(NULL, ", ");
+  split_par = strtok(NULL, ", ");
+  split_sal = strtok(NULL, ", ");
+  split_date = strtok(NULL, "\r\n"); 
 
-  temp = atof(strtok(split_temp, ","));
+  temp = atof(split_temp);
+  cond = atof(split_cond);
+  pres = atof(split_pres);
+  flu = atof(split_flu);
+  par = atof(split_par);
+  sal = atof(split_sal);
+  LARA.DEPTH = pres;
 
-  LARA.DEPTH = atof(strtok(split_pres, ","));
-
-  SAL = atof(strtok(split_SAL, ","));
-
+  // convert date time to secs
   info.tm_mday = atoi(strtok(split_date, " "));
-  info.tm_mon = -1;
   mon = strtok(NULL, " ");
+  info.tm_year = (atoi(strtok(NULL, " ")) - 1900);
+  info.tm_hour = atoi(strtok(NULL, ":"));
+  info.tm_min = atoi(strtok(NULL, ":"));
+  info.tm_sec = atoi(strtok(NULL, " "));
+
+  info.tm_mon = -1;
   if (strstr(mon, "Jan") != NULL)
     info.tm_mon = 0;
   else if (strstr(mon, "Feb") != NULL)
@@ -468,60 +489,53 @@ bool CTD_Data() {
   else if (strstr(mon, "Dec") != NULL)
     info.tm_mon = 11;
 
+  // need better sanity checks
   if (info.tm_mon == -1) {
-    flogf("\nERROR|CTD_Data(): Date incorrect. flush tuport ");
+    flogf("\nERROR|CTD_Data(): month %s incorrect. flush tuport ", mon);
+    flogf("\nERROR|CTD_Data(): %s ", stringin );
+    flogf("\nERROR|CTD_Data(): %f, %f, %f, %f, %f, %f, %d, %s, %d ", 
+      temp, cond, pres, flu, par, sal, info.tm_mday, mon, info.tm_year);
     TURxFlush(CTDPort);
-    return returnvalue;
+    return false;
   }
-
-  info.tm_year = (atoi(strtok(NULL, " ")) - 1900);
-  info.tm_hour = atoi(strtok(NULL, ":"));
-  info.tm_min = atoi(strtok(NULL, ":"));
-  info.tm_sec = atoi(strtok(NULL, " "));
 
   month = info.tm_mon + 2;
   sprintf(split_date, ", %d.%d.%d %d:%d:%d", info.tm_mday, month,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
 
   secs = mktime(&info);
+  // this was in the write log section
+  if (LARA.BUOYMODE != 0)
+    CTD_VertVel(secs);
+  // ?? this incr might be an error, done in VertVel
+  LARA.CTDSAMPLES++;
+
 
   // Log WriteString
-  if (log) {
-    memset(writestring, 0, 64 * sizeof(char));
-    sprintf(writestring, "#%.4f,", temp);
-    strcat(writestring, split_pres);
-    LARA.DEPTH = atof(strtok(split_pres, ","));
-    strcat(writestring, ","); // added 9.28 after deploy 2, data 1. 02UTC of
-                              // 9.29
-    strcat(writestring, split_SAL);
-    strcat(writestring, split_date);
-    strcat(writestring, "\n");
+  memset(stringout, 0, 1024 * sizeof(char));
+  sprintf(stringout, "#%.4f,", temp);
+  strcat(stringout, split_pres);
+  LARA.DEPTH = atof(strtok(split_pres, ","));
+  strcat(stringout, ","); // added 9.28 after deploy 2, data 1. 02UTC of
+                            // 9.29
+  strcat(stringout, split_sal);
+  strcat(stringout, split_date);
+  strcat(stringout, "\n");
 
-    LARA.CTDSAMPLES++;
-    TURxFlush(CTDPort);
-    filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
-    if (filehandle <= 0) {
-      flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
-      if (errno != 0) {
-        // CTD_CreateFile(MPC.FILENUM);
-        return true;
-      }
-    }
+  TURxFlush(CTDPort);
+  filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
+  if (filehandle <= 0) {
+    flogf("\nERROR  |ctdlogfile '%s' fd %d", CTDLogFile, filehandle);
+    flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
+    flogf("\nLog: %s", stringout);
+    return false;
+  }
+  byteswritten = write(filehandle, stringout, strlen(stringout));
+  DBG2( cprintf("\nBytes Written: %d", byteswritten);)
 
-    flogf("\nLog: %s", writestring);
-    if (LARA.BUOYMODE != 0)
-      CTD_VertVel(secs);
-
-    byteswritten = write(filehandle, writestring, strlen(writestring));
-    // cprintf("\nBytes Written: %d", byteswritten);
-
-    if (close(filehandle) != 0)
-      flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
-
-  } else {
-    cprintf("\nNo \# found: %s", stringin);
-    CTD_Start_Up(true);
-    CTD_SyncMode();
+  if (close(filehandle) != 0) {
+    flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
+    return false;
   }
   return true;
 
@@ -558,36 +572,48 @@ time_t CTD_VertVel(time_t seconds) {
   return timechange;
 
 } //____ CTD_VertVel() ____//
+/***
+ * void SwitchTD(char);
+ * select, A=>antenna TD sbe39, B=>buoy CTD sbeCat
+ ***/
+void SwitchTD(char c) {
+  if (c == 'A') PIOSet(TDCOM);
+  else if (c == 'B') PIOClear(TDCOM);
+  else flogf("\nError: SwitchTD(%c) bad choice", c);
+} //__ SwitchTD() __//
+
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
+** ?? calloc/free may not match, should these be globals?
 \******************************************************************************/
 void OpenTUPort_CTD(bool on) {
-
+  // global stringout, stringin
   short CTD_RX, CTD_TX;
   flogf("\n\t|%s CTD TUPort", on ? "Open" : "Close");
   if (on) {
-    CTD_RX = TPUChanFromPin(32);
-    CTD_TX = TPUChanFromPin(31);
-    PIOSet(22);
-    PIOClear(23);
+    CTD_RX = TPUChanFromPin(ANTMODRX);
+    CTD_TX = TPUChanFromPin(ANTMODTX);
+    PIOSet(ANTMODPWR);
+    // use buoy CTD
+    SwitchTD('B'); 
     CTDPort = TUOpen(CTD_RX, CTD_TX, BAUD, 0);
     RTCDelayMicroSeconds(20000L);
     if (CTDPort == 0)
       flogf("\nBad TU Channel: CTDPort...");
-    writestring = (char *)calloc(64, sizeof(char));
-    stringin = (char *)calloc(128, sizeof(char));
+    stringout = (char *)calloc(1024, sizeof(char));
+    stringin = (char *)calloc(1024, sizeof(char));
   }
   if (!on) {
 
-    free(writestring);
+    free(stringout);
     free(stringin);
 
-    PIOClear(22);
     TUClose(CTDPort);
   }
   return;
 
 } //____ OpenTUPort_CTD() ____//
+
 /******************************************************************************\
 ** void GetCTDSettings();
 \******************************************************************************/
@@ -599,6 +625,7 @@ void GetCTDSettings() {
   DBG(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
 
 } //____ GetCTDSettings() ____//
+
 /******************************************************************************\
 ** float CTD_AverageDepth(int)
         -Usually Called while waiting for Winch Response.
@@ -615,6 +642,7 @@ float CTD_AverageDepth(int i, float *velocity) {
   float returnValue;
   ulong starttime = 0, stoptime = 0;
 
+  DBG2( flogf("\n . CTD_AverageDepth"); )
   if (tgetq(CTDPort))
     TURxFlush(CTDPort);
   // This for loop is to understand the profiling buoy's starting position prior

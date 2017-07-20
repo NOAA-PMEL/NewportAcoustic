@@ -9,9 +9,13 @@
 *.RMP
 *.RUN
 *.bin
+*.mcp
 Resource.frk
 bin
 *_Data
 *~
 *.swp
 *.pyc
+# log or *.log
+*log
+.tags
