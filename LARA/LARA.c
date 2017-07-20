@@ -216,6 +216,7 @@ void main() {
     }
   } // while lara.on
 
+  flogf("\nLARA.ON == false\n");
   free(WriteBuffer);
   free(returnstr);
   shutdown();
@@ -367,7 +368,7 @@ void InitializeLARA(ulong *PwrOn) {
     Make_Directory("LOG");
     if (WISPRNUMBER > 1) {
       if (WISP.NUM != 1)
-        WISP.NUM = 1;
+        WISP.NUM = 1; // ??
 
       OpenTUPort_WISPR(true);
 
@@ -621,12 +622,9 @@ void PhaseThree() {
       ParseStartupParams(true); 
     } 
 
-    // gpsFails>2 ?? irrelevant in the logic flow. where set?
-    // gpsFails++ and checked in result==-1
     if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
-      // ?? check this at bottom of loop?
     }
     if (result == 1 || result == 2) { 
       // Upload Success / Commands
@@ -1327,10 +1325,8 @@ ulong WriteFile(ulong TotalSeconds) {
   RTCDelayMicroSeconds(50000L);
 #endif
   //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
-  sprintf(logfile, "%08ld.log", MPC.FILENUM + 1);
-  RTCDelayMicroSeconds(50000L);
-  Initflog(logfile, true);
   if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
+    sprintf(logfile, "%08ld.log", MPC.FILENUM);
     DBG(cprintf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
     stat(logfile, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 2000))

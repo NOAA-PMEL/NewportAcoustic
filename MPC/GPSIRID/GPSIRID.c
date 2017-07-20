@@ -65,7 +65,8 @@ bool SatComOpen = false;
 bool LostConnect = false;
 short Max_No_SigQ_Chk = 7;
 
-int BlkLength = 2000; // Irid file block size. 1kB to 2kB, 1024-2048
+// int BlkLength = 2000; // Irid file block size. 1kB to 2kB, 1024-2048
+int BlkLength = RUDICSBLOCK; 
 short IRIDWarm = 27;  // Irid Modem warm-up. 45 IS NORMAL, 1 FOR TESTING ///
 short MinSQ;
 
@@ -269,7 +270,7 @@ it,
 **            -1, Garbled
 **             0, resent request received. This should not happen.
 **             1, "done" received
-**             2  "cmds" received. Either Senddata or other non-params
+**             2  "cmds" received. Senddata.
 **             3  parameters
 ** Can upload up to ComMax (=10) files per connection
 **
@@ -299,7 +300,6 @@ short Connect_SendFile_RecCmd(const char *filename) {
   // Figure out file size and how many blocks need to be sent
   stat(IRIDFilename, &info);
   // Only need to do this once... Unless we Power off the modem.
-  // ?? who does it if the modem is cycled? Too bad iridium pin check is broken.
   PhonePin();
 
   // Register, call and check SQ, connect the Rudics and login PMEL:
@@ -318,7 +318,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
       //        -1, Garbled
       //         0, resent request received. This should not happen.
       //         1, "done" received.
-      //         2  "SendData" received. Either Senddata or other non-param
+      //         2  "SendData" received. 
       //	 3, Real Commands
 
       AD_Check();
@@ -656,7 +656,7 @@ void OpenTUPort_AntMod(bool on) {
     // Power ON
     PIOSet(ANTMODPWR);
     PIOSet(ANTMODCOM);
-    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, 19200L, 0);
+    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, IRIDBAUD, 0);
 
     if (AntModPort == 0)
       flogf("\n\t|Bad IridiumPort");
@@ -1197,7 +1197,7 @@ short Send_File(bool FileExist, long filelength) {
     // Send the data IridFile in blocks
     for (i = 0; i < NumOfBlks; i++)
       bitmap[63 - i] = '1'; // Set bitmap all to '1s' to send all blocks
-    DBG(flogf("\n\t|Check First Bitmap: %s", bitmap); putflush();)
+    // DBG(flogf("\n\t|Check First Bitmap: %s", bitmap); putflush();)
 
     Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
   } // FileExist

@@ -17,5 +17,5 @@ bin
 *.swp
 *.pyc
 # log or *.log
-*log
+*.log
 .tags

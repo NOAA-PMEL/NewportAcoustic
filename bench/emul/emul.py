@@ -67,7 +67,7 @@ def restart():
     start()
 
 if __name__=='__main__': start()
-else: print "start() stop() init() buoy.info() winch.start() winch.cable=15"
+else: print "start() stop() init() buoy.info() winch.mooring=14 winch.cable=15"
 
 
 # Notes:
