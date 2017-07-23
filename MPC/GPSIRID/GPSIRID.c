@@ -1204,8 +1204,7 @@ short Send_File(bool FileExist, long filelength) {
 
     flogf("\n%s|Send_File(%s):\n\t|%ld Bytes, %d BLKS", Time(NULL),
           IRIDFilename, filelength, NumOfBlks);
-    putflush();
-    CIOdrain(); // Log the IridFile length
+    cdrain(); // Log the IridFile length
 
     AD_Check();
 
@@ -1215,10 +1214,11 @@ short Send_File(bool FileExist, long filelength) {
     // DBG(flogf("\n\t|Check First Bitmap: %s", bitmap); putflush();)
 
     Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
-    // note- S_B flushes IO
+    // note- S_B delays per output size, flushes input
   } // FileExist
   // Delay = (short)LastBlkLength / 1000;
   // if (Delay == 0) Delay = 1;
+  // delay for land to reply
   Delay_AD_Log(5);
 
   Reply = Check_If_Cmds_Done_Or_Resent(&val0, &val1);
@@ -1357,6 +1357,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       RTCDelayMicroSeconds(mlength * 3333L);
     } // if bitmap[]
     // pause that refreshes
+    cdrain();
     Delayms(500);
   }
 
