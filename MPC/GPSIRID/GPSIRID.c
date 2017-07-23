@@ -1350,13 +1350,17 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       // antMod blockmode for header // ^B, 2 byte length
       sprintf(bmode, "%c%c%c", (uchar)2, 
         (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));
+      DBG1(cprintf("\n\t| TUTxPutBlock(%ld)", 3); cdrain();)
       TUTxPutBlock(AntModPort, bmode, (long) 3, 1000);
+      DBG1(cprintf("\n\t| TUTxPutBlock(%ld)", mlength); cdrain();)
       l = TUTxPutBlock(AntModPort, buf, mlength, 10000);
       if (l < mlength) flogf("\nERROR: Send_Blocks(): sent only %ld of %ld", l, mlength);
       // let transmission complete // satellite @ 2400baud = 300/sec
+      DBG1(cprintf("\n\t| delay");)
       RTCDelayMicroSeconds(mlength * 3333L);
     } // if bitmap[]
     // pause that refreshes
+    DBG1(cprintf("\n\t| delay");)
     cdrain();
     Delayms(500);
   }

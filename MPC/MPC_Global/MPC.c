@@ -666,6 +666,7 @@ void Delay_AD_Log(short Sec) {
   short i;
   long last, rem;
   DBG(flogf( " {%d} ", Sec );)
+  cdrain();
   last = Sec / 5;
   rem = Sec - last * 5;
 
