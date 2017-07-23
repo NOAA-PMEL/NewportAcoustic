@@ -386,9 +386,11 @@ int System_Timer() {
         // Set NIGK to recovery?
         NIGK.RECOVERY = 1;
         VEEStoreShort(NIGKRECOVERY_NAME, NIGK.RECOVERY);
-        MPC.DATAXINT = 30;
-        VEEStoreShort(DATAXINTERVAL_NAME,
-                      MPC.DATAXINT); // Call every 30 minutes at surface.
+        // Call every 30 minutes at surface.
+        if (MPC.DATAXINT != 30) { 
+          MPC.DATAXINT = 30;
+          VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT); 
+        }
         return 2;
       }
     }
@@ -652,6 +654,9 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   return true;
 
 } //____ AppendFiles() ____//
+void Delayms(int d) {
+  RTCDelayMicroSeconds(1000 * d);
+} // Delayms
   /*************************************************************************
   ** Delay_AD_Log()
   ** AD function with time delay.  Do AD_Log at 5 sec incrment.
@@ -1347,3 +1352,17 @@ void print_clock_cycle_count(clock_t start, clock_t stop, char *label) {
   flogf("\n%f seconds for %s",
         ((double)(stop - start)) / (double)CLOCKS_PER_SEC, label);
 }
+
+/* printsafe()
+ * print a mix of ascii, non-ascii
+ */
+void printsafe (long l, char *b) {
+  long i;
+  for (i=0; i<l; i++) {
+    c=b[i];
+    if ((c<32)||(c>126)) cprintf(" %X ", c);
+    else cprintf("%c", c);
+    if (c=='\n') cprintf("\n");
+  }
+} // printsafe
+
