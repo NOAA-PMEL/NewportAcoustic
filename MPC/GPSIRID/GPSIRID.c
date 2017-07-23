@@ -56,6 +56,9 @@ of commands
 #define NUMCOM 7 // Number of commmands can be receive per telemetry
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
+#define STRING_SIZE 1024
+// #define RUDICSBLOCK 500
+#define RUDICSBLOCK 20000
 
 
 IridiumParameters IRID;
@@ -120,8 +123,7 @@ DBG( void ConsoleIrid(); ) // check console for interrupt, redirect
 TUPort *AntModPort;
 short ANTMOD_RX, ANTMOD_TX;
 
-char *inputstring;
-char *first;
+char *inputstring, *first, *scratch;
 //
 /********************************************************************************\
 ** GPSIRID-3.0 12/15/2015-AT
@@ -416,7 +418,6 @@ short Connect_SendFile_RecCmd(const char *filename) {
 ** Get GPS loc, time and synchronizes CF2 RTC with offset seconds
 \******************************************************************************/
 bool GetGPS_SyncRTC() {
-
   // char* Location;
   char *Latitude;
   char *Longitude;
@@ -431,6 +432,8 @@ bool GetGPS_SyncRTC() {
   bool pole = false;
 
   bool returnvalue = true;
+  char* first;
+  first = scratch;
 
   if (MPC.STARTUPS == 0 && firstGPS)
     firstGPS = true;
@@ -455,6 +458,7 @@ bool GetGPS_SyncRTC() {
 
   if (sat_num >= 6) {
 
+    // freed?
     // Location=(char*)calloc(100,1);
     Latitude = (char *)calloc(16, 1);
     Longitude = (char *)calloc(16, 1);
@@ -469,6 +473,7 @@ bool GetGPS_SyncRTC() {
     coflush();
 
     SendString("AT+PL");
+    RTCDelayMicroSeconds(100000); // blk - seems to miss part of reply
     if (GetGPSInput("PL", &sat_num) != NULL) {
       Latitude = strtok(first, "|");
       Longitude = strtok(NULL, "|");
@@ -496,20 +501,21 @@ bool GetGPS_SyncRTC() {
       sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
       DBG(flogf("\n\t|Write to file: %s", uploadfname);)
       datafilehandle = open(uploadfname, O_RDWR);
-      RTCDelayMicroSeconds(25000L);
+      RTCDelayMicroSeconds(25000L); // ??
       if (datafilehandle <= 0) {
         flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
               errno);
+        // not a fatal err, did not log ??
         returnvalue = false;
       } else {
-        DBG(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
+        DBG2(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
         lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
-        RTCDelayMicroSeconds(25000L);
+        RTCDelayMicroSeconds(25000L); // ??
         byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
-        DBG(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
+        DBG2(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
         if (close(datafilehandle) != 0)
           flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
-        DBG(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
+        DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
       }
     }
     cdrain();
@@ -537,12 +543,12 @@ bool GetUTCSeconds() {
   SendString("AT+PD");
   strncpy(time, GetGPSInput("PD", NULL), 10);
   CLK(start_clock = clock();)
-  DBG(flogf("\n%s|TimeNow", Time(NULL));)
+  DBG2(flogf("\n%s|TimeNow", Time(NULL));)
   SendString("AT+PT");
   strcat(time, "|");
   strncat(time, GetGPSInput("PT", NULL), 12);
 
-  DBG(flogf("\n%s|GetUTCSeconds(): %s", Time(NULL), time);)
+  DBG2(flogf("\n%s|GetUTCSeconds(): %s", Time(NULL), time);)
   cdrain();
   coflush();
 
@@ -569,7 +575,7 @@ bool GetUTCSeconds() {
   if (time_seconds != -1) {
     // time_seconds=time_seconds+(ulong)IRID.OFFSET;
     difference = time_now - (time_seconds + (ulong)IRID.OFFSET);
-    DBG(flogf("\n\t|Time Difference: %ld", difference);)
+    DBG2(flogf("\n\t|Time Difference: %ld", difference);)
     if (difference <= 300L && difference >= -300L) {
 
       CLK(stop_clock = clock(); print_clock_cycle_count(
@@ -648,7 +654,7 @@ void OpenTUPort_AntMod(bool on) {
   short wait = 10000;
   int warm;
 
-  DBG(flogf("  ..OpenTUPort_AntMod() ");)
+  DBG2(flogf("  ..OpenTUPort_AntMod() ");)
   if (on) {
     ANTMOD_RX = TPUChanFromPin(ANTMODRX);
     ANTMOD_TX = TPUChanFromPin(ANTMODTX);
@@ -662,13 +668,14 @@ void OpenTUPort_AntMod(bool on) {
       flogf("\n\t|Bad IridiumPort");
 
     warm = IRID.WARMUP;
-    flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);
+    DBG(flogf("\n%s|Warming up GPS/IRID Unit for %d Sec", Time(NULL), warm);)
     putflush(); CIOdrain();
     TUTxFlush(AntModPort);
     SwitchAntenna('G');
 
-    inputstring = (char *)calloc(128, 1);
-    first = (char *)calloc(128, 1);
+    // never freed
+    inputstring = (char *)calloc(STRING_SIZE, 1);
+    scratch = (char *)calloc(STRING_SIZE, 1);
 
     Delay_AD_Log(warm);
 
@@ -907,7 +914,7 @@ short PhoneStatus() {
 \******************************************************************************/
 short PhonePin(void) {
   short wait = 10000;
-  flogf("\n\t|no PhonePin()");
+  flogf("\n\t|no PhonePin on this sim card");
   return 0;
   // ?? sim card setup
   flogf("\n\t|PhonePin()");
@@ -992,7 +999,7 @@ bool Call_Land(void) {
   // Looks for ATD followed by phonenum
   if (GetIRIDInput("ATD", 3, PhoneNum, NULL, 5000) != 1) {
     CallOK = false;
-    DBG(flogf("\n\t|Call did not make it"); cdrain(); coflush();)
+    DBG2(flogf("\n\t|Call did not make it"); cdrain(); coflush();)
     // StatusCheck();
     if ((status = PhoneStatus()) == 0) {
       if (CallStatus() == 6) {
@@ -1018,11 +1025,11 @@ bool Call_Land(void) {
         SendString(call);
         if (GetIRIDInput("ATD", 3, "0881600", NULL, 12000) != 1) {
           CallOK = false;
-          DBG(flogf("\n\t|Call did not make it, again");)
+          DBG2(flogf("\n\t|Call did not make it, again");)
         }
         num = GetIRIDInput("CONNEC", 6, "192", NULL, wait);
         if (num == 1) {
-          DBG(flogf("\n\t|Connected!");)
+          DBG2(flogf("\n\t|Connected!");)
           CallOK = true;
         }
       } else {
@@ -1053,34 +1060,41 @@ bool Acknowledge() {
   short wait = 2500; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
-  unsigned char buf[13], proj[8];
+  // need an extra char for null terminated
+  unsigned char buf[16], proj[8], bmode[4];
 
   // Flush IO Buffers
+  TUTxFlush(AntModPort);
+  TURxFlush(AntModPort);
+
   flogf("\n%s|Acknowledge(%4s%4s)", Time(NULL), MPC.PROJID, MPC.PLTFRMID);
   sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
+
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
-  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c", 
+  sprintf(buf, "???%c%c%c%c%c%c%c%c%c%c%c%c", 
           (char)((crc1 >> 8) & 0x00FF), (char)(crc2 & 0x00FF), 
           proj[0], proj[1], proj[2], proj[3], 
           proj[4], proj[5], proj[6], proj[7]);
+          // '\n', '\r'); // really? crlf? ??
 
-  TUTxFlush(AntModPort);
-  TURxFlush(AntModPort);
+  // antMod blockmode for header // ^B, 2 byte length
+  sprintf(bmode, "%c%c%c", (char)2, (char)0, (char)13 );
+  DBG2(flogf("%4d%4d%4d", (char)2, (char)0, (char)13 );)
+
   Delay_AD_Log(1);
 
   while (Ack == false && Num_ACK < AckMax) { // Repeat
 
     AD_Check();
-    // antMod binary mode for header
-    TUTxPrintf(AntModPort, "%c%c", (char)5, (char)13 );
-    TUTxPrintf(AntModPort, "%s\n\r", buf);
+    // TUTxPrintf(AntModPort, "%s%s\n\r", bmode, buf);
+    TUTxPutBlock(AntModPort, bmode, 3, 10000);
+    TUTxPutBlock(AntModPort, buf, 13, 10000); // 13 bytes + crlf
     TUTxWaitCompletion(AntModPort);
 
     TickleSWSR(); // another reprieve
-                  // TUTxPrintf(AntModPort, "%s", buf);
-    // TUTxWaitCompletion(AntModPort);
+
     Status = GetIRIDInput("ACK", 3, NULL, NULL, wait);
     if (Status == 1) {
       flogf("\n\t|ACK Received");
@@ -1230,7 +1244,7 @@ short Send_File(bool FileExist, long filelength) {
       RTCDelayMicroSeconds(10000L);
       if (Reply == 0) { // Request to resend bad blocks
         Convert_BitMap_To_CharBuf(val0, val1, &bitmap);
-        DBG(flogf("\n\t|Resend"); putflush(); CIOdrain();
+        DBG2(flogf("\n\t|Resend"); putflush(); CIOdrain();
             RTCDelayMicroSeconds(20000L);)
         Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
       }
@@ -1285,12 +1299,12 @@ short Send_File(bool FileExist, long filelength) {
 int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
                 ushort LastBlkLength) {
 
-  uchar *buf;
-  uchar BlkNum;
+  uchar *buf, bmode[4];
+  uchar BlkNum, c;
   long mlength;
   ushort blklen;
   uchar mlen[2];
-  int crc_calc;
+  int i, crc_calc;
   long bytesread;
   const short dataheader = 10; 
 
@@ -1335,12 +1349,16 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
       TUTxFlush(AntModPort);
       TURxFlush(AntModPort);
-      // antMod binary mode for header
-      TUTxPrintf(AntModPort, "%c%c", (char)5, (char)10 );
+      // antMod blockmode for header // ^B, 2 byte length
+      DBG(flogf("%4d.%4d.%4d%4d", (uchar)2, mlength,
+          (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));)
+      sprintf(bmode, "%c%c%c", (uchar)2, 
+          (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));
+      TUTxPutBlock(AntModPort, bmode, 3, 10000);
       TUTxPutBlock(AntModPort, buf, mlength,
                    TUBlockDuration(AntModPort, mlength));
       TUTxWaitCompletion(AntModPort);
-      RTCDelayMicroSeconds(mlength * 2000L);
+      RTCDelayMicroSeconds(mlength * 2000L); // ??
     }
     free(buf);
   }
@@ -1351,7 +1369,16 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   if (tgetq(AntModPort))
     cprintf("\n**** queue in TUPort: %d", tgetq(AntModPort));
 
-  TURxFlush(AntModPort);
+  DBG( // fetch and print safe
+  mlength = TURxGetBlock(AntModPort, inputstring, (long) STRING_SIZE, 0);
+  for (i=0; i<mlength; i++) {
+    c=inputstring[i];
+    if ((c<32)||(c>126)) cprintf(" %X ", c);
+    else cprintf("%c", c);
+    if (c=='\n') cprintf("\n");
+  })
+  
+  // TURxFlush(AntModPort);
   cdrain();
   coflush();
 
@@ -1467,7 +1494,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   flogf("\n%s|Waiting for Land", Time(NULL));
   putflush();
   CIOdrain();
-  memset(inputstring, 0, 128);
+  memset(inputstring, 0, STRING_SIZE);
   CLK(start_clock = clock();)
 
   AD_Check();
@@ -1733,27 +1760,30 @@ bool HangUp(void) {
 ** 3: From within here, we can see if we need to return a short pointer for
 **    SigQual, and returns
 ** 4: Compares Iridium buf[] to compstring. If it sees the same string,
+ * numchars is optional output, atoi 
 **
 ** @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
 ** 2/27/2015
 \*******************************************************************************/
 short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
                    int *numchars, short wait) {
-
   short Match = 0;
   int i = 0;
   short stringlength;
   long len;
   long lenreturn;
+  char *first;
+
+  first = scratch; // blk - first is a problem
+
+  DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); coflush();)
 
   DBG(ConsoleIrid();)  // check if console is asking to stop
-  memset(inputstring, 0, 128);
-  memset(first, 0, 40);
+
+  memset(inputstring, 0, STRING_SIZE);
+  memset(first, 0, STRING_SIZE);
 
   CLK(start_clock = clock();)
-
-  DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); cdrain();
-      coflush();)
 
   // Wait up to wait milliseconds to grab next byte from iridium/gps
   // 3.25.14 up to possibly 20 seconds...
@@ -1761,7 +1791,8 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   inputstring[0] = TURxGetByteWithTimeout(AntModPort, wait);
   RTCDelayMicroSeconds(100000L);
 
-  len = (long)tgetq(AntModPort);
+  len = (long) tgetq(AntModPort);
+  if (len>STRING_SIZE) len=(long)STRING_SIZE;
   lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
                            TUBlockDuration(AntModPort, len));
   if (len == 0)
@@ -1777,6 +1808,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   // If we are looking for the string Template
   if (Template != NULL) {
     // if we did not find Template
+    // first!! ptr into inputstring
     if ((first = strstr(inputstring, Template)) == NULL) {
       RTCDelayMicroSeconds(50000L);
       Match = 0;
@@ -1789,12 +1821,13 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
           print_clock_cycle_count(start_clock, stop_clock, "GetIRIDInput");
           cdrain(); coflush();)
       if (numchars != NULL) {
+        // overwrite begin of inpstr with match .. num_char
+        // ouput numchars = int found after end of match
         strncpy(inputstring, first, num_char_to_reads);
         *numchars = atoi(inputstring + strlen(Template));
-        DBG(flogf("%d", *numchars);)
       }
     }
-  }
+  } // template
 
   // If we are looking for the String compstring
   if ((compstring != NULL)) {
@@ -1803,19 +1836,22 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     stringlength = strlen(compstring);
 
     if (!Template)
+      // no template, so first has not been assigned
       strncpy(first, strstr(inputstring, compstring), stringlength);
     else
+      // first points into inputstring at match Template
       strncat(first, strstr(inputstring, compstring), stringlength);
 
     // If compstring was successfully added to inputstring
+    // i.e. if strstr(inputstring, compstring) 
     if (strstr(first, compstring) != NULL)
       Match = 1;
     else {
       Match = 0;
       first[2] = 0;
       RTCDelayMicroSeconds(20000L);
-    }
-  }
+    } // strstr(first, compstring)
+  } // (compstring != NULL)
   if (Match > 0)
     return Match;
 
@@ -1899,8 +1935,10 @@ char *GetGPSInput(char *chars, int *numsats) {
 
   DBG(ConsoleIrid();)  // check if console is asking to stop
 
-  memset(inputstring, 0, 128);
-  memset(first, 0, 128);
+  first = scratch; // blk - first is a problem
+
+  memset(inputstring, 0, STRING_SIZE);
+  memset(first, 0, STRING_SIZE);
 
   inputstring[0] = TURxGetByteWithTimeout(
       AntModPort, 5000); // Wait for first character to come in.

@@ -89,3 +89,34 @@ GetIRIDInput:
 	|664 Bytes, 1 BLKS
 	|Check First Bitmap: K3
 
+
+
+Program: LARA  Project ID: QUEH   Platform ID: RA01  Boot ups: 26
+Program Start time: 07/21/2017 17:28:07
+	|FreeDiskSpace 989376kB
+	|WriteFile(c:00000430.dat)
+LARA Program Ver:3.3
+aa:bb.cccc North ddd:ee.ffff West
+FileNumber: 430
+Starts:26 of 50
+WriteTime:07/21/2017 17:28:08
+Seconds:0
+Detection Interval: 30
+Data Inteval: 30
+
+	|POWERMonitor(c:00000430.pwr)
+	|Current Bat Cap: 150495190, New Bat Cap: 150495195305360900000000000000000000000.00
+
+
+-----
+
+TARGETDPETH:10
+AVG.VEL:-0.35
+CTDSAMPLES:14
+
+	|POWER: 0.068A, 13.82V
+	|POWERMonitor(c:00000430.pwr)
+	|PowerMonitor: ADSFile Closed
+	|Current Bat Cap: 150495195305360900, New Bat Cap: 150495190195372000.00
+
+------

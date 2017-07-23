@@ -207,7 +207,6 @@ short WISPR_Data() {
 
     if (WISPRFile <= 0) {
       flogf("\nERROR|WISPR_Data() open errno: %d", errno);
-      // ?? if (errno != 0)
       return -3;
     }
 
@@ -485,7 +484,7 @@ char *GetWISPRInput(float *numchars) {
   // Sending Free Space, return value between , and *
   else if (strncmp("DFP", r + 1, 3) == 0) {
     *numchars = atof(strtok(WisprString + 5, "*"));
-    // if(numchars==0.00) return false??
+    // if(numchars==0.00) return false?
   }
   /*
   else if(strncmp("TFP", r+1, 3)==0){

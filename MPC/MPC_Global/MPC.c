@@ -599,7 +599,6 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   Source = open(SourceFileName, O_RDONLY);
   if (Source <= 0) {
     flogf("\nERROR  |AppendFiles() %s open errno: %d", SourceFileName, errno);
-    // ?? if (errno != 0)
     return false;
   }
   DBG(else flogf("\n\t|Append_Files() %s opened", SourceFileName);)
@@ -660,6 +659,7 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 void Delay_AD_Log(short Sec) {
   short i;
   long last, rem;
+  DBG(flogf( " {%d} ", Sec );)
   last = Sec / 5;
   rem = Sec - last * 5;
 
@@ -801,7 +801,6 @@ bool SaveParams(const char *Command) {
   RTCDelayMicroSeconds(25000);
   if (paramfilehandle <= 0) {
     flogf("\nERROR  |SYSTEM.CFG open errno: %d", errno);
-    // ?? if (errno != 0)
     return false;
   }
   DBG(else flogf("\n\t|SYSTEM.CFG Opened"); cdrain(); coflush();)

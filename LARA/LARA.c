@@ -201,11 +201,11 @@ void main() {
       // writefile 1) MPC 2) Winch Info 3) Winch Status
       // v
       WriteFile(PwrOff);
-      // Init New LogFile
+      // Init New LogFile, set PwrOn which is start of dataxint cycle
       Time(&PwrOn);
 
       PhaseThree();
-      CTD_Start_Up(true); // ?? why start here
+      CTD_Start_Up(true); // ?? why start here, for phase4
       CTD_SyncMode();
       break;
 
@@ -366,9 +366,9 @@ void InitializeLARA(ulong *PwrOn) {
     Make_Directory("SNT");
     Make_Directory("CTD");
     Make_Directory("LOG");
-    if (WISPRNUMBER > 1) {
+    if (WISPRNUMBER > 1) { // total number
       if (WISP.NUM != 1)
-        WISP.NUM = 1; // ??
+        WISP.NUM = 1; // current used board
 
       OpenTUPort_WISPR(true);
 
@@ -631,10 +631,8 @@ void PhaseThree() {
       IridCallsNoParams++; // call sessions w/o Params
       flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
       if (IridCallsNoParams > 3) {
-        // calls > 3 implies ?? 
         // Load default parameters in "default.cfg" file
         ParseStartupParams(true); 
-        // checked here because ??
       } // calls>3
     } // Upload Success / Commands
     else if (result == 3) { 
@@ -678,7 +676,6 @@ void PhaseThree() {
         secs = 10;
       flogf("\n\t|Ascend for %d seconds, %fmeters", secs, depth);
 
-      // ?? are we trying to go up?
       if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
         LARA.TDEPTH = NIGK_MIN_DEPTH;
         gpsFails = 5;
@@ -688,8 +685,7 @@ void PhaseThree() {
       WaitForWinch(1);
 
       // Count++ every 1/10th of a second.
-      while (LARA.DEPTH > LARA.TDEPTH) { // who changes these??
-        // reading ctd?
+      while (LARA.DEPTH > LARA.TDEPTH) { 
         Incoming_Data();
         RTCDelayMicroSeconds(100000L);
         count++;
@@ -719,7 +715,7 @@ void PhaseThree() {
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(MPC.FILENUM); // ??
+  CTD_CreateFile(MPC.FILENUM); 
   LARA.TDEPTH = NIGK.TDEPTH;
 
   OpenTUPort_CTD(true);
@@ -1261,7 +1257,6 @@ ulong WriteFile(ulong TotalSeconds) {
 
   if (filehandle <= 0) {
     flogf("\nERROR  |WriteFile(): open error: errno: %d", errno);
-    // ?? if (errno != 0)
     return -1;
   }
   DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
@@ -1307,7 +1302,7 @@ ulong WriteFile(ulong TotalSeconds) {
   WISPRWriteFile(filehandle);
   RTCDelayMicroSeconds(50000L);
 
-//*** CTD File Upload ***??
+//*** CTD File Upload ***
 #ifdef CTDSENSOR
   if (CTD.UPLOAD || TotalSeconds == 0) {
     sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);

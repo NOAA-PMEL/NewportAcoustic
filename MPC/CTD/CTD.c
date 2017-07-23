@@ -507,7 +507,7 @@ bool CTD_Data() {
   // this was in the write log section
   if (LARA.BUOYMODE != 0)
     CTD_VertVel(secs);
-  // ?? this incr might be an error, done in VertVel
+  // this incr looks strange, but lara.ctd is not ctdsamples
   LARA.CTDSAMPLES++;
 
 
@@ -584,7 +584,6 @@ void SwitchTD(char c) {
 
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
-** ?? calloc/free may not match, should these be globals?
 \******************************************************************************/
 void OpenTUPort_CTD(bool on) {
   // global stringout, stringin
