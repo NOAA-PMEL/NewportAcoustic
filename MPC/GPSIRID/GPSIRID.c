@@ -242,7 +242,7 @@ void SelectModule(char m) {
     case 'S': OpenTUPort_AntMod(false); OpenTUPort_CTD(true); break;
     default: flogf("\nError SelectModule(%c)", m);
   }
-  DelayMilli(1000
+  Delayms(500);
 } // SelectModule()
 
 /******************************************************************************\
@@ -1171,7 +1171,7 @@ short Send_File(bool FileExist, long filelength) {
   long oldLength;
   ulong val0, val1; // 64-bit bit map for resending the data block
   short Reply = 0;
-  short Delay;
+  // short Delay;
   DBG2(flogf(" .Send_File() ");)
   if (FileExist) {
 
@@ -1301,11 +1301,11 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
                 ushort LastBlkLength) {
 
   uchar *buf, bmode[4];
-  uchar BlkNum, c;
+  uchar BlkNum;
   long l, mlength;
   ushort blklen;
   uchar mlen[2];
-  int i, crc_calc;
+  int crc_calc;
   long bytesread;
   const short dataheader = 10; 
 
@@ -1366,7 +1366,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
   DBG(else flogf("\n\t|Send_Blocks: IRID Closed");)
   DBG(if (tgetq(AntModPort)) cprintf("\n**** queue in TUPort: %d", tgetq(AntModPort));)
-  DBG(printsafe(scratch, TURxGetBlock(AntModPort, scratch, (long) STRING_SIZE, 0));)
+  DBG(printsafe(TURxGetBlock(AntModPort, scratch, (long) STRING_SIZE, 0), scratch);)
 
   TURxFlush(AntModPort);
   cdrain();

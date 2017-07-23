@@ -656,6 +656,7 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 } //____ AppendFiles() ____//
 void Delayms(int d) {
   RTCDelayMicroSeconds(1000 * d);
+
 } // Delayms
   /*************************************************************************
   ** Delay_AD_Log()
@@ -1358,6 +1359,7 @@ void print_clock_cycle_count(clock_t start, clock_t stop, char *label) {
  */
 void printsafe (long l, char *b) {
   long i;
+  char c;
   for (i=0; i<l; i++) {
     c=b[i];
     if ((c<32)||(c>126)) cprintf(" %X ", c);

@@ -91,7 +91,7 @@ float Check_Timers(ushort);
 bool Append_Files(int, const char *, bool, long);
 
 // easy delay millisec
-Delayms(int);
+void Delayms(int);
 
 // print ascii, non-ascii
 void printsafe (long, char *);
