@@ -90,6 +90,12 @@ float Check_Timers(ushort);
         */
 bool Append_Files(int, const char *, bool, long);
 
+// easy delay millisec
+Delayms(int);
+
+// print ascii, non-ascii
+void printsafe (long, char *);
+
 /*Delay_AD_Log:
         @Param1: Short value, number of seconds for delay while watching Power
    Logging & Tickling Watch Dog Timer
