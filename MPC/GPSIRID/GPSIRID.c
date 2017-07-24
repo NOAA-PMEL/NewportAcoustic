@@ -124,7 +124,7 @@ DBG( void ConsoleIrid(); ) // check console for interrupt, redirect
 TUPort *AntModPort;
 short ANTMOD_RX, ANTMOD_TX;
 
-char *inputstring, *first, *scratch;
+uchar *inputstring, *first, *scratch;
 //
 /********************************************************************************\
 ** GPSIRID-3.0 12/15/2015-AT
@@ -1346,26 +1346,28 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       AD_Check();
     } // if bitmap[]
     // pause that refreshes
+
+#ifdef DEBUG
+    if (tgetq(AntModPort)) {
+      printsafe( TURxGetBlock(AntModPort, scratch, 
+          (long) STRING_SIZE, (short) 100),
+        scratch);
+    }
+#else
+    TURxFlush(AntModPort);
     cdrain();
-    Delayms(1500);
+#endif
+    Delayms(1000);
   }
 
   free(buf);
   if (close(IRIDFileHandle) != 0)
     flogf("\nERROR  |Send_Blocks: File Close error: %d", errno);
-
-#ifdef DEBUG
-  if (tgetq(AntModPort)) 
-    printsafe( TURxGetBlock(AntModPort, scratch, 
-        (long) STRING_SIZE, (short) 100),
-      scratch);
-#else
-  TURxFlush(AntModPort);
-#endif
-  cdrain();
   return 0;
 
 } //____Send_Blocks____//
+
+
 /********************************************************************************************\
 ** Calc_Crc
 ** Calculate 16-bit CRC of contents of buf. Use long integer for calculation,
@@ -1755,7 +1757,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   first = scratch; // blk - first is a problem
 
-  DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); cdrain();)
+  DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
 
   DBG(ConsoleIrid();)  // check if console is asking to stop
 
@@ -1777,12 +1779,11 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   if (len == 0)
     return 0;
 
-  DBG(flogf("\nGot %ld bytes", lenreturn); RTCDelayMicroSeconds(25000L);
-      cdrain();)
+  DBG1(printsafe(lenreturn, inputstring);)
+  // RTCDelayMicroSeconds(25000L);
 
   TickleSWSR(); // another reprieve
 
-  DBG(flogf("\nGetIRIDInput: %s", inputstring); cdrain();)
 
   // If we are looking for the string Template
   if (Template != NULL) {

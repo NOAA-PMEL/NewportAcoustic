@@ -56,6 +56,7 @@ void SetupHardware(void);
         @return string of date/time
         */
 char *Time(ulong *);
+char *TimeDate(ulong *);
 
 /*MakeDirectory:
         @Takes string of new directory name to be created
@@ -96,7 +97,7 @@ bool Append_Files(int, const char *, bool, long);
 // void Delayms(int);
 
 // print ascii, non-ascii
-void printsafe (long, char *);
+void printsafe (long, uchar *);
 
 /*Delay_AD_Log:
         @Param1: Short value, number of seconds for delay while watching Power

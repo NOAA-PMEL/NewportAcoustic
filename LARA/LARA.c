@@ -278,7 +278,7 @@ void InitializeLARA(ulong *PwrOn) {
   Time(&time);
   *PwrOn = time;
 
-  flogf("\nProgram Start time: %s", Time(NULL));
+  flogf("\nProgram Start time: %s", TimeDate(NULL));
 
   // WINCH Struct Init
   WINCH.ASCENTCALLS = 0;

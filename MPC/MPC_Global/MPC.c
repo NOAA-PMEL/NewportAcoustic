@@ -285,11 +285,29 @@ void DOS_Com(char *command, long filenum, char *ext, char *extt) {
 }
 
 /******************************************************************************\
-**	Time & Date String
-** Get the RTC time seconds since 1970 and convert it to an
-** understandable format
+**	Time String
+** Get the RTC time seconds since 1970 and convert it 
 \******************************************************************************/
 char *Time(ulong *seconds) {
+
+  RTCtm *rtc_time;
+  ulong secs = NULL;
+
+  ushort ticks;
+
+  RTCGetTime(&secs, &ticks);
+  rtc_time = RTClocaltime(&secs);
+  *seconds = secs;
+  sprintf(time_chr, "%.2d:%.2d:%.2d", 
+          rtc_time->tm_hour, rtc_time->tm_min, rtc_time->tm_sec);
+  return time_chr;
+
+} //____ Time() ____//
+/******************************************************************************\
+**	Time & Date String
+** Get the RTC time seconds since 1970 and convert it 
+\******************************************************************************/
+char *TimeDate(ulong *seconds) {
 
   RTCtm *rtc_time;
   ulong secs = NULL;
@@ -1355,14 +1373,13 @@ void print_clock_cycle_count(clock_t start, clock_t stop, char *label) {
 /* printsafe()
  * print a mix of ascii, non-ascii
  */
-void printsafe (long l, char *b) {
+void printsafe (long l, uchar *b) {
   long i;
-  char c;
-  cdrain();
-  cprintf("\n%ld''", l);
+  uchar c;
+  cprintf("\n%s+%ld''", Time(NULL), l);
   for (i=0L; i<l; i++) {
     c=b[i];
-    if ((c<32)||(c>126)) cprintf(" x%X ", c);
+    if ((c<32)||(c>126)) cprintf(" x%02X ", c);
     else cprintf("%c", c);
     if (c=='\n') cprintf("\n");
   }
