@@ -2,6 +2,7 @@
 //#include <PLATFORM.h>
 #include <cfxpico.h>
 #include <time.h>
+#define Delayms(X) RTCDelayMicroSeconds((long) 1000 * (long) X)
 
 extern volatile clock_t start_clock;
 extern volatile clock_t stop_clock;
@@ -91,7 +92,8 @@ float Check_Timers(ushort);
 bool Append_Files(int, const char *, bool, long);
 
 // easy delay millisec
-void Delayms(int);
+// mad into macro
+// void Delayms(int);
 
 // print ascii, non-ascii
 void printsafe (long, char *);

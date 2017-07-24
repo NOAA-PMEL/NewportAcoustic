@@ -654,18 +654,15 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   return true;
 
 } //____ AppendFiles() ____//
-void Delayms(int d) {
-  RTCDelayMicroSeconds(1000 * d);
 
-} // Delayms
-  /*************************************************************************
-  ** Delay_AD_Log()
-  ** AD function with time delay.  Do AD_Log at 5 sec incrment.
+/*************************************************************************
+** Delay_AD_Log()
+** AD function with time delay.  Do AD_Log at 5 sec incrment.
   **************************************************************************/
 void Delay_AD_Log(short Sec) {
   short i;
   long last, rem;
-  DBG(flogf( " {%d} ", Sec );)
+  DBG1(flogf( " {%d} ", Sec );)
   cdrain();
   last = Sec / 5;
   rem = Sec - last * 5;
@@ -1361,11 +1358,20 @@ void print_clock_cycle_count(clock_t start, clock_t stop, char *label) {
 void printsafe (long l, char *b) {
   long i;
   char c;
-  for (i=0; i<l; i++) {
+  cdrain();
+  cprintf("\n%ld''", l);
+  for (i=0L; i<l; i++) {
     c=b[i];
-    if ((c<32)||(c>126)) cprintf(" %X ", c);
+    if ((c<32)||(c>126)) cprintf(" x%X ", c);
     else cprintf("%c", c);
     if (c=='\n') cprintf("\n");
   }
+  cprintf("''\n");
+  cdrain();
 } // printsafe
+
+// made into macro, mpcglobal.h
+// void Delayms(int d) {
+//  RTCDelayMicroSeconds((long) 1000 * (long) d);
+//} // Delayms
 

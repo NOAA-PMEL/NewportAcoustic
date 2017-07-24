@@ -17,6 +17,7 @@ name = 'ctd'
 eol = '\r'        # input is \r, output \r\n
 port = '/dev/ttyS5'
 baudrate = 9600
+CTD_DELAY = 1
 
 def info():
     "globals which may be externally set"
@@ -109,6 +110,11 @@ def ctdDateTime():
     f='%d %b %Y %H:%M:%S'
     return time.strftime(f,time.localtime(time.time()-timeOff))
 
+def ctdDelay():
+    "Delay for response. TBD, variance"
+    global CTD_DELAY
+    return CTD_DELAY
+
 # Temp, conductivity, depth, fluromtr, PAR, salinity, time
 # 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
 def ctdOut():
@@ -116,7 +122,7 @@ def ctdOut():
     # "\r\n# t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss\r\n"
 
     # ctd delay to process, nominal 3.5 sec. Add variance?
-    sleep(3.8)
+    sleep(ctdDelay())
     ###
     # note: modify temp for ice
     ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %

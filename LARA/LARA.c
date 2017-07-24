@@ -93,10 +93,11 @@
 #include <WISPR.h>
 #include <Winch.h>
 
+#define STRING_SIZE 1024
+#define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 // WDT Watch Dog Timer definition
 // Not sure if this watchdog is even working You have to define
 short CustomSYPCR = WDT105s | HaltMonEnable | BusMonEnable | BMT32;
-#define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 
 //#define LPMODE    FullStop          //NOT USING SLEEP MODE CURRENTLY// Low
 //power mode
@@ -161,9 +162,9 @@ void main() {
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
   // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(1024, sizeof(char));
+  WriteBuffer = (char *)calloc(STRING_SIZE, 1);
   // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(1024, sizeof(char));
+  returnstr = (char *)calloc(STRING_SIZE, 1);
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -394,6 +395,11 @@ void InitializeLARA(ulong *PwrOn) {
     ParseStartupParams(true);
     // Force IRID.CALLMODE to one even if default.cfg parses a 0
     IRID.CALLMODE = 1;
+
+    // testing
+    // DBG( if (LARA.STARTPHASE>0) { LARA.PHASE=LARA.STARTPHASE; return; } )
+    
+
     depth = CTD_AverageDepth(5, &velocity);
 
     // Place Buouy in correct state
@@ -1242,7 +1248,7 @@ static void IRQ5_ISR(void) {
 \******************************************************************************/
 ulong WriteFile(ulong TotalSeconds) {
 
-  long BlkLength = 1024;
+  long BlkLength = STRING_SIZE;
   int filehandle;
   struct stat info;
   char detfname[] = "c:00000000.dtx";
@@ -1278,7 +1284,7 @@ ulong WriteFile(ulong TotalSeconds) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     RTCDelayMicroSeconds(50000L);
-    memset(WriteBuffer, 0, 1024 * sizeof(char));
+    memset(WriteBuffer, 0, STRING_SIZE);
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());

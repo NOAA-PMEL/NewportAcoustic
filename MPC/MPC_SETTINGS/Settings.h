@@ -38,10 +38,14 @@ typedef struct // Used to access runtime settings
 #define LATITUDE_DESC                                                          \
   "9 character string in format above of degree and decimal minute latitude\n"
 
+// Variable will be written to every software restart
 #define STARTUPS_NAME "MPC.STARTUPS"
-#define STARTUPS_DEFAULT                                                       \
-  "0" // Variable will be written to every software restart
+#define STARTUPS_DEFAULT "0" 
 #define STARTUPS_DESC "The total number of reboots/startups\n"
+
+#define STARTPHASE_NAME "MPC.STARTPHASE"
+#define STARTPHASE_DEFAULT "0" 
+#define STARTPHASE_DESC "recommended phase to start.\n"
 
 #define STARTMAX_NAME                                                          \
   "MPC.STARTMAX" //-s to control this valuable through SYSTEM.CFG file
