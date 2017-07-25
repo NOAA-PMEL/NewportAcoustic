@@ -93,10 +93,11 @@
 #include <WISPR.h>
 #include <Winch.h>
 
+#define STRING_SIZE 1024
+#define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 // WDT Watch Dog Timer definition
 // Not sure if this watchdog is even working You have to define
 short CustomSYPCR = WDT105s | HaltMonEnable | BusMonEnable | BMT32;
-#define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 
 //#define LPMODE    FullStop          //NOT USING SLEEP MODE CURRENTLY// Low
 //power mode
@@ -161,9 +162,9 @@ void main() {
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
   // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(1024, sizeof(char));
+  WriteBuffer = (char *)calloc(STRING_SIZE, 1);
   // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(1024, sizeof(char));
+  returnstr = (char *)calloc(STRING_SIZE, 1);
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -201,11 +202,11 @@ void main() {
       // writefile 1) MPC 2) Winch Info 3) Winch Status
       // v
       WriteFile(PwrOff);
-      // Init New LogFile
+      // Init New LogFile, set PwrOn which is start of dataxint cycle
       Time(&PwrOn);
 
       PhaseThree();
-      CTD_Start_Up(true); // ?? why start here
+      CTD_Start_Up(true); // ?? why start here, for phase4
       CTD_SyncMode();
       break;
 
@@ -216,6 +217,7 @@ void main() {
     }
   } // while lara.on
 
+  flogf("\nLARA.ON == false\n");
   free(WriteBuffer);
   free(returnstr);
   shutdown();
@@ -276,7 +278,7 @@ void InitializeLARA(ulong *PwrOn) {
   Time(&time);
   *PwrOn = time;
 
-  flogf("\nProgram Start time: %s", Time(NULL));
+  flogf("\nProgram Start time: %s", TimeDate(NULL));
 
   // WINCH Struct Init
   WINCH.ASCENTCALLS = 0;
@@ -365,9 +367,9 @@ void InitializeLARA(ulong *PwrOn) {
     Make_Directory("SNT");
     Make_Directory("CTD");
     Make_Directory("LOG");
-    if (WISPRNUMBER > 1) {
+    if (WISPRNUMBER > 1) { // total number
       if (WISP.NUM != 1)
-        WISP.NUM = 1;
+        WISP.NUM = 1; // current used board
 
       OpenTUPort_WISPR(true);
 
@@ -393,6 +395,11 @@ void InitializeLARA(ulong *PwrOn) {
     ParseStartupParams(true);
     // Force IRID.CALLMODE to one even if default.cfg parses a 0
     IRID.CALLMODE = 1;
+
+    // testing
+    // DBG( if (LARA.STARTPHASE>0) { LARA.PHASE=LARA.STARTPHASE; return; } )
+    
+
     depth = CTD_AverageDepth(5, &velocity);
 
     // Place Buouy in correct state
@@ -621,22 +628,17 @@ void PhaseThree() {
       ParseStartupParams(true); 
     } 
 
-    // gpsFails>2 ?? irrelevant in the logic flow. where set?
-    // gpsFails++ and checked in result==-1
     if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
       LARA.PHASE = 4;
-      // ?? check this at bottom of loop?
     }
     if (result == 1 || result == 2) { 
       // Upload Success / Commands
       IridCallsNoParams++; // call sessions w/o Params
       flogf("\n\t|Successful IRID Call: %d", IridCallsNoParams);
       if (IridCallsNoParams > 3) {
-        // calls > 3 implies ?? 
         // Load default parameters in "default.cfg" file
         ParseStartupParams(true); 
-        // checked here because ??
       } // calls>3
     } // Upload Success / Commands
     else if (result == 3) { 
@@ -680,7 +682,6 @@ void PhaseThree() {
         secs = 10;
       flogf("\n\t|Ascend for %d seconds, %fmeters", secs, depth);
 
-      // ?? are we trying to go up?
       if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
         LARA.TDEPTH = NIGK_MIN_DEPTH;
         gpsFails = 5;
@@ -690,8 +691,7 @@ void PhaseThree() {
       WaitForWinch(1);
 
       // Count++ every 1/10th of a second.
-      while (LARA.DEPTH > LARA.TDEPTH) { // who changes these??
-        // reading ctd?
+      while (LARA.DEPTH > LARA.TDEPTH) { 
         Incoming_Data();
         RTCDelayMicroSeconds(100000L);
         count++;
@@ -721,7 +721,7 @@ void PhaseThree() {
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(MPC.FILENUM); // ??
+  CTD_CreateFile(MPC.FILENUM); 
   LARA.TDEPTH = NIGK.TDEPTH;
 
   OpenTUPort_CTD(true);
@@ -1248,7 +1248,7 @@ static void IRQ5_ISR(void) {
 \******************************************************************************/
 ulong WriteFile(ulong TotalSeconds) {
 
-  long BlkLength = 1024;
+  long BlkLength = STRING_SIZE;
   int filehandle;
   struct stat info;
   char detfname[] = "c:00000000.dtx";
@@ -1263,7 +1263,6 @@ ulong WriteFile(ulong TotalSeconds) {
 
   if (filehandle <= 0) {
     flogf("\nERROR  |WriteFile(): open error: errno: %d", errno);
-    // ?? if (errno != 0)
     return -1;
   }
   DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
@@ -1285,7 +1284,7 @@ ulong WriteFile(ulong TotalSeconds) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     RTCDelayMicroSeconds(50000L);
-    memset(WriteBuffer, 0, 1024 * sizeof(char));
+    memset(WriteBuffer, 0, STRING_SIZE);
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());
@@ -1309,7 +1308,7 @@ ulong WriteFile(ulong TotalSeconds) {
   WISPRWriteFile(filehandle);
   RTCDelayMicroSeconds(50000L);
 
-//*** CTD File Upload ***??
+//*** CTD File Upload ***
 #ifdef CTDSENSOR
   if (CTD.UPLOAD || TotalSeconds == 0) {
     sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);
@@ -1327,10 +1326,8 @@ ulong WriteFile(ulong TotalSeconds) {
   RTCDelayMicroSeconds(50000L);
 #endif
   //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
-  sprintf(logfile, "%08ld.log", MPC.FILENUM + 1);
-  RTCDelayMicroSeconds(50000L);
-  Initflog(logfile, true);
   if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
+    sprintf(logfile, "%08ld.log", MPC.FILENUM);
     DBG(cprintf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
     stat(logfile, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 2000))

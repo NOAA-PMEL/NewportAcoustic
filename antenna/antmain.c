@@ -222,7 +222,6 @@ TUPort* OpenSbePt(bool on) {
     // Define SBE TD tuporst
     RTCDelayMicroSeconds(100000L);
     sbePort = TUOpen(sb39rxch, sb39txch, baud, 0);
-    // ?? flush, like IridPt
     if (sbePort == NULL) {
       flogf("\n!!! Error opening SBE channel...");
     } else {
@@ -459,7 +458,7 @@ void antennaSwitch(char c) {
   switch(c) {
     case 'G': PIOClear(ANTSW); break;
     case 'I': PIOSet(ANTSW); break;
-    default: flogf("antennaSwitch(%c) ??\n", c); return;
+    default: flogf("antennaSwitch(%c) ?\n", c); return;
   }
   antSw=c;
 } // antennaSwitch()

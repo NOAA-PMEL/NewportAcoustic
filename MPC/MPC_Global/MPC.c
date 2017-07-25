@@ -285,11 +285,29 @@ void DOS_Com(char *command, long filenum, char *ext, char *extt) {
 }
 
 /******************************************************************************\
-**	Time & Date String
-** Get the RTC time seconds since 1970 and convert it to an
-** understandable format
+**	Time String
+** Get the RTC time seconds since 1970 and convert it 
 \******************************************************************************/
 char *Time(ulong *seconds) {
+
+  RTCtm *rtc_time;
+  ulong secs = NULL;
+
+  ushort ticks;
+
+  RTCGetTime(&secs, &ticks);
+  rtc_time = RTClocaltime(&secs);
+  *seconds = secs;
+  sprintf(time_chr, "%.2d:%.2d:%.2d", 
+          rtc_time->tm_hour, rtc_time->tm_min, rtc_time->tm_sec);
+  return time_chr;
+
+} //____ Time() ____//
+/******************************************************************************\
+**	Time & Date String
+** Get the RTC time seconds since 1970 and convert it 
+\******************************************************************************/
+char *TimeDate(ulong *seconds) {
 
   RTCtm *rtc_time;
   ulong secs = NULL;
@@ -386,9 +404,11 @@ int System_Timer() {
         // Set NIGK to recovery?
         NIGK.RECOVERY = 1;
         VEEStoreShort(NIGKRECOVERY_NAME, NIGK.RECOVERY);
-        MPC.DATAXINT = 30;
-        VEEStoreShort(DATAXINTERVAL_NAME,
-                      MPC.DATAXINT); // Call every 30 minutes at surface.
+        // Call every 30 minutes at surface.
+        if (MPC.DATAXINT != 30) { 
+          MPC.DATAXINT = 30;
+          VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT); 
+        }
         return 2;
       }
     }
@@ -599,7 +619,6 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   Source = open(SourceFileName, O_RDONLY);
   if (Source <= 0) {
     flogf("\nERROR  |AppendFiles() %s open errno: %d", SourceFileName, errno);
-    // ?? if (errno != 0)
     return false;
   }
   DBG(else flogf("\n\t|Append_Files() %s opened", SourceFileName);)
@@ -653,13 +672,16 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   return true;
 
 } //____ AppendFiles() ____//
-  /*************************************************************************
-  ** Delay_AD_Log()
-  ** AD function with time delay.  Do AD_Log at 5 sec incrment.
+
+/*************************************************************************
+** Delay_AD_Log()
+** AD function with time delay.  Do AD_Log at 5 sec incrment.
   **************************************************************************/
 void Delay_AD_Log(short Sec) {
   short i;
   long last, rem;
+  DBG1(flogf( " {%d} ", Sec );)
+  cdrain();
   last = Sec / 5;
   rem = Sec - last * 5;
 
@@ -801,7 +823,6 @@ bool SaveParams(const char *Command) {
   RTCDelayMicroSeconds(25000);
   if (paramfilehandle <= 0) {
     flogf("\nERROR  |SYSTEM.CFG open errno: %d", errno);
-    // ?? if (errno != 0)
     return false;
   }
   DBG(else flogf("\n\t|SYSTEM.CFG Opened"); cdrain(); coflush();)
@@ -1348,3 +1369,26 @@ void print_clock_cycle_count(clock_t start, clock_t stop, char *label) {
   flogf("\n%f seconds for %s",
         ((double)(stop - start)) / (double)CLOCKS_PER_SEC, label);
 }
+
+/* printsafe()
+ * print a mix of ascii, non-ascii
+ */
+void printsafe (long l, uchar *b) {
+  long i;
+  uchar c;
+  cprintf("\n%s+%ld''", Time(NULL), l);
+  for (i=0L; i<l; i++) {
+    c=b[i];
+    if ((c<32)||(c>126)) cprintf(" x%02X ", c);
+    else cprintf("%c", c);
+    if (c=='\n') cprintf("\n");
+  }
+  cprintf("''\n");
+  cdrain();
+} // printsafe
+
+// made into macro, mpcglobal.h
+// void Delayms(int d) {
+//  RTCDelayMicroSeconds((long) 1000 * (long) d);
+//} // Delayms
+

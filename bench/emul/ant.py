@@ -1,4 +1,4 @@
-# emulate buoy
+# emulate antenna sbe39
 
 #from laraSer import Serial
 from laraSer import Serial
@@ -13,11 +13,11 @@ import time
 # sleepMode = syncMode = False
 # timeOff = 0
 
-name = 'ctd'
+name = 'sbe39'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS5'
+port = '/dev/ttyS4'
 baudrate = 9600
-CTD_DELAY = 3.8
+CTD_DELAY = 1
 
 def info():
     "globals which may be externally set"
@@ -125,8 +125,13 @@ def ctdOut():
     sleep(ctdDelay())
     ###
     # note: modify temp for ice
-    ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
-        (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
+    #ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
+    #    (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
+    ser.put("\r\n# %f, %f, %s\r\n" % (temper(), depth(), ctdDateTime() ))
+
+def temper():
+    "return 20.1 unless we emulate ice at a certain depth"
+    return 20.1
 
 #def modGlobals(**kwargs):
 #    "change defaults from command line"

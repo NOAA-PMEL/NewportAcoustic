@@ -36,6 +36,8 @@
 #include <time.h>
 #include <unistd.h> // PicoDOS POSIX-like UNIX Function Definitions
 
+#define STRING_SIZE 1024
+
 time_t CTD_VertVel(time_t);
 
 int Sea_Ice_Algorithm(); // Returns reason: 1=Stop, should be at surface and
@@ -161,11 +163,11 @@ void CTD_DateTime() {
 ** CTD_GetPrompt()
 \********************************************************************************/
 bool CTD_GetPrompt() {
-
+  // global char *stringin;
   short count = 0;
   short LastByteInQ;
 
-  memset(stringin, 0, 1024 * sizeof(char));
+  memset(stringin, 0, STRING_SIZE);
 
   LastByteInQ = TURxPeekByte(CTDPort, (tgetq(CTDPort) - 1));
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
@@ -178,7 +180,7 @@ bool CTD_GetPrompt() {
   }
 
   if (count == 2) {
-    TURxGetBlock(CTDPort, stringin, 1024 * sizeof(uchar), 1000);
+    TURxGetBlock(CTDPort, stringin, (long) STRING_SIZE, (short) 1000);
     if (strstr(stringin, "S>") != NULL) {
       cprintf("\nPrompt from CTDBlock");
       TURxFlush(CTDPort);
@@ -403,9 +405,9 @@ bool CTD_Data() {
 
   DBG2( flogf("\n. CTD_Data()"); )
 
-  memset(stringin, 0, 1024 * sizeof(char));
+  memset(stringin, 0, STRING_SIZE);
   // loop until 3 timeouts; should this be loop until \n ?
-  while (count < 3 && i < 1024) {
+  while (count < 3 && i < STRING_SIZE) {
     charin = TURxGetByteWithTimeout(CTDPort, 250);
     if (charin == -1)
       count++;
@@ -507,12 +509,12 @@ bool CTD_Data() {
   // this was in the write log section
   if (LARA.BUOYMODE != 0)
     CTD_VertVel(secs);
-  // ?? this incr might be an error, done in VertVel
+  // this incr looks strange, but lara.ctd is not ctdsamples
   LARA.CTDSAMPLES++;
 
 
   // Log WriteString
-  memset(stringout, 0, 1024 * sizeof(char));
+  memset(stringout, 0, STRING_SIZE);
   sprintf(stringout, "#%.4f,", temp);
   strcat(stringout, split_pres);
   LARA.DEPTH = atof(strtok(split_pres, ","));
@@ -584,7 +586,6 @@ void SwitchTD(char c) {
 
 /******************************************************************************\
 ** void OpenTUPort_CTD(bool);
-** ?? calloc/free may not match, should these be globals?
 \******************************************************************************/
 void OpenTUPort_CTD(bool on) {
   // global stringout, stringin
@@ -600,8 +601,8 @@ void OpenTUPort_CTD(bool on) {
     RTCDelayMicroSeconds(20000L);
     if (CTDPort == 0)
       flogf("\nBad TU Channel: CTDPort...");
-    stringout = (char *)calloc(1024, sizeof(char));
-    stringin = (char *)calloc(1024, sizeof(char));
+    stringout = (char *)calloc(STRING_SIZE, 1);
+    stringin = (char *)calloc(STRING_SIZE, 1);
   }
   if (!on) {
 

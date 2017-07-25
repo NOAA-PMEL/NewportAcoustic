@@ -2,6 +2,7 @@
 //#include <PLATFORM.h>
 #include <cfxpico.h>
 #include <time.h>
+#define Delayms(X) RTCDelayMicroSeconds((long) 1000 * (long) X)
 
 extern volatile clock_t start_clock;
 extern volatile clock_t stop_clock;
@@ -55,6 +56,7 @@ void SetupHardware(void);
         @return string of date/time
         */
 char *Time(ulong *);
+char *TimeDate(ulong *);
 
 /*MakeDirectory:
         @Takes string of new directory name to be created
@@ -89,6 +91,13 @@ float Check_Timers(ushort);
         @Return: Boolean true of successful appendage
         */
 bool Append_Files(int, const char *, bool, long);
+
+// easy delay millisec
+// mad into macro
+// void Delayms(int);
+
+// print ascii, non-ascii
+void printsafe (long, uchar *);
 
 /*Delay_AD_Log:
         @Param1: Short value, number of seconds for delay while watching Power

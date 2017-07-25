@@ -9,7 +9,7 @@ from threading import Thread, Event
 # buffOut = ''
 #motorRunState = off, down, up
 #cable = 0
-#mooring = 20
+mooring = 20
 
 # amodRate measured about 6.5 sec 
 name = 'winch'
@@ -28,7 +28,6 @@ def init():
     "set global vars to defaults"
     global ser,cable, mooring, motorRunState, go, motorOn
     cable = 0
-    mooring = 20
     # motorRunState off, down, up
     motorRunState = 'off' 
     go = Event()

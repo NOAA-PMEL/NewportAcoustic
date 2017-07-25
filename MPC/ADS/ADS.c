@@ -30,7 +30,7 @@ process.
 
    A) Need to check which BITSHIFT size leads to overflow.
       1) BITSHIFT of 10 results in 25.6 secon buffers, 11: 51.2, 12: 102.4 etc.
-16? Too big??
+16? Too big?
 
    B) No required Array allocation or "data2" for knowing power needs to be
 averaged.
@@ -297,7 +297,6 @@ void AD_Write(ushort *AveragedEnergy) {
   ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND);
   if (ADSFileHandle <= 0) {
     flogf("\nERROR|AD_Write() %s open fail. errno: %d", ADAvgFileName, errno);
-    // ?? if (errno != 0)
     return;
   }
   // DBG(   else      flogf("\n\t|AD_Write() %s opened", ADAvgFileName);)
@@ -312,13 +311,12 @@ void AD_Write(ushort *AveragedEnergy) {
   CLK(stop_clock = clock();
       print_clock_cycle_count(start_clock, stop_clock, "AD_Write: write");)
 
-  if (!ADSOn)
+  if (!ADSOn) // SetupAD(false) from power monitor
     return;
   if (close(ADSFileHandle) < 0)
     flogf("\nERROR  |AD_Write() %s Close error: %d", ADAvgFileName, errno);
   // DBG(   else      flogf("\n\t|AD_Write() %s Closed", ADAvgFileName);)
  
-  // ?? why delay
   RTCDelayMicroSeconds(10000);
 
 } //_____ AD_Write() _____//
@@ -350,16 +348,19 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
       ADSTIME = 1044;
     ADSTIME = ((10 * totaltime) % ADSTIME); // Last AD Power Buffer size
     AD_Log();
+    // opens adsfh
   }
-  // Coming in after reboot
+  // Coming in after reboot // Setup_ADS(false), AD_Log also opens .pwr file
   else {
     ADSFileHandle = open(ADAvgFileName, O_RDWR | O_BINARY | O_APPEND);
     ad = CFxADInit(&adbuf, ADSLOT, ADInitFunction);
     if (!CFxADLock(ad)) {
       flogf("\nCouldn't lock and own A-D with QSPI\n");
+      // close
       return 0.0;
     }
   }
+  // adsfh is open
 
   flogf("\n\t|POWERMonitor(%s)", ADAvgFileName);
 
@@ -371,14 +372,18 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
   filelength = fileinfo.st_size;
 
   // if file unwritten to
-  if (filelength < 6)
+  if (filelength < 6) {
+    if (close(ADSFileHandle) < 0)
+      flogf("\nERROR  |PowerMonitor: File Close error: %d", errno);
+    DBG(else flogf("\n\t|PowerMonitor: ADSFile Closed");)
     return 0.0;
+  }
 
   if (ADSFileHandle > 0) {
+    // we maybe just wrote into file, so seek back to start
     lseek(ADSFileHandle, 0, SEEK_SET);
-    filelength =
-        filelength /
-        6; // 6 is the number of bytes for the values of current, voltage, time.
+    // 6 is the number of bytes for the values of current, voltage, time.
+    filelength = filelength / 6; 
 
     // Get the number of times file has been written to
     while (DataCount < filelength) {

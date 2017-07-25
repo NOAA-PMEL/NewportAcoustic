@@ -1,5 +1,5 @@
 import sys, time
-import laraSer, winch, buoy, radio
+import laraSer, winch, buoy, ant
 from shared import *
 
 
@@ -40,25 +40,25 @@ def init():
     "init all"
     buoy.init()
     winch.init()
-    # radio.init()
+    ant.init()
 
 def start():
     "start all"
     buoy.start()
     winch.start()
-    # radio.start()
+    ant.start()
 
 def stop():
     "stop all"
     buoy.stop()
     winch.stop()
-    # radio.stop()
+    ant.stop()
 
 def info():
     "info all"
     buoy.info()
     winch.info()
-    # radio.info()
+    ant.info()
     
 def restart():
     "stop init start"
@@ -67,7 +67,7 @@ def restart():
     start()
 
 if __name__=='__main__': start()
-else: print "start() stop() init() buoy.info() winch.start() winch.cable=15"
+else: print "start() stop() init() buoy.info() winch.mooring=14 winch.cable=15"
 
 
 # Notes:

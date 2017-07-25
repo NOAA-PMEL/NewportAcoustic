@@ -74,6 +74,7 @@ void LARA_Recovery();
 #define POWERLOGGING
 // two levels of debug
 #define DEBUG
+#define DEBUG1
 // #define DEBUG2
 #define SYSTEMDIAGNOSTICS
 #define WISPR
@@ -128,6 +129,12 @@ void LARA_Recovery();
 #define DBG(X) X
 #else
 #define DBG(X)
+#endif
+// DEBUG1
+#ifdef DEBUG1
+#define DBG1(X) X
+#else
+#define DBG1(X)
 #endif
 // DEBUG2
 #ifdef DEBUG2
