@@ -57,7 +57,7 @@ of commands
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
 #define STRING_SIZE 1024
-#define RUDICSBLOCK 1000
+#define RUDICSBLOCK 2000
 // #define RUDICSBLOCK 2000
 
 
@@ -88,6 +88,7 @@ static char IRIDFilename[sizeof "c:00000000.dat"];
 
 void OpenTUPort_CTD(bool); // CTD.c
 void OpenTUPort_AntMod(bool);
+void OpenSatCom(bool);
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
 short Connect_SendFile_RecCmd(const char *);
@@ -118,10 +119,10 @@ void SelectModule(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
-DBG( void ConsoleIrid(); ) // check console for interrupt, redirect 
+void ConsoleIrid(); // check console for interrupt, redirect 
 
 // IRIDUM TUPORT Setup
-TUPort *AntModPort;
+TUPort *AntModPort = NULL;
 short ANTMOD_RX, ANTMOD_TX;
 
 uchar *inputstring, *first, *scratch;
@@ -195,8 +196,11 @@ short UploadFiles() {
 ** PowerOn_GPS()
 \*********************************************************************************/
 bool PowerOn_GPS() {
+  if (!SatComOpen) {
+    OpenSatCom(true);
+    PhonePin();
+  }
   // Open the GPS/IRID satellite com...
-  OpenTUPort_AntMod(true);
   SwitchAntenna('G');
 
   if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
@@ -210,25 +214,31 @@ bool PowerOn_GPS() {
  * ^A Antenna G|I * ^B Binary byte * ^C Connect I|S * ^D powerDown I|S * ^E binary lEngth
 \**********************************************************************************/
 short SwitchAntenna(char r) {
+  static char ant='-', device='-';
   char a, d;
-  DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
+  DBG1(flogf("\n\t|SwitchAntenna(%c)", r);)
+  if (AntModPort == NULL) OpenTUPort_AntMod(true);
   // select antMod vs SBE16, switch antMod device
   switch (r) {
     case 'G': { a='G'; d='I'; break; }
     case 'I': { a='I'; d='I'; break; }
-    case 'S': { a='0'; d='S'; break; }
+    case 'S': { a=ant; d='S'; break; }
     default: { // bad case
       flogf("\nError SwitchAntenna(%c): bad choice", r);
       return -1;
     }
   }
-
-  TUTxPutByte(AntModPort, 3, true);  // connect
-  TUTxPutByte(AntModPort, d, true);  // I S
-  if (a) {
+  if (d!=device) {
+    // turn on, connect
+    TUTxPutByte(AntModPort, 3, true);  
+    TUTxPutByte(AntModPort, d, true);  
+    device=d;
+  }
+  if (a!=ant) {
     TUTxPutByte(AntModPort, 1, true);  // antenna
     TUTxPutByte(AntModPort, a, true);  // G I
     RTCDelayMicroSeconds(1000000L); // wait 1 sec to settle antenna switch noise
+    ant=a;
   }
   return 0;
 } //____ SwitchAntenna ____//
@@ -420,6 +430,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
 \******************************************************************************/
 bool GetGPS_SyncRTC() {
   // char* Location;
+  static bool firstGPS = true;
   char *Latitude;
   char *Longitude;
   char *Coordinates;
@@ -427,98 +438,95 @@ bool GetGPS_SyncRTC() {
   short count = 0;
   ulong total_seconds = 0;
   int byteswritten = 0;
-  static bool firstGPS = true;
   int datafilehandle;
   char uploadfname[] = "c:00000000.bot";
   bool pole = false;
 
   bool returnvalue = true;
   char* first;
+
+  flogf("\n\t|GetGPS_SyncRTC()");
   first = scratch;
 
-  if (MPC.STARTUPS == 0 && firstGPS)
+  if (MPC.STARTUPS == 0 && firstGPS) // ??
     firstGPS = true;
   else
     firstGPS = false;
 
-  // while sat number is less than 4
-  flogf("\n\t|GetGPS_SyncRTC()");
-  while (sat_num < 6 && count < GPS_TRIES) {
+  while (sat_num < 5) {
+    if (count++ > GPS_TRIES) return false; // give up
     SendString("AT+PD");
-    RTCDelayMicroSeconds(10000); // HM
+    // RTCDelayMicroSeconds(10000); // HM
     GetGPSInput(NULL, &sat_num);
     flogf("\n\t|Sat num: %d", sat_num);
     cdrain();
     Delay_AD_Log(8);
-    count++;
   }
-  if (count > 9)
-    return false;
-  // When sat number is minimum to be acceptable
+  // sat number is acceptable
 
-  if (sat_num >= 6) {
+  // freed?
+  // Location=(char*)calloc(100,1);
+  Latitude = (char *)calloc(16, 1);
+  Longitude = (char *)calloc(16, 1);
+  Coordinates = (char *)calloc(33, 1);
 
-    // freed?
-    // Location=(char*)calloc(100,1);
-    Latitude = (char *)calloc(16, 1);
-    Longitude = (char *)calloc(16, 1);
-    Coordinates = (char *)calloc(33, 1);
+  // Synchronize the RTC time with GPS
+  if (GetUTCSeconds())
+    flogf("\n%s|Successful New Time", Time(NULL));
+  else
+    flogf("\n\t|Failed gathering GPS Time");
+  cdrain();
 
-    // Synchronize the RTC time with GPS
-    if (GetUTCSeconds())
-      flogf("\n%s|Successful New Time", Time(NULL));
-    else
-      flogf("\n\t|Failed gathering GPS Time");
-    cdrain();
-
-    SendString("AT+PL");
-    RTCDelayMicroSeconds(100000); // blk - seems to miss part of reply
-    if (GetGPSInput("PL", &sat_num) != NULL) {
-      Latitude = strtok(first, "|");
-      Longitude = strtok(NULL, "|");
-      sprintf(Coordinates, "%s %s", Latitude, Longitude);
-      flogf("\n\t|Coords: %s", Coordinates);
-      if (!CompareCoordinates(Latitude, Longitude)) {
-        SendString("AT+PL");
-        if (GetGPSInput("PL", &sat_num) != NULL) {
-          Latitude = strtok(first, "|");
-          Longitude = strtok(NULL, "|");
-          sprintf(Coordinates, "%s|%s", Latitude, Longitude);
-          flogf("\n\t|Coords: %s", Coordinates);
-          if (!CompareCoordinates(Latitude, Longitude) && !firstGPS) {
-            LARA_Recovery();
-          }
+  SendString("AT+PL");
+  RTCDelayMicroSeconds(100000); // blk - seems to miss part of reply
+  if (GetGPSInput("PL", &sat_num) != NULL) {
+    Latitude = strtok(first, "|");
+    Longitude = strtok(NULL, "|");
+    sprintf(Coordinates, "%s %s", Latitude, Longitude);
+    flogf("\n\t|Coords: %s", Coordinates);
+    if (!CompareCoordinates(Latitude, Longitude)) {
+      SendString("AT+PL");
+      if (GetGPSInput("PL", &sat_num) != NULL) {
+        Latitude = strtok(first, "|");
+        Longitude = strtok(NULL, "|");
+        sprintf(Coordinates, "%s|%s", Latitude, Longitude);
+        flogf("\n\t|Coords: %s", Coordinates);
+        if (!CompareCoordinates(Latitude, Longitude) && !firstGPS) {
+          LARA_Recovery();
         }
       }
-      strncpy(MPC.LAT, Coordinates, 16);
-      //	   	VEEStoreStr(LATITUDE_NAME, strtok(Coordinates, "|"));
-      strncpy(MPC.LONG, &Coordinates[17], 16);
-      //	   	VEEStoreStr(LONGITUDE_NAME, strtok(NULL, "|"));
-      firstGPS = false;
-      flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
-
-      sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
-      DBG(flogf("\n\t|Write to file: %s", uploadfname);)
-      datafilehandle = open(uploadfname, O_RDWR);
-      RTCDelayMicroSeconds(25000L); // ??
-      if (datafilehandle <= 0) {
-        flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
-              errno);
-        // not a fatal err, did not log ??
-        returnvalue = false;
-      } else {
-        DBG2(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
-        lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
-        RTCDelayMicroSeconds(25000L); // ??
-        byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
-        DBG2(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
-        if (close(datafilehandle) != 0)
-          flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
-        DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
-      }
     }
-    cdrain();
-  }
+    strncpy(MPC.LAT, Coordinates, 16);
+    //	   	VEEStoreStr(LATITUDE_NAME, strtok(Coordinates, "|"));
+    strncpy(MPC.LONG, &Coordinates[17], 16);
+    //	   	VEEStoreStr(LONGITUDE_NAME, strtok(NULL, "|"));
+    firstGPS = false;
+    flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
+
+    sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
+    DBG2(flogf("\n\t|Write to file: %s", uploadfname);)
+    datafilehandle = open(uploadfname, O_RDWR);
+    RTCDelayMicroSeconds(25000L); // ??
+    if (datafilehandle <= 0) {
+      flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
+            errno);
+      // not a fatal err, did not log ??
+      returnvalue = false;
+    } else {
+      DBG2(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
+      lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
+      RTCDelayMicroSeconds(25000L); // ??
+      byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
+      DBG(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
+      if (close(datafilehandle) != 0)
+        flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
+      DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
+    } // open(upload)
+  } // GetGPSInput
+  cdrain();
+  free(Latitude);
+  free(Longitude);
+  free(Coordinates);
 
   return returnvalue;
 }
@@ -647,55 +655,26 @@ bool CompareCoordinates(char *LAT, char *LONG) {
 ** Close COM2 for Iridium/GPS unit and power down
 \******************************************************************************/
 void OpenTUPort_AntMod(bool on) {
-
-  short wait = 10000;
-  int warm;
-
-  DBG2(flogf("  ..OpenTUPort_AntMod() ");)
+  DBG1(flogf("  ..OpenTUPort_AntMod() ");)
   if (on) {
     ANTMOD_RX = TPUChanFromPin(ANTMODRX);
     ANTMOD_TX = TPUChanFromPin(ANTMODTX);
-
     // Power ON
     PIOSet(ANTMODPWR);
     PIOSet(ANTMODCOM);
 
     AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, IRIDBAUD, 0);
-    if (AntModPort == 0) {
+    if (AntModPort == NULL) {
       flogf("\n\t|Bad IridiumPort");
+      // go to recovery mode??
       return;
     }
-    TUTxFlush(AntModPort);
-    TURxFlush(AntModPort);
-
-    warm = IRID.WARMUP;
-    DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), warm); cdrain();)
-    // connect to gps
-    SwitchAntenna('G');
-
-    inputstring = (char *)calloc(STRING_SIZE, 1);
-    scratch = (char *)calloc(STRING_SIZE, 1);
-
-    Delay_AD_Log(warm);
-
-    TURxFlush(AntModPort);
-    SatComOpen = true;
-
   } else if (!on) {
-
-    flogf("\n%s|PowerDownCloseComANTMOD() ", Time(NULL));
-    SendString("AT*P");
-
-    Delay_AD_Log(3);
-
+    TUClose(AntModPort);
+    AntModPort=NULL;
+    // power off
     PIOClear(ANTMODCOM);
     PIOClear(ANTMODPWR);
-    TUClose(AntModPort);
-
-    free(inputstring);
-    free(scratch);
-
-    SatComOpen = false;
   }
 }
 /******************************************************************************\
@@ -728,6 +707,36 @@ bool CheckSignal() {
   return false;
 
 } //____ CheckSignal() ____//
+
+/* OpenSatCom(bool) - turn on/off modem, init gps
+ * set SatComOpen=bool
+ */
+void OpenSatCom(bool onoff) {
+  // global bool SatComOpen
+  if (SatComOpen == onoff) return;
+  
+  if (onoff) { // turn on
+    // may be already open for sbe16
+    inputstring = (char *)calloc(STRING_SIZE, 1);
+    scratch = (char *)calloc(STRING_SIZE, 1);
+
+    // connect to gps first
+    SwitchAntenna('G'); // turn on and connect
+    DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
+    Delay_AD_Log(IRID.WARMUP);
+  } else { // !onoff
+    flogf("\n%s|PowerDownCloseComANTMOD() ", Time(NULL));
+    // tell modem to power off
+    SendString("AT*P");
+    Delay_AD_Log(3);
+    // tell ant mod to power off modem
+    SwitchAntenna('S');
+    free(inputstring);
+    free(scratch);
+  } // onoff
+  SatComOpen=onoff;
+} // OpenSatCom
+
 /******************************************************************************\
 ** InitModem()
 ** Initialize the Irid modem port.
@@ -741,10 +750,6 @@ bool InitModem(int status) {
 
   flogf("\n%s|Modem Initialization", Time(NULL));
 
-  if (!SatComOpen) {
-    OpenTUPort_AntMod(true);
-    PhonePin();
-  }
   ACK = false;
   // bizarre switch without break
   switch (status) {
@@ -957,14 +962,16 @@ short SignalQuality(short *signal_quality) {
 
   return returnvalue;
 }
+
 /******************************************************************************\
 ** void SendString()
 \******************************************************************************/
 void SendString(const char *StringIn) {
-  DBG(flogf("\n\t|SendString(%s)", StringIn); cdrain();)
-  strcpy(scratch, StringIn);
-  strcat(scratch, "\r");
-  TUTxPutBlock(AntModPort, scratch, (long) strlen(scratch), (short) 10000);
+  char *local[16];
+  strcpy(local, StringIn);
+  DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
+  strcat(local, "\r");
+  TUTxPutBlock(AntModPort, local, (long) strlen(local), (short) 1000);
 } //_____ SendString() _____//
 
 /******************************************************************************\
@@ -1046,7 +1053,7 @@ bool Call_Land(void) {
 } //____ Call_Land() ____//
 /******************************************************************************\
 ** SendProjHdr
-** After connection is established, send platform ID twice and check if
+** After connection is established, send platform ID AckMax and check if
 ** ACK is received. If successful, return true.
 ** HM, NOAA, CIMRS
 \******************************************************************************/
@@ -1054,7 +1061,7 @@ bool SendProjHdr() {
   bool Ack = false;
   short Num_ACK = 0;
   short AckMax = 20;
-  short wait = 2500; // in millisec //was 1500 8.29.2016
+  short wait = 15000; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
   // need an extra char for null terminated
@@ -1339,25 +1346,31 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
         (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));
       TUTxPutBlock(AntModPort, bmode, (long) 3, 1000);
       TUTxPutBlock(AntModPort, buf, mlength, 10000);
-      // let transmission complete // satellite @ 2400baud*10bit bytes = 240/s
-      // 1/240 = 4.167millisec
-      RTCDelayMicroSeconds(mlength * 4167L);
+      // let transmission complete // satellite @ 2400baud = 300/s
+      RTCDelayMicroSeconds(mlength * 3333L);
 
       AD_Check();
     } // if bitmap[]
     // pause that refreshes
 
 #ifdef DEBUG
-    if (tgetq(AntModPort)) {
-      printsafe( TURxGetBlock(AntModPort, scratch, 
-          (long) STRING_SIZE, (short) 100),
+    blklen=tgetq(AntModPort);
+    if (blklen) {
+      cprintf("\n%d+", blklen);
+      // blklen=0;
+      // while ((scratch[blklen++]=TURxGetByteWithTimeout(AntModPort, 1)) >= 0) {}
+      // printsafe( (long) blklen, scratch);
+        
+      memset( scratch, 0, STRING_SIZE );
+      printsafe( (long) TURxGetBlock(AntModPort, scratch, 
+                          (long) STRING_SIZE, (short) 1),
         scratch);
     }
 #else
     TURxFlush(AntModPort);
     cdrain();
 #endif
-    Delayms(1000);
+    Delayms(2000);
   }
 
   free(buf);
@@ -1910,57 +1923,49 @@ char *GetGPSInput(char *chars, int *numsats) {
   // global inputstring first 
   bool good = false;
   int count = 0;
-  long len;
   long lenreturn;
+  // long len;
 
+  DBG1(flogf(" .GetGPSInput. ");)
   DBG(ConsoleIrid();)  // check if console is asking to stop
 
-  first = scratch; // blk - first is a problem
+  first = scratch; 
 
   memset(inputstring, 0, (size_t) STRING_SIZE);
   memset(first, 0, (size_t) STRING_SIZE);
 
-  inputstring[0] = TURxGetByteWithTimeout(
-      AntModPort, 5000); // Wait for first character to come in.
+  // Wait for first character to come in.
+  // inputstring[0] = TURxGetByteWithTimeout(AntModPort, 5000); 
 
   RTCDelayMicroSeconds(50000L);
-  len = (long)tgetq(AntModPort);
-  RTCDelayMicroSeconds(20000L);
-  // ?? why flush here
-  cdrain();
-
-  lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
-                           TUBlockDuration(AntModPort, len));
-  DBG(flogf("\nGPS<< %s", inputstring);)
+  // len = (long) tgetq(AntModPort);
+  lenreturn = TURxGetBlock(AntModPort, inputstring, (long) STRING_SIZE, 100);
+  DBG1(flogf("\nGPS<< %ld '%s'", lenreturn, inputstring);)
 
   if (chars != NULL) {
     strtok(inputstring, "=");
 
     if (chars == "PL") {
+      // concatenates long by tokenizing next '='
       strncpy(first, strtok(NULL, "="), 16); // concatenates lat
       strcat(first, "|"); // Places a | for distinction between lat and long
-      strncat(first, strtok(NULL, "="),
-              16); // concatenates long by tokenizing next '='
+      strncat(first, strtok(NULL, "="), 16); 
       RTCDelayMicroSeconds(20000L);
     }
-
     else if (chars == "PD")
       strncpy(first, strtok(NULL, "="), 10);
-
     else if (chars == "PT")
       strncpy(first, strtok(NULL, "="), 12);
-
     else
       first = NULL;
-
-  }
+  } // chars
 
   else if (strstr(inputstring, "Used=") != NULL) {
     *numsats = atoi(strrchr(inputstring, '=') + 1);
     RTCDelayMicroSeconds(20000L);
     cdrain();
   }
-  DBG(flogf("\n\t|first string: %s", first);)
+  // DBG(flogf("\n\t|first string: %s", first);)
   TURxFlush(AntModPort);
   TUTxFlush(AntModPort);
 
@@ -2034,7 +2039,6 @@ void StatusCheck() {
  * ConsoleIrid()
  * check for console input during IRID modem use
  */
-DBG(
 void ConsoleIrid() {
   // flush pending, look at most recent char
   char c=0;
@@ -2045,4 +2049,3 @@ void ConsoleIrid() {
     break;
   }
 }
-)

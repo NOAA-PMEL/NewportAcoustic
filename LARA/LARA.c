@@ -470,6 +470,33 @@ void InitializeLARA(ulong *PwrOn) {
 
   create_dtx_file(MPC.FILENUM);
 
+  DBG({
+  TUChParams *tuch; 
+  tuch = TUGetDefaultParams();
+  flogf("\nTUChParams: baud %ld, rx %d, tx %d, pf %d",
+    tuch->baud, tuch->rxqsz, tuch->txqsz, tuch->tpfbsz);
+  tuch->rxqsz=4096;
+  tuch->txqsz=4096;
+  TUSetDefaultParams(tuch);
+  tuch = TUGetDefaultParams();
+  flogf("\nTUChParams: baud %ld, rx %d, tx %d, pf %d",
+    tuch->baud, tuch->rxqsz, tuch->txqsz, tuch->tpfbsz);
+  })
+  
+/*
+ * typedef struct {
+ * short bits; // data bits exclusive of start, stop, parity
+ * short parity; // parity: 'o','O','e','E', all else is none
+ * short autobaud; // automatically adjust baud when clock changes
+ * long baud; // baud rate
+ * short rxpri; // receive channel TPUPriority
+ * short txpri; // transmit channel TPUPriority
+ * short rxqsz; // receive channel queue buffer size
+ * short txqsz; // transmit channel queue buffer size
+ * short tpfbsz; // transmit channel printf buffer size
+ * } TUChParams;
+ */
+
 } //____ InitializeAUH() ____//
 /****************************************************************************\
 ** PhaseOne
@@ -617,16 +644,15 @@ void PhaseThree() {
   }
   OpenTUPort_WISPR(false);
 
+  if (GlobalRestart) { 
+    // Added 9.28.2016 after first deployment Lake W.
+    ParseStartupParams(true); 
+  } 
+
   while (result <= 0) { 
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
-    DBG2( flogf( "\n . . phase3.IRIDGPS(restart)");)
     result = IRIDGPS(); 
-
-    if (GlobalRestart) { 
-      // Added 9.28.2016 after first deployment Lake W.
-      ParseStartupParams(true); 
-    } 
 
     if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase

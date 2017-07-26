@@ -26,11 +26,11 @@ def info():
 
 def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode
+    global ser, go, sleepMode, syncMode, timeOff
     ser = None
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     sleepMode = syncMode = False
-    timeoff = 0
+    timeOff = 0
     go = Event()
 
 def start():
