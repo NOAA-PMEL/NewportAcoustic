@@ -31,7 +31,7 @@ short IRIDGPS();
 void GetIRIDIUMSettings();
 
 void OpenTUPort_AntMod(bool);
-bool PowerOn_GPS();
+bool GPSstartup();
 
 #define IRIDBAUD 19200L
 // #define IRIDBAUD 9600L

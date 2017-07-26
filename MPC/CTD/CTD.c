@@ -48,17 +48,18 @@ int Sea_Ice_Algorithm(); // Returns reason: 1=Stop, should be at surface and
 // 5: Stop due to little change in salinity
 // CTDParameters CTD;
 
+int sbe=1; // 0=buoy, 1=antenna
 extern SystemParameters MPC;
 extern SystemStatus LARA;
 
-CTDParameters CTD;
+CTDParameters CTD[2];
 
-bool SyncMode;
+bool SyncMode[2];
 
-TUPort *CTDPort;
+TUPort *CTDPort[2];
 
 float SummedVelocity;
-short CTDSamples;
+short CTDSamples[2];
 
 char CTDLogFile[] = "c:00000000.ctd";
 
@@ -74,30 +75,30 @@ static char *stringout;
 ** CTD_Start_Up()
 * open port if needed, send break, get prompt, flush; opt settime
 \*****************************************************************************/
-bool CTD_Start_Up(bool settime) {
+bool CTD_Start_Up(int sbe, bool settime) {
   bool returnval = false;
 
   // CTD_CreateFile(MPC.FILENUM);  // called from lara.c
   DBG( flogf("i\n. CTD_Start_Up"); )
 
-  if (CTDPort == NULL)
-    OpenTUPort_CTD(true);
+  if (CTDPort[sbe] == NULL)
+    OpenTUPort_CTD(sbe, true);
 
   // leave sync mode
   CTD_SampleBreak();
   Delay_AD_Log(1);
 
-  if (CTD_GetPrompt()) {
+  if (CTD_GetPrompt(sbe)) {
     cprintf("successful startup");
     returnval = true;
   } else {
 
-    if (!CTD_GetPrompt()) {
-      OpenTUPort_CTD(false);
+    if (!CTD_GetPrompt(sbe)) {
+      OpenTUPort_CTD(sbe, false);
       RTCDelayMicroSeconds(100000);
-      OpenTUPort_CTD(true);
-      CTD_SampleBreak();
-      if (CTD_GetPrompt()) {
+      OpenTUPort_CTD(sbe, true);
+      CTD_SampleBreak(sbe);
+      if (CTD_GetPrompt(sbe)) {
         returnval = true;
         cprintf("successful startup3");
       }
@@ -107,14 +108,12 @@ bool CTD_Start_Up(bool settime) {
     }
   }
   if (settime)
-    CTD_DateTime();
-
-  TURxFlush(CTDPort);
-  TUTxFlush(CTDPort);
-
+    CTD_DateTime(sbe);
+  TURxFlush(CTDPort[sbe]);
+  TUTxFlush(CTDPort[sbe]);
   return returnval;
-
 } //_____ CTD_Start_Up() _____//
+
 /******************************************************************************\
 ** CTD_CreateFile()
 \******************************************************************************/
@@ -198,7 +197,7 @@ bool CTD_GetPrompt() {
 /********************************************************************************\
 ** CTD_Sample()
 \********************************************************************************/
-void CTD_Sample() {
+void CTD_Sample(int sbe) {
 
   DBG2( flogf("\n . CTD_Sample"); )
   if (SyncMode) {

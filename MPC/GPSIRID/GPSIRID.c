@@ -146,10 +146,12 @@ short IRIDGPS() {
 
   short TX_Result;
 
-  if (!PowerOn_GPS()) {
+  DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  if (!GPSstartup()) {
     OpenTUPort_AntMod(false);
     return -1;
   }
+  DBG1(flogf("\n\t|iridgps.uploadfiles()"); cdrain();)
 
   TX_Result = UploadFiles();
   if (TX_Result >= 1) {
@@ -193,9 +195,9 @@ short UploadFiles() {
 
 } //____ UploadFiles() ____//
 /*********************************************************************************\
-** PowerOn_GPS()
+** GPSstartup()
 \*********************************************************************************/
-bool PowerOn_GPS() {
+bool GPSstartup() {
   if (!SatComOpen) {
     OpenSatCom(true);
     PhonePin();
@@ -429,11 +431,8 @@ short Connect_SendFile_RecCmd(const char *filename) {
 ** Get GPS loc, time and synchronizes CF2 RTC with offset seconds
 \******************************************************************************/
 bool GetGPS_SyncRTC() {
-  // char* Location;
   static bool firstGPS = true;
-  char *Latitude;
-  char *Longitude;
-  char *Coordinates;
+  char *Latitude, *Longitude, *Coordinates;
   short sat_num = 0;
   short count = 0;
   ulong total_seconds = 0;
@@ -465,9 +464,8 @@ bool GetGPS_SyncRTC() {
   // sat number is acceptable
 
   // freed?
-  // Location=(char*)calloc(100,1);
-  Latitude = (char *)calloc(16, 1);
-  Longitude = (char *)calloc(16, 1);
+  // Latitude = (char *)calloc(16, 1);
+  // Longitude = (char *)calloc(16, 1);
   Coordinates = (char *)calloc(33, 1);
 
   // Synchronize the RTC time with GPS
@@ -477,6 +475,7 @@ bool GetGPS_SyncRTC() {
     flogf("\n\t|Failed gathering GPS Time");
   cdrain();
 
+  // Lat Long
   SendString("AT+PL");
   RTCDelayMicroSeconds(100000); // blk - seems to miss part of reply
   if (GetGPSInput("PL", &sat_num) != NULL) {
@@ -506,7 +505,7 @@ bool GetGPS_SyncRTC() {
     sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
     DBG2(flogf("\n\t|Write to file: %s", uploadfname);)
     datafilehandle = open(uploadfname, O_RDWR);
-    RTCDelayMicroSeconds(25000L); // ??
+    // RTCDelayMicroSeconds(25000L); // ??
     if (datafilehandle <= 0) {
       flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
             errno);
@@ -524,9 +523,10 @@ bool GetGPS_SyncRTC() {
     } // open(upload)
   } // GetGPSInput
   cdrain();
-  free(Latitude);
-  free(Longitude);
+  // free(Latitude);
+  // free(Longitude);
   free(Coordinates);
+  DBG1(flogf("\n\t|GetGPS_SyncRTC free buffers");)
 
   return returnvalue;
 }

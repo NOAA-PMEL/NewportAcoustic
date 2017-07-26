@@ -425,7 +425,7 @@ CmdTable IridiumCmdTable[] =
         "IRID>", PDCCmdStdInteractive, 0, 0, 1, 1, "Iridium Command Menu\n",
         "SYSTEM", SystemSettings, 0, 0, 0, 0, "System Menu", "LIST",
         SetupListCmd, 0, 0, 0, 0, "List settings [/V] (verbose)", "SET",
-        PDCSetCmd, 0, 0, 0, 0, "[var=[str]] [/SLFE?]", "GPS", PowerOn_GPS, 0, 0,
+        PDCSetCmd, 0, 0, 0, 0, "[var=[str]] [/SLFE?]", "GPS", GPSstartup, 0, 0,
         0, 0, "Gathering GPS Time", "GETSET", GetIRIDIUMSettings, 0, 0, 0, 0,
         "Get IRIDUM Settings", "IRIDGPS", IRIDGPS, 0, 0, 0, 0, "Full Test"
         //   ,"UPLOAD"		, UploadFiles,			0, 0, 0, 0, "Upload
