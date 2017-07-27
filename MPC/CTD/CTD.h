@@ -1,19 +1,18 @@
 #define SBE19
 
-bool CTD_Start_Up(bool settime);
-bool CTD_GetPrompt();
-void CTD_DateTime();
-bool CTD_Data(void);
-void CTD_Sample();
-void CTD_SampleBreak();
-void CTD_CreateFile(long);
-void CTD_SyncMode();
-void GetCTDSettings();
-void SwitchTD(char);
-void OpenTUPort_CTD(bool);
-float CTD_CalculateVelocity();
-float CTD_AverageDepth(int, float *);
-extern TUPort *CTDPort;
+bool CTD_Start_Up(int sbe, bool settime);
+bool CTD_GetPrompt(int sbe);
+void CTD_DateTime(int sbe);
+bool CTD_Data(int sbe);
+void CTD_Sample(int sbe);
+void CTD_SampleBreak(int sbe);
+void CTD_CreateFile(int sbe, long);
+void CTD_SyncMode(int sbe);
+void GetCTDSettings(int sbe);
+void OpenTUPort_CTD(int sbe, bool);
+float CTD_CalculateVelocity(int sbe);
+float CTD_AverageDepth(int sbe, int, float *);
+// void SwitchTD(char);
 #define BAUD 9600L
 
 typedef struct {

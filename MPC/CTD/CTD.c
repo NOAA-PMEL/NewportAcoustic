@@ -40,8 +40,9 @@
 
 time_t CTD_VertVel(time_t);
 
-int Sea_Ice_Algorithm(); // Returns reason: 1=Stop, should be at surface and
-                         // ready to send.
+int Sea_Ice_Algorithm(); 
+// Returns reason: 
+// 1: Stop, should be at surface and ready to send.
 // 2: Stop due to low Temp or other reason
 // 3: Ascend2, careful ascent
 // 4: Descend, definitely ice
@@ -53,6 +54,7 @@ extern SystemParameters MPC;
 extern SystemStatus LARA;
 
 CTDParameters CTD[2];
+extern TUPort *CTDPort[2]; // ?? extern?
 
 bool SyncMode[2];
 
