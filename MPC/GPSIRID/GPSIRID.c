@@ -86,7 +86,7 @@ static int IRIDFileHandle;
 static short IRIDStatus;
 static char IRIDFilename[sizeof "c:00000000.dat"];
 
-void OpenTUPort_CTD(bool); // CTD.c
+extern void CTD_OpenTUPort(int, bool); // CTD.c
 void OpenTUPort_AntMod(bool);
 void OpenSatCom(bool);
 void shutdown(); // defined in lara.c
@@ -251,8 +251,8 @@ short SwitchAntenna(char r) {
 void SelectModule(char m) {
   // select is slow, but com port speeds differ
   switch (m) {
-    case 'A': OpenTUPort_CTD(false); OpenTUPort_AntMod(true); break;
-    case 'S': OpenTUPort_AntMod(false); OpenTUPort_CTD(true); break;
+    case 'A': CTD_OpenTUPort(1, false); OpenTUPort_AntMod(true); break;
+    case 'S': OpenTUPort_AntMod(false); CTD_OpenTUPort(1, true); break;
     default: flogf("\nError SelectModule(%c)", m);
   }
   Delayms(500);

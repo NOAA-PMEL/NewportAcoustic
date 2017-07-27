@@ -107,7 +107,7 @@ void AModem_Data(void) {
   if (prechar == 'R') {
 
     if (LARA.BUOYMODE == 0)
-      CTD_Sample();
+      CTD_Sample(1);
     LARA.BUOYMODE = 1;
     WINCH.ASCENTRCV++;
     // if(!symbol)
@@ -115,7 +115,7 @@ void AModem_Data(void) {
   } else if (prechar == 'F') {
 
     if (LARA.BUOYMODE == 0)
-      CTD_Sample();
+      CTD_Sample(1);
     LARA.BUOYMODE = 2;
     WINCH.DESCENTRCV++;
 

@@ -8,12 +8,12 @@ void CTD_Sample(int sbe);
 void CTD_SampleBreak(int sbe);
 void CTD_CreateFile(int sbe, long);
 void CTD_SyncMode(int sbe);
-void GetCTDSettings(int sbe);
-void OpenTUPort_CTD(int sbe, bool);
+void CTD_GetSettings(int sbe);
+int CTD_OpenTUPort(int sbe, bool); // returns 0 on success
 float CTD_CalculateVelocity(int sbe);
 float CTD_AverageDepth(int sbe, int, float *);
-// void SwitchTD(char);
-#define BAUD 9600L
+#define BAUD_BUOYCTD 9600L
+#define BAUD_ANTCTD 19200L
 
 typedef struct {
 

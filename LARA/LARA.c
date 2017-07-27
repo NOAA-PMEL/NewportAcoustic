@@ -27,7 +27,7 @@
 *  LARA.PHASE case 2: case 4:
 *    case 'w': WinchConsole();
 *    case 'p': LARA.PHASE = c;
-*    case 't': CTD_Sample();
+*    case 't': CTD_Sample(1);
 *    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
 *    case 'a': PrintSystemStatus();
 *    case 's': LARA.SURFACED = true;
@@ -206,8 +206,8 @@ void main() {
       Time(&PwrOn);
 
       PhaseThree();
-      CTD_Start_Up(true); // ?? why start here, for phase4
-      CTD_SyncMode();
+      CTD_Start_Up(1, true); // ?? why start here, for phase4
+      CTD_SyncMode(1);
       break;
 
     // PHASE 4:  Descend ICE Housing
@@ -343,11 +343,11 @@ void InitializeLARA(ulong *PwrOn) {
     LARA.LOWPOWER = false;
 
   // SETUP CTD
-  CTD_CreateFile(MPC.FILENUM);
+  CTD_CreateFile(1, MPC.FILENUM);
   DBG2( flogf("\n .. setup ctd"); )
-  OpenTUPort_CTD(true);
-  CTD_Start_Up(true);
-  CTD_SyncMode();
+  CTD_OpenTUPort(1, true);
+  CTD_Start_Up(1, true);
+  CTD_SyncMode(1);
 
   // Initialize More System Parameters
   LARA.PAYOUT = -1;
@@ -400,7 +400,7 @@ void InitializeLARA(ulong *PwrOn) {
     // DBG( if (LARA.STARTPHASE>0) { LARA.PHASE=LARA.STARTPHASE; return; } )
     
 
-    depth = CTD_AverageDepth(5, &velocity);
+    depth = CTD_AverageDepth(1, 5, &velocity);
 
     // Place Buouy in correct state
     if (depth > NIGK.TDEPTH) {
@@ -525,7 +525,7 @@ void PhaseOne() {
       break;
   }
 
-  CTD_AverageDepth(2, NULL);
+  CTD_AverageDepth(1, 2, NULL);
 
   // This would mean the profiling buoy is at//near surface.
   if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
@@ -547,7 +547,7 @@ void PhaseTwo() {
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
-  LARA.DEPTH = CTD_AverageDepth(3, &velocity);
+  LARA.DEPTH = CTD_AverageDepth(1, 3, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
   if (LARA.DATA) {
@@ -558,7 +558,7 @@ void PhaseTwo() {
   // Else, sensor package deeper than target depth. Ascend.
   if (LARA.BUOYMODE != 1) {
     AscentStart = Winch_Ascend();
-    CTD_Sample();
+    CTD_Sample(1);
     WaitForWinch(1);
   }
 
@@ -593,7 +593,7 @@ void PhaseTwo() {
       if (LARA.TOPDEPTH <= NIGK.TDEPTH)
         LARA.SURFACED = true;
 
-      LARA.AVGVEL = CTD_CalculateVelocity();
+      LARA.AVGVEL = CTD_CalculateVelocity(1);
       if (LARA.AVGVEL == 0.0)
         LARA.AVGVEL = ((float)NIGK.RRATE / 60.0);
 
@@ -638,7 +638,7 @@ void PhaseThree() {
   flogf("\n\t|PHASE THREE");
 
   // close ctd, turn off wispr, close wispr
-  OpenTUPort_CTD(false);
+  CTD_OpenTUPort(1, false);
   if (WISPR_Status()) {
     WISPRSafeShutdown();
   }
@@ -695,13 +695,13 @@ void PhaseThree() {
       } // >=5
       // does GPSIRID close antenna tup?
       OpenTUPort_NIGK(true);
-      OpenTUPort_CTD(true);
+      CTD_OpenTUPort(1, true);
 
       // Set LARA System back to !Surfaced so CTD will take measurements.
       LARA.SURFACED = false;
       LARA.TDEPTH -= 5;
 
-      LARA.DEPTH = CTD_AverageDepth(1, NULL);
+      LARA.DEPTH = CTD_AverageDepth(1, 1, NULL);
       depth = LARA.DEPTH - LARA.TDEPTH;
       secs = (short)depth / LARA.AVGVEL;
       if (secs < 10)
@@ -733,7 +733,7 @@ void PhaseThree() {
       flogf("\n\t|AscentTime: %d", AscentTime);
 
       // confirm stop
-      OpenTUPort_CTD(false);
+      CTD_OpenTUPort(1, false);
       OpenTUPort_NIGK(false);
     } // Bad GPS- GPS fails usually from bad reception
   } // while result<=0
@@ -747,10 +747,10 @@ void PhaseThree() {
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(MPC.FILENUM); 
+  CTD_CreateFile(1, MPC.FILENUM); 
   LARA.TDEPTH = NIGK.TDEPTH;
 
-  OpenTUPort_CTD(true);
+  CTD_OpenTUPort(1, true);
 
   // why here ??
   if (WISP.DUTYCYCL > 50) {
@@ -787,12 +787,12 @@ void PhaseFour() {
   }
   // Now descend.
   if (LARA.BUOYMODE != 2) {
-    LARA.TOPDEPTH = CTD_AverageDepth(2, &velocity);
+    LARA.TOPDEPTH = CTD_AverageDepth(1, 2, &velocity);
     DescentStart = Winch_Descend();
     WaitForWinch(2);
-    CTD_Sample();
+    CTD_Sample(1);
   } else
-    CTD_Sample();
+    CTD_Sample(1);
 
   /****
   ADD IN CHECK HERE. if WaitForWinch returns false because of timeout and lack
@@ -837,7 +837,7 @@ void PhaseFour() {
     LARA.MOORDEPTH = LARA.DEPTH;
 
   // Descent Velocity;
-  descentvelocity = CTD_CalculateVelocity();
+  descentvelocity = CTD_CalculateVelocity(1);
   flogf("\n\t|Calculated Descent Velocity: %.2fm/s", descentvelocity);
 
   // Total Vertical depth change. total time change, calculate estimated
@@ -875,11 +875,11 @@ int Incoming_Data() {
         AModem_Data();
       } else if (tgetq(CTDPort)) {
         // DBG(flogf("CTD Incoming");)
-        CTD_Data();
+        CTD_Data(1);
         if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
             LARA.PHASE == 0) // if not surfaced (target depth not reached.) and
                              // winch is moving (not stopped)
-          CTD_Sample();
+          CTD_Sample(1);
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());
@@ -898,7 +898,7 @@ int Incoming_Data() {
         // DBG(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (tgetq(CTDPort)) {
-        CTD_Data();
+        CTD_Data(1);
       }
       // Console Wake up.
       else if (cgetq()) {
@@ -926,11 +926,11 @@ int Incoming_Data() {
         AModem_Data();
       } else if (tgetq(CTDPort)) {
         // DBG(flogf("CTD Incoming");)
-        CTD_Data();
+        CTD_Data(1);
         if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
             LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
                                // and winch is moving (not stopped)
-          CTD_Sample();
+          CTD_Sample(1);
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());
@@ -1047,7 +1047,7 @@ void Console(char in) {
     case 'T':
     case 't':
       flogf("\n\t|Take CTD Sample");
-      CTD_Sample();
+      CTD_Sample(1);
       break;
     case 'x':
       // LARA.ON = false;
@@ -1416,7 +1416,7 @@ void WaitForWinch(short expectedBuoyMode) {
       else if (expectedBuoyMode == 3)
         return;
     } else if (tgetq(CTDPort)) {
-      CTD_Data();
+      CTD_Data(1);
 
     } else
       RTCDelayMicroSeconds(250000L);
