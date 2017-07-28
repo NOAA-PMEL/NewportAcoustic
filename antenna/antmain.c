@@ -72,8 +72,10 @@
 //#define       SYSCLK   8000           // choose: 160 to 32000 (kHz)
 #define SYSCLK 16000            // choose: 160 to 32000 (kHz)
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
+// #define BUOY_BAUD 9600L
 #define BUOY_BAUD 19200L
 #define IRID_BAUD 19200L
+#define BUFSIZE 4096
 
 #define BUOY 0
 #define SBE 1
@@ -97,11 +99,13 @@ void connect(char c);
 short char2id(short ch);
 void init();
 void help();
-void status(short command);
+void status();
 void antennaSwitch(char c);
+void transBlock(int b);
 void printchar(char c);
 void prerun();
 
+uchar *buf;
 char *LogFile = {"activity.log"}; 
 char antSw;
 bool run=true; 
@@ -117,8 +121,8 @@ TUPort *buoy=NULL, *devPort=NULL; // dev port of connnected upstream device
 **	main
 \******************************************************************************/
 void main() {
-  short ch, command=0;
-  int binary=0; // count of binary chars to pass thru
+  short ch;
+  int arg;
   bool echoDn=false;
   bool echoUp=false;
 
@@ -126,6 +130,7 @@ void main() {
   prerun();
   // set up hw
   init();
+  buf = (uchar *)malloc(BUFSIZE);
   // initial connection is SBE
   power('S', true);
   connect('S');
@@ -137,51 +142,41 @@ void main() {
     // note: using vars buoy,devport is faster than dev[id].port
     // get all from dev upstream
     if (devPort && TURxQueuedCount(devPort)) {
-      ch=getByte(devPort);
+      // ch=getByte(devPort);
+      ch=TURxGetByte(devPort, true); // blocking, best to check queue first
       TUTxPutByte(buoy, ch, true); // block if queue is full
       DBG( if (echoDn) printchar(ch); )
     } // char from device
 
     // get all from buoy
     if (buoy && TURxQueuedCount(buoy)) {
-      ch=getByte(buoy);
-      // binaryMode, commandMode, new command, character
-      if (binary>0) {
-        TUTxPutByte(devPort, ch, true);
-        binary--;
-        // if (--binary<1) binaryMode=false;
-        DBG(printf(binary ? "." : ".\n"); )
-      // endif (binaryMode)
-      } else if (command>0) {
-        switch (command) { // set by previous byte
-          case 5: // ^E binary lEngth 1Byte
-            binary=ch;
-            // binaryMode=true;
+      // blocking, best to check queue first
+      ch=TURxGetByte(buoy, true) & 0x00FF; 
+      if (ch<8) {
+        // get argument
+        arg= (int) TURxGetByte(buoy, true) & 0x00FF; // blocking
+        switch (ch) { // command
+          case 1: // ^A Antenna G|I
+            antennaSwitch(arg);
             break;
-          case 4: // ^D powerDown I|S
-            power(ch, false);
+          case 2: // ^B Binary Block 2bytes arg
+            // get another byte
+            arg=(int) ((short) arg<<8) + (TURxGetByte(buoy, true) & 0x00FF);
+            transBlock(arg);
             break;
           case 3: // ^C Connect I|S
-            connect(ch);
+            connect(arg);
             break;
-          case 2: // ^B Binary byte
-            TUTxPutByte(devPort, ch, true);
-            break;
-          case 1: // ^A Antenna G|I
-            antennaSwitch(ch);
+          case 4: // ^D powerDown I|S
+            power(arg, false);
             break;
           default: // uhoh
-            flogf("ERR: illegal command %d\n", command);
-            return; // exit
+            flogf("ERR: illegal command %d\n", ch);
+            cdrain();
+            break; // exit
         } // switch (command)
-        DBG(printf("cmd:%d arg:%d\n", command, ch);)
-        // commandMode=false;
-        command=0;
-      // endif (commandMode)
-      } else if (ch<8) {
-          // commandMode=true;
-          command=ch;
-      // endif (ch<8)
+        DBG(printf("cmd:%d arg:%d\n", ch, arg);)
+      // if (ch<8)
       } else { 
         // regular char
         TUTxPutByte(devPort, ch, true);
@@ -197,7 +192,7 @@ void main() {
         case 'x': 
           BIOSResetToPicoDOS(); break;
         case 's':
-          status(command); break;
+          status(); break;
         case 'd':
           echoDn = !echoDn; 
           cprintf("\nechoDn: %s\n", echoDn ? "on" : "off"); 
@@ -300,7 +295,7 @@ TUPort* OpenBuoyPt(bool on) {
   long baud = BUOY_BAUD;
   short com4rxch, com4txch;
   if (on) {
-    DBG(flogf("Opening the buoy COM4 port\n");)
+    DBG(flogf("Opening the buoy COM4 port at %ld \n", baud);)
     PIOSet(COM4PWR); // PWR On COM4 device
     com4rxch = TPUChanFromPin(COM4RX);
     com4txch = TPUChanFromPin(COM4TX);
@@ -328,49 +323,6 @@ TUPort* OpenBuoyPt(bool on) {
 } /*OpenBuoyPt(bool on) */
 
 
-/*************************************************************************\
-**  static void Irq2ISR(void)
-static void Irq2RxISR(void) {
-  PinIO(IRQ2);
-  RTE();
-} //____ Irq2ISR ____//
-\*************************************************************************/
-
-/******************************************************************************\
-**	Irq5RxISR			Interrupt handler for IRQ5 (tied to
-CMOS RxD)
-**
-**	This single interrupt service routine handles both the IRQ4 interrupt
-**	and the very likely spurious interrupts that may be generated by the
-**	repeated asynchronous and non-acknowledged pulses of RS-232 input.
-**
-**	The handler simply reverts IRQ4 back to input (to prevent further level
-**	sensative interrupts) and returns. It's assumed the routine that set
-this
-**	up is just looking for the side effect of breaking the CPU out of STOP
-**	or LPSTOP mode.
-**
-**	Note that this very simple handler is defined as a normal C function
-**	rather than an IEV_C_PROTO/IEV_C_FUNCT. We can do this because we know
-**	(and can verify by checking the disassembly) that is generates only
-**	direct addressing instructions and will not modify any registers.
-static void Irq5RxISR(void) {
-  PinIO(IRQ5); // 39 IRQ5 (tied to Rx)
-  RTE();
-} //____ Irq4RxISR() ____//
-\******************************************************************************/
-
-/******************************************************************************\
-**	ExtPulseRuptHandler		IRQ5 request interrupt
-**
-IEV_C_FUNCT(CharRuptHandler) {
-
-#pragma unused(ievstack) // implied (IEVStack *ievstack:__a0) parameter
-  PinIO(IRQ5);
-
-  // flogf("Interrupted by IRQ5 \n", time_chr);cdrain();coflush();
-} //____ ExtFinishPulseRuptHandler() ____//
-\******************************************************************************/
 
 
 /*
@@ -384,10 +336,9 @@ void help() {
       "Iridium/GPS.\n"
       "Buoy is downstream, connecting to com4 at %d BAUD\n"
       " ^A Antenna G|I \n"
-      " ^B Binary byte \n"
-      " ^C Connect G|I|S \n"
-      " ^D powerDown G|I|S|A \n"
-      " ^E binary lEngth (1byte short) \n"
+      " ^B Blockmode (2byte short) \n"
+      " ^C Connect I|S \n"
+      " ^D powerDown I|S \n"
       " ^F unused \n"
       " ^G unused \n"
       "On console (com1):\n s=status x=exit *=this message\n"
@@ -434,14 +385,13 @@ void init() {
 } // init()
 
 /*
- * status(command) - console <- "connected:A3LA A3LA:on SBE:on"
+ * status() - console <- "connected:A3LA A3LA:on SBE:on"
  */
-void status(short command) {
-  cprintf("connected:%s antenna:%c iridgps:%s sbe:%s command:%d\n",
+void status() {
+  cprintf("connected:%s antenna:%c iridgps:%s sbe:%s \n",
     dev[devID].name, antSw,
     dev[IRID].power ? "on" : "off",
-    dev[SBE].power ? "on" : "off",
-    command);
+    dev[SBE].power ? "on" : "off");
 }
 
 /*
@@ -560,4 +510,24 @@ void prerun() {
     coflush();
   }
   cprintf("\n");
+}
+
+// block transfer from buoy to devID
+void transBlock(int b) {
+  short len;
+  long count;
+  // long TURxGetBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
+  // long TUTxPutBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
+  count = TURxGetBlock(buoy, buf, b, 50000);
+  if (count != (long) b) 
+    cprintf("Error: getblock %ld != expected %d \n", count, b);
+  count = TUTxPutBlock(devPort, buf, b, 10000);
+  if (count != (long) b) 
+    cprintf("Error: putblock %ld != expected %d \n", count, b);
+  DBG(
+    len = TURxQueuedCount(devPort); // accumulated
+    cprintf(" [[%d]]", count);
+    if (len > 0)
+  	cprintf("%d bytes accumulated on devPort from RUDICS \n", len);
+  )
 }
