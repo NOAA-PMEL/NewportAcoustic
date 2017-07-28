@@ -1,19 +1,19 @@
 #define SBE19
 
+int CTD_OpenTUPort(int sbe); // 0=off, 1=buoy, 2=ant, returns 0 on success
 bool CTD_Start_Up(int sbe, bool settime);
-bool CTD_GetPrompt(int sbe);
-void CTD_DateTime(int sbe);
-bool CTD_Data(int sbe);
-void CTD_Sample(int sbe);
-void CTD_SampleBreak(int sbe);
-void CTD_CreateFile(int sbe, long);
-void CTD_SyncMode(int sbe);
-void CTD_GetSettings(int sbe);
-int CTD_OpenTUPort(int sbe, bool); // returns 0 on success
-float CTD_CalculateVelocity(int sbe);
-float CTD_AverageDepth(int sbe, int, float *);
-#define BAUD_BUOYCTD 9600L
-#define BAUD_ANTCTD 19200L
+bool CTD_GetPrompt();
+void CTD_DateTime();
+bool CTD_Data();
+void CTD_Sample();
+void CTD_SampleBreak();
+void CTD_CreateFile(long);
+void CTD_SyncMode();
+void CTD_GetSettings();
+float CTD_CalculateVelocity();
+float CTD_AverageDepth(int, float *);
+
+extern void SelectAntMod(char); // GPSIRID.c
 
 typedef struct {
 

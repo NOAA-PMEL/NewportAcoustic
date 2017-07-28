@@ -30,11 +30,9 @@ short IRIDGPS();
    */
 void GetIRIDIUMSettings();
 
-void OpenTUPort_AntMod(bool);
+short SelectAntMod(char r);
+int SelectDevice(int sbe);
 bool GPSstartup();
-
-#define IRIDBAUD 19200L
-// #define IRIDBAUD 9600L
 
 // defines for pins moved to platform.h
 

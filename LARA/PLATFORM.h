@@ -13,7 +13,6 @@
  * Winch.h:#define AMODEMPWR 21
  * Winch.h:#define AMODEMRX 33
  * Winch.h:#define AMODEMTX 35
- * CTD.h:#define TDCOM 23 // com1 shared, must match GPSIRID.h#ANTMODCOM
  * GPSIRID.h:#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
  * GPSIRID.h:#define ANTMODCOM 23 // com1 shared, must match CTD.h#TDCOM
  * GPSIRID.h:#define ANTMODRX 32
@@ -21,19 +20,20 @@
  */
 
 #define AMODEMPWR 21
-#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
-#define ANTMODCOM 23 // com1 shared, must match 
-#define TDCOM 23 // com1 shared, must match 
+#define DEVICEPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+#define DEVICECOM 23 // com1 shared, must match 
 #define WISPRTHREE 24
 #define WISPRFOUR 25
 #define WISPRONE 29
 #define WISPRTWO 30
-#define ANTMODTX 31
-#define ANTMODRX 32
+#define DEVICETX 31
+#define DEVICERX 32
 #define AMODEMRX 33
 #define AMODEMTX 35
 #define WISPR_PWR_ON 37
 #define WISPR_PWR_OFF 42
+#define BUOYBAUD 9600L
+#define IRIDBAUD 19200L
 
 // This structure is primarily for system diagnostics logging. Keeping track of
 // phase, alarms, system statuses

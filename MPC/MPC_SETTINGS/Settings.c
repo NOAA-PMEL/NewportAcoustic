@@ -754,7 +754,7 @@ void SetupIridiumCmd() {
 
   char *ProgramDescription = {"\n"
                               "Type HELP to view commands\n"};
-  // OpenTUPort_AntMod(true);
+  // Device_OpenTUPort(true);
   // printf(ProgramDescription);
   SettingsPointer = IRIDSettings;
   CmdStdSetup(&cia, IridiumCmdTable, 0);
@@ -767,7 +767,7 @@ void SetupIridiumCmd() {
     fflush(stdout);
   }
 
-  // OpenTUPort_AntMod(false);
+  // Device_OpenTUPort(false);
   SystemSettings();
 }
 #endif
@@ -1035,7 +1035,7 @@ void DisplayParameters(FILE *stream) {
   VEEData vdp;
   Settings *setp = SYSSettings;
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 
   fprintf(stream, "SETTING NAME:       SETTING VALUE:\n");
 
@@ -1054,5 +1054,5 @@ void DisplayParameters(FILE *stream) {
     setp++;
   }
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 }

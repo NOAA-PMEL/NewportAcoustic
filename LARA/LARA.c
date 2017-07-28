@@ -229,7 +229,7 @@ void main() {
 void shutdown() {
   WISPRSafeShutdown();
 
-  PIOClear(ANTMODPWR); // Make sure Iridium is Off
+  PIOClear(DEVICEPWR); // Make sure Iridium is Off
   PIOClear(26); // Make sure DIFAR Power Out is off
   PIOClear(21); // Clear AModem Power
 
@@ -250,7 +250,7 @@ void InitializeLARA(ulong *PwrOn) {
   bool check = false;
 
   PIOMirrorList(mirrorpins);
-  PIOClear(ANTMODPWR); // Make sure iridium is off...
+  PIOClear(DEVICEPWR); // Make sure iridium is off...
   PIOSet(26);
   // Get the system settings running
   SetupHardware();
@@ -719,7 +719,7 @@ void PhaseThree() {
       // Count++ every 1/10th of a second.
       while (LARA.DEPTH > LARA.TDEPTH) { 
         Incoming_Data();
-        RTCDelayMicroSeconds(100000L);
+        Delayms(100);
         count++;
         // Break on time being exceeded.
         if ((count / 10) >= secs) break;
@@ -979,7 +979,7 @@ void Console(char in) {
   short c;
 
   DBG(flogf("Incoming Char: %c", in);)
-  RTCDelayMicroSeconds(2000L);
+  Delayms(2);
   switch (LARA.PHASE) {
   case 1:
     switch (in) {
@@ -1105,7 +1105,7 @@ IEV_C_FUNCT(ExtFinishPulseRuptHandler) {
 \******************************************************************************/
 void Sleep(void) {
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   IEVInsertAsmFunct(IRQ4_ISR, level4InterruptAutovector); // Console Interrupt
   IEVInsertAsmFunct(IRQ4_ISR, spuriousInterrupt);
   IEVInsertAsmFunct(IRQ5_ISR, level5InterruptAutovector); // PAMPort Interrupt
@@ -1138,7 +1138,7 @@ void Sleep(void) {
   PutInSleepMode = false;
 
   // DBG2(flogf(".");)
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 
 } //____ Sleep() ____//
 /******************************************************************************\
@@ -1149,7 +1149,7 @@ void Sleep(void) {
 \******************************************************************************/
 void CTDSleep(void) {
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   IEVInsertAsmFunct(IRQ3_ISR, level3InterruptAutovector); // AModem Interrupt
   IEVInsertAsmFunct(IRQ3_ISR, spuriousInterrupt);
   IEVInsertAsmFunct(IRQ2_ISR, level2InterruptAutovector); // CTDPort/Seaglider
@@ -1183,7 +1183,7 @@ void CTDSleep(void) {
   PutInSleepMode = false;
 
   //   DBG2(flogf(",");)
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 
 } //____ Sleep() ____//
 /******************************************************************************\
@@ -1309,7 +1309,7 @@ ulong WriteFile(ulong TotalSeconds) {
   if (TotalSeconds != 0) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
-    RTCDelayMicroSeconds(50000L);
+    Delayms(50);
     memset(WriteBuffer, 0, STRING_SIZE);
 
     //*** Winch Status ***//
@@ -1320,25 +1320,25 @@ ulong WriteFile(ulong TotalSeconds) {
   // Else, coming from reboot. Name the PowerLogging File.
   else {
     ADSFileName(MPC.FILENUM);
-    RTCDelayMicroSeconds(50000L);
+    Delayms(50);
   }
 
   //*** Power Monitoring Upload ***//
   Power_Monitor(TotalSeconds, filehandle, &LoggingTime);
-  RTCDelayMicroSeconds(50000L);
+  Delayms(50);
   Setup_ADS(true, MPC.FILENUM + 1, BITSHIFT);
   DOS_Com("del", MPC.FILENUM, "PWR", NULL);
-  RTCDelayMicroSeconds(500000L);
+  Delayms(500);
 
   //*** WISPR File Upload ***//
   WISPRWriteFile(filehandle);
-  RTCDelayMicroSeconds(50000L);
+  Delayms(50);
 
 //*** CTD File Upload ***
 #ifdef CTDSENSOR
   if (CTD.UPLOAD || TotalSeconds == 0) {
     sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);
-    RTCDelayMicroSeconds(50000L);
+    Delayms(50);
     DBG(cprintf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
     stat(detfname, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 1000))
@@ -1349,7 +1349,7 @@ ulong WriteFile(ulong TotalSeconds) {
   }
   // Despite being upload, move CTD file to archive
   DOS_Com("move", MPC.FILENUM, "CTD", "CTD");
-  RTCDelayMicroSeconds(50000L);
+  Delayms(50);
 #endif
   //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
   if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
@@ -1361,14 +1361,14 @@ ulong WriteFile(ulong TotalSeconds) {
     else
       maxupload = 0;
     Append_Files(filehandle, logfile, false, maxupload);
-    RTCDelayMicroSeconds(50000L);
+    Delayms(50);
   }
-  RTCDelayMicroSeconds(50000L);
+  Delayms(50);
   DOS_Com("move", MPC.FILENUM, "LOG", "LOG");
 
   // Close File
   close(filehandle);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
 
   // Return number of seconds of time on
   if (TotalSeconds == 0)
@@ -1390,7 +1390,7 @@ char *PrintSystemStatus() {
           LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
           LARA.CTDSAMPLES);
   flogf("\n%s", returnstr);
-  RTCDelayMicroSeconds(100000L);
+  Delayms(100);
 
   return returnstr;
 }
@@ -1419,7 +1419,7 @@ void WaitForWinch(short expectedBuoyMode) {
       CTD_Data(1);
 
     } else
-      RTCDelayMicroSeconds(250000L);
+      Delayms(250);
 
     timenow = time(NULL);
   }
