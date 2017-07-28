@@ -790,7 +790,7 @@ void SetupCTDCmd() {
 
   while (CmdStdRun(&cia) != CMD_BREAK) {
     PWR(AD_Check();)
-    if (tgetq(CTDPort))
+    if (tgetq(devicePort))
       CTD_Data(1);
     printf("\n%s", cia.errmes);
     fflush(stdout);
@@ -799,7 +799,7 @@ void SetupCTDCmd() {
   SystemSettings();
 }
 void StartCTDCmd() { CTD_Start_Up(1, false); }
-void StopCTDCmd() { OpenTUPort_CTD(false); }
+void StopCTDCmd() { DevSelect(DEVX); }
 #endif
 /******************************************************************************\
 ** FetchSettings(Settings)

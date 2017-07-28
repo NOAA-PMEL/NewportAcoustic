@@ -20,10 +20,11 @@
  */
 
 #define AMODEMPWR 21
-#define DEVICEPWR 22 // Iridium Power pin (1=ON, 0=OFF)
-#define DEVICECOM 23 // com1 shared, must match 
+#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
+#define DEVICECOM 23 // set ANTMOD (device), clear BUOY (sbe)
 #define WISPRTHREE 24
 #define WISPRFOUR 25
+#define DIFARPWR 26
 #define WISPRONE 29
 #define WISPRTWO 30
 #define DEVICETX 31
@@ -34,6 +35,11 @@
 #define WISPR_PWR_OFF 42
 #define BUOYBAUD 9600L
 #define IRIDBAUD 19200L
+
+// DEVA=AntennaModule, DEVB=BuoyCTD
+#define DEVX 0
+#define DEVA 1
+#define DEVB 2
 
 // This structure is primarily for system diagnostics logging. Keeping track of
 // phase, alarms, system statuses

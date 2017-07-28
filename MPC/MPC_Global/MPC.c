@@ -383,11 +383,11 @@ int System_Timer() {
 // CTD Measurements
 #ifdef CTDSENSOR
     // Get an average of CTD Depth and calculate velocity
-    depth = CTD_AverageDepth(1, 3, &vel);
+    depth = CTD_AverageDepth(3, &vel);
     // If initial average is less than target depth... why?
     if (depth <= NIGK.TDEPTH) {
       // Average more CTD Depth
-      depth = CTD_AverageDepth(1, 5, &vel);
+      depth = CTD_AverageDepth(5, &vel);
       // Still Less than target depth? Set in recovery mode. Set calling
       // interval to 30 minutes.
       if (depth < NIGK.TDEPTH) {

@@ -1,6 +1,6 @@
 #define SBE19
 
-int CTD_OpenTUPort(int sbe); // 0=off, 1=buoy, 2=ant, returns 0 on success
+int CTD_Init();
 bool CTD_Start_Up(int sbe, bool settime);
 bool CTD_GetPrompt();
 void CTD_DateTime();
@@ -13,7 +13,7 @@ void CTD_GetSettings();
 float CTD_CalculateVelocity();
 float CTD_AverageDepth(int, float *);
 
-extern void SelectAntMod(char); // GPSIRID.c
+extern int SelectDevice(int sbe); // GPSIRID.c
 
 typedef struct {
 

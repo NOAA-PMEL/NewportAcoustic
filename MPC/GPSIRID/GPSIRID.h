@@ -14,27 +14,11 @@ typedef struct {
   bool LOWFIRST;  // send file with lowest value first
 } IridiumParameters;
 
-/*******************
-**IRIDIUM FUNCTIONS
-*****************/
-/* IRIDGPS:
-   Automated call into RUDICS for uploading files and downloading new parameters
-   return: 	-1 on failed GPS
-                        -2 on failed IRID
-                        1 on successful IRID && GPS
-   */
+void GetIRIDIUMSettings();
+int DevSelect(int);
+int AntMode(char);
+int GPSIRID_Init();
+bool GPSstartup();
 short IRIDGPS();
 
-/* GetIRIDIUMSettings:
-   if #define IRIDIUM then grab necessary VEEPROM Parameters for IRIDIUM use.
-   */
-void GetIRIDIUMSettings();
-
-short SelectAntMod(char r);
-int SelectDevice(int sbe);
-bool GPSstartup();
-
-// defines for pins moved to platform.h
-
-// char* GetFileName(bool, bool, long*, const char*);
-// INT_MAX
+extern TUPort *devicePort;

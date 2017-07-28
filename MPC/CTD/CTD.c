@@ -6,12 +6,12 @@
 #include <cfxpico.h> // Persistor PicoDOS Definitions
 #include <MPC_Global.h>
 #include <PLATFORM.h>
-//#include <Winch.h>
 #include <CTD.h>
-
 #include <ADS.h>
 #include <Settings.h>
 #include <Winch.h>
+#include <GPSIRID.h>
+
 #include <assert.h>
 #include <ctype.h>
 #include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
@@ -56,7 +56,7 @@ CTDParameters CTD;
 
 bool SyncMode;
 
-extern TUPort *DevicePort; // GPSIRID
+extern TUPort *devicePort; // GPSIRID
 
 float SummedVelocity;
 short CTDSamples;
@@ -71,6 +71,15 @@ float ascentRate = 0.26;
 static char *stringin;
 static char *stringout;
 
+/* CTD_Init() initialize file
+ */
+int CTD_Init() {
+  // global char *stringin, *stringout;  // used by CTD.c
+  stringout = (char *)calloc(STRING_SIZE, 1);
+  stringin = (char *)calloc(STRING_SIZE, 1);
+  return 0;
+}
+
 /*****************************************************************************\
 ** CTD_Start_Up()
 * open port if needed, send break, get prompt, flush; opt settime
@@ -80,8 +89,8 @@ bool CTD_Start_Up(int sbe, bool settime) {
   DBG( flogf("\n\t|. CTD_Start_Up"); )
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
 
-  if (DevicePort == NULL)
-    SelectDevice(sbe);
+  if (devicePort == NULL)
+    DevSelect(sbe);
 
   // leave sync mode
   CTD_SampleBreak();
@@ -92,9 +101,9 @@ bool CTD_Start_Up(int sbe, bool settime) {
     returnval = true;
   } else {
     if (!CTD_GetPrompt()) {
-      SelectDevice(0);
+      DevSelect(0);
       Delayms(100);
-      SelectDevice(sbe);
+      DevSelect(sbe);
       CTD_SampleBreak();
       if (CTD_GetPrompt()) {
         returnval = true;
@@ -107,8 +116,8 @@ bool CTD_Start_Up(int sbe, bool settime) {
   }
   if (settime)
     CTD_DateTime();
-  TURxFlush(DevicePort);
-  TUTxFlush(DevicePort);
+  TURxFlush(devicePort);
+  TUTxFlush(devicePort);
   return returnval;
 } //_____ CTD_Start_Up() _____//
 
@@ -146,10 +155,10 @@ void CTD_DateTime() {
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 
-  TUTxPrintf(DevicePort, "DATETIME=%s\r", buffer);
+  TUTxPrintf(devicePort, "DATETIME=%s\r", buffer);
   Delayms(250);
-  while (tgetq(DevicePort))
-    cprintf("%c", TURxGetByte(DevicePort, true));
+  while (tgetq(devicePort))
+    cprintf("%c", TURxGetByte(devicePort, true));
 
 } //_____ CTD_DateTime() ____//
 
@@ -163,21 +172,21 @@ bool CTD_GetPrompt() {
 
   memset(stringin, 0, STRING_SIZE);
 
-  LastByteInQ = TURxPeekByte(DevicePort, (tgetq(DevicePort) - 1));
+  LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
-                                                    // command line for DevicePort
+                                                    // command line for devicePort
                                                     // or 7 seconds pass
-    TUTxPrintf(DevicePort, "\r");
+    TUTxPrintf(devicePort, "\r");
     Delayms(1000);
-    LastByteInQ = TURxPeekByte(DevicePort, (tgetq(DevicePort) - 1));
+    LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
     count++;
   }
 
   if (count == 2) {
-    TURxGetBlock(DevicePort, stringin, (long) STRING_SIZE, (short) 1000);
+    TURxGetBlock(devicePort, stringin, (long) STRING_SIZE, (short) 1000);
     if (strstr(stringin, "S>") != NULL) {
       cprintf("\nPrompt from CTDBlock");
-      TURxFlush(DevicePort);
+      TURxFlush(devicePort);
       return true;
     }
     return false;
@@ -185,7 +194,7 @@ bool CTD_GetPrompt() {
 
   else {
     cprintf("\nPrompt from CTD");
-    TURxFlush(DevicePort);
+    TURxFlush(devicePort);
     return true;
   }
 }
@@ -196,9 +205,9 @@ bool CTD_GetPrompt() {
 void CTD_Sample() {
   DBG2( flogf("\n . CTD_Sample"); )
   if (SyncMode) {
-    TUTxPrintf(DevicePort, "x\r");
+    TUTxPrintf(devicePort, "x\r");
   } else {
-    TUTxPrintf(DevicePort, "TS\r");
+    TUTxPrintf(devicePort, "TS\r");
   }
   Delayms(250);
 } //____ CTD_Sample() ____//
@@ -207,21 +216,21 @@ void CTD_Sample() {
 ** CTD_SampleSleep()
 \********************************************************************************/
 void CTD_SyncMode() {
-  TUTxPrintf(DevicePort, "Syncmode=y\r");
-  TUTxWaitCompletion(DevicePort);
+  TUTxPrintf(devicePort, "Syncmode=y\r");
+  TUTxWaitCompletion(devicePort);
   Delayms(500);
-  TUTxPrintf(DevicePort, "QS\r");
-  TUTxWaitCompletion(DevicePort);
+  TUTxPrintf(devicePort, "QS\r");
+  TUTxWaitCompletion(devicePort);
   Delayms(1000);
   SyncMode = true;
-  TURxFlush(DevicePort);
+  TURxFlush(devicePort);
 } //____ CTD_Sample() ____//
 
 /********************************************************************************\
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_SampleBreak() {
-  TUTxBreak(DevicePort, 5000);
+  TUTxBreak(devicePort, 5000);
   SyncMode = false;
 } //____ CTD_Sample() ____//
 
@@ -401,7 +410,7 @@ bool CTD_Data(sbe) {
   memset(stringin, 0, STRING_SIZE);
   // loop until 3 timeouts; should this be loop until \n ?
   while (count < 3 && i < STRING_SIZE) {
-    charin = TURxGetByteWithTimeout(DevicePort, 250);
+    charin = TURxGetByteWithTimeout(devicePort, 250);
     if (charin == -1)
       count++;
     else {
@@ -498,7 +507,7 @@ bool CTD_Data(sbe) {
     flogf("\nERROR|CTD_Data(): %s ", stringin );
     flogf("\nERROR|CTD_Data(): %f, %f, %f, %f, %f, %f, %d, %s, %d ", 
       temp, cond, pres, flu, par, sal, info.tm_mday, mon, info.tm_year);
-    TURxFlush(DevicePort);
+    TURxFlush(devicePort);
     return false;
   }
 
@@ -518,7 +527,7 @@ bool CTD_Data(sbe) {
     strcat(stringout, split_date);
     strcat(stringout, "\n");
 
-    TURxFlush(DevicePort);
+    TURxFlush(devicePort);
     filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
     if (filehandle <= 0) {
       flogf("\nERROR  |ctdlogfile '%s' fd %d", CTDLogFile, filehandle);
@@ -599,12 +608,12 @@ float CTD_AverageDepth(int i, float *velocity) {
   ulong starttime = 0, stoptime = 0;
 
   DBG2( flogf("\n . CTD_AverageDepth"); )
-  if (tgetq(DevicePort))
-    TURxFlush(DevicePort);
+  if (tgetq(devicePort))
+    TURxFlush(devicePort);
   // This for loop is to understand the profiling buoy's starting position prior
   // to ascending the water column.
   Delay_AD_Log(1);
-  // TUTxPrintf(DevicePort, "\n");
+  // TUTxPrintf(devicePort, "\n");
   CTD_Sample();
   for (j = 0; j < i; NULL) {
     if (AD_Check()) {
@@ -616,7 +625,7 @@ float CTD_AverageDepth(int i, float *velocity) {
         return 0.0;
       }
     }
-    if (tgetq(DevicePort)) {
+    if (tgetq(devicePort)) {
       if (CTD_Data(2)) {
         if (firstreading)
           starttime = RTCGetTime(NULL, NULL);

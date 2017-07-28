@@ -85,8 +85,6 @@ static int IRIDFileHandle;
 static short IRIDStatus;
 static char IRIDFilename[sizeof "c:00000000.dat"];
 
-extern void CTD_OpenTUPort(int); // CTD.c
-void Device_OpenTUPort(bool);
 void OpenSatCom(bool);
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
@@ -113,18 +111,38 @@ short GetIRIDInput(char *, short, uchar *, int *, short wait);
 char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
-int SelectAntMod(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
+// G.h
+// bool GPSstartup();
+// int DevSelect(int);
+// int AntMode(char);
+// int GPSIRID_Init();
+// short IRIDGPS();
+// void GetIRIDIUMSettings();
+TUPort *devicePort; 
 
 // IRIDUM TUPORT Setup
-TUPort *DevicePort; 
-short device_rx, device_tx;
+short deviceRX, deviceTX;
 int deviceID=0; // 0=off, 1=buoy, 2=antenna
-
 uchar *inputstring, *first, *scratch;
+
+/* GPSIRID_Init() initialize file
+ * returns 0 success
+ */
+int GPSIRID_Init() {
+  // global short deviceRX, deviceTX;
+  // global char *inputstring, *scratch;
+  inputstring = (char *)calloc(STRING_SIZE, 1);
+  scratch = (char *)calloc(STRING_SIZE, 1);
+  deviceRX = TPUChanFromPin(DEVICERX);
+  deviceTX = TPUChanFromPin(DEVICETX);
+  DevSelect(DEVB); // buoy sbe by default
+  return 0;
+}
+
 //
 /********************************************************************************\
 ** GPSIRID-3.0 12/15/2015-AT
@@ -144,24 +162,23 @@ sleep before
 short IRIDGPS() {
 
   short TX_Result;
-
   DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
   if (!GPSstartup()) {
-    Device_OpenTUPort(false);
+    DevSelect(DEVX);
+    flogf("\n\t|IRIDGPS(): GPS failed");
     return -1;
   }
-  DBG1(flogf("\n\t|iridgps.uploadfiles()"); cdrain();)
 
   TX_Result = UploadFiles();
   if (TX_Result >= 1) {
-    flogf("\n\t|DEVICE SUccess");
-    Device_OpenTUPort(false);
+    flogf("\n\t|IRIDGPS(): upload success %d", TX_Result);
+    DevSelect(DEVX);
     return TX_Result;
   }
 
   else {
-    flogf("\nLOST CARRIER");
-    Device_OpenTUPort(false);
+    flogf("\n\t|IRIDGPS(): upload fail %d", TX_Result);
+    DevSelect(DEVX);
     return -2;
   }
 
@@ -173,7 +190,7 @@ short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
-  SelectAntMod('I');
+  DevSelect('I');
 
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
@@ -202,91 +219,92 @@ bool GPSstartup() {
     PhonePin();
   }
   // Open the GPS/IRID satellite com...
-  SelectAntMod('G');
+  DevSelect('G');
 
   if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
     return true;
   else
     return false;
 }
+
 /**********************************************************************************\
- * SelectAntMod(G|I|S)
+ * AntMode(G|I|S)
  * Switch antenna module between SBE39 TD, Iridium and GPS.  
  * ^A Antenna G|I * ^B Binary byte * ^C Connect I|S * ^D powerDown I|S * ^E binary lEngth
 \**********************************************************************************/
-short SelectAntMod(char r) {
-  static char ant='-', device='-';
+int AntMode(char r) {
+  static char ant='-', dev='-';
   char a, d;
-  DBG1(flogf("\n\t|SelectAntMod(%c)", r);)
-  if (DevicePort == NULL) Device_OpenTUPort(true);
-  // select antMod vs SBE16, switch antMod device
+  DBG1(flogf("\n\t|AntMode(%c)", r);)
+  DevSelect(DEVA);
+  // select ant SBE16, switch ant device
   switch (r) {
     case 'G': { a='G'; d='I'; break; }
     case 'I': { a='I'; d='I'; break; }
     case 'S': { a=ant; d='S'; break; }
     default: { // bad case
-      flogf("\nError SelectAntMod(%c): bad choice", r);
+      flogf("\nError DevSelect(%c): bad choice", r);
       return -1;
     }
   }
-  if (d!=device) {
+  if (d!=dev) {
     // turn on, connect
-    TUTxPutByte(DevicePort, 3, true);  
-    TUTxPutByte(DevicePort, d, true);  
-    device=d;
+    TUTxPutByte(devicePort, 3, true);  // ^C connect device
+    TUTxPutByte(devicePort, d, true);  
+    Delayms(20);
+    dev=d;
   }
   if (a!=ant) {
-    TUTxPutByte(DevicePort, 1, true);  // antenna
-    TUTxPutByte(DevicePort, a, true);  // G I
+    TUTxPutByte(devicePort, 1, true);  // ^A antenna
+    TUTxPutByte(devicePort, a, true);  // G I
     Delayms(1000); // wait 1 sec to settle antenna switch noise
     ant=a;
   }
   return 0;
-} //____ SelectAntMod ____//
+} //AntMode
 
 /*
- * int SelectDevice(1);
- * 0 = off, 1 = buoy, 2 = antenna
+ * int DevSelect(DEVA);
+ * DEVX=0 = off, DEVA=1 = antenna, DEVB=2 = buoy
  */
-int SelectDevice(int sbe) {
-  // global stringout, stringin, sbeID
-  short ctd_rx, ctd_tx;
-  DBG(flogf("\n\t|CTD TUPort %d", sbe);)
-  if (sbe>0) { // on
-    if (sbe==sbeID && DevicePort) return 0; // already open // use a stronger test??
-    if (DevicePort) SelectDevice(0); // other ctd is open, close it
-    switch (sbe) {
-      case 2: // antenna sbe
-        SelectAntMod('S');
-        break;
-      case 1: // buoy on
-        PIOClear(DEVICECOM);
+int DevSelect(int dev) {
+  // global stringout, stringin, deviceID
+  DBG(flogf("\n\t|DevSelect(%d)", dev);)
+  // use a stronger tests for open??
+  if (dev==deviceID && devicePort) return 0; // already selected
 
-        // ok to do this repeatedly ?? probably only needed once
-        ctd_rx = TPUChanFromPin(DEVICERX);
-        ctd_tx = TPUChanFromPin(DEVICETX);
-
-        DevicePort = TUOpen(ctd_rx, ctd_tx, BUOYBAUD, 0);
-        if (DevicePort == NULL) {
-          flogf("\nERR SelectDevice(): failed %d", sbe);
-          return -1;
-        }
-        Delayms(20);
-        stringout = (char *)calloc(STRING_SIZE, 1);
-        stringin = (char *)calloc(STRING_SIZE, 1);
-        break;
-      case 0: // off
-        if (DevicePort) TUClose( DevicePort );
-        DevicePort=NULL;
-
-        free(stringout);
-        free(stringin);
-        break;
-    }
-  }
+  // if other device open, close
+  if (devicePort) TUClose(devicePort); 
+  switch (dev) {
+    case DEVA: // antenna module dev
+      PIOSet(DEVICECOM); 
+      devicePort = TUOpen(deviceRX, deviceTX, IRIDBAUD, 0);
+      if (devicePort == NULL) {
+        flogf("\nERR DevSelect(): failed %d", dev);
+        return -1;
+      }
+      Delayms(20); // to settle rs232
+      if (PIOTestAssertClear(ANTMODPWR)) { // ant module is off
+        PIOSet(ANTMODPWR);
+        Delay_AD_Log(5); // power up delay
+      }
+      break;
+    case DEVB: // buoy sbe
+      PIOClear(DEVICECOM); // talk to local port // do not turn off ant module
+      devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
+      if (devicePort == NULL) {
+        flogf("\nERR DevSelect(): failed %d", dev);
+        return -1;
+      }
+      Delayms(20); // to settle rs232
+      break;
+    case DEVX: // power off antenna, port closed
+      PIOClear(ANTMODPWR); // antMod off
+      devicePort=NULL;
+      break;
+  } //switch
   return 0;
-
-} //____ SelectDevice() ____//
+} //DevSelect
 
 
 
@@ -450,7 +468,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
     ACK = false; // Reset
   }
 
-  // Device_OpenTUPort(false);
+  // DevSelect(DEVX);
 
   if (NewCMDS)
     TX_Success = 3;
@@ -577,7 +595,7 @@ bool GetUTCSeconds() {
   ulong time_now = 0;
 
   time = (char *)calloc(24, sizeof(char));
-  TURxFlush(DevicePort);
+  TURxFlush(devicePort);
   SendString("AT+PD");
   strncpy(time, GetGPSInput("PD", NULL), 10);
   CLK(start_clock = clock();)
@@ -683,32 +701,7 @@ bool CompareCoordinates(char *LAT, char *LONG) {
   return returnvalue;
 
 } //____ CompareCoordinates ____//
-/******************************************************************************\
-** Close COM2 for Iridium/GPS unit and power down
-\******************************************************************************/
-void Device_OpenTUPort(bool on) {
-  DBG1(flogf("  ..Device_OpenTUPort() ");)
-  if (on) {
-    device_rx = TPUChanFromPin(DEVICERX);
-    device_tx = TPUChanFromPin(DEVICETX);
-    // Power ON
-    PIOSet(DEVICEPWR);
-    PIOSet(DEVICECOM);
 
-    DevicePort = TUOpen(device_rx, device_tx, IRIDBAUD, 0);
-    if (DevicePort == NULL) {
-      flogf("\n\t|Bad IridiumPort");
-      // go to recovery mode??
-      return;
-    }
-  } else if (!on) {
-    TUClose(DevicePort);
-    DevicePort=NULL;
-    // power off
-    PIOClear(DEVICECOM);
-    PIOClear(DEVICEPWR);
-  }
-}
 /******************************************************************************\
 ** CheckSignal
    returns true if good signal.
@@ -748,12 +741,8 @@ void OpenSatCom(bool onoff) {
   if (SatComOpen == onoff) return;
   
   if (onoff) { // turn on
-    // may be already open for sbe16
-    inputstring = (char *)calloc(STRING_SIZE, 1);
-    scratch = (char *)calloc(STRING_SIZE, 1);
-
     // connect to gps first
-    SelectAntMod('G'); // turn on and connect
+    DevSelect('G'); // turn on and connect
     DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
     Delay_AD_Log(IRID.WARMUP);
   } else { // !onoff
@@ -762,7 +751,7 @@ void OpenSatCom(bool onoff) {
     SendString("AT*P");
     Delay_AD_Log(3);
     // tell ant mod to power off modem
-    SelectAntMod('S');
+    DevSelect('S');
     free(inputstring);
     free(scratch);
   } // onoff
@@ -982,8 +971,8 @@ short SignalQuality(short *signal_quality) {
 
   SendString("AT+CSQ");
   Delayms(10);
-  TURxFlush(DevicePort);
-  TURxGetByteWithTimeout(DevicePort, 5000);
+  TURxFlush(devicePort);
+  TURxGetByteWithTimeout(devicePort, 5000);
   Delayms(3000);
 
   GetIRIDInput("CSQ:", 5, NULL, &sig, 20000);
@@ -1003,7 +992,7 @@ void SendString(const char *StringIn) {
   strcpy(local, StringIn);
   DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
   strcat(local, "\r");
-  TUTxPutBlock(DevicePort, local, (long) strlen(local), (short) 1000);
+  TUTxPutBlock(devicePort, local, (long) strlen(local), (short) 1000);
 } //_____ SendString() _____//
 
 /******************************************************************************\
@@ -1100,7 +1089,7 @@ bool SendProjHdr() {
   unsigned char buf[16], proj[8], bmode[4];
 
   // Flush IO Buffers
-  TUTxFlush(DevicePort); TURxFlush(DevicePort);
+  TUTxFlush(devicePort); TURxFlush(devicePort);
   DBG(flogf("\n%s|SendProjHdr(%4s%4s)", Time(NULL), MPC.PROJID, MPC.PLTFRMID);)
 
   sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
@@ -1117,8 +1106,8 @@ bool SendProjHdr() {
 
   while (Ack == false && Num_ACK < AckMax) { // Repeat
     AD_Check();
-    TUTxPutBlock(DevicePort, bmode, 3, 10000);
-    TUTxPutBlock(DevicePort, buf, 13, 10000); // 13 bytes + crlf
+    TUTxPutBlock(devicePort, bmode, 3, 10000);
+    TUTxPutBlock(devicePort, buf, 13, 10000); // 13 bytes + crlf
     RTCDelayMicroSeconds((long) (16 * 3333));
     // give rudics a chance to reply
     TickleSWSR(); // another reprieve
@@ -1146,12 +1135,12 @@ bool SendProjHdr() {
       StatusCheck();
       Delayms(20);
     } else {
-      TUTxFlush(DevicePort);
-      TURxFlush(DevicePort);
+      TUTxFlush(devicePort);
+      TURxFlush(devicePort);
 
       // Exit in-call data mode to check phone status.
-      TUTxPrintf(DevicePort, "+++");  // ??
-      TUTxWaitCompletion(DevicePort);
+      TUTxPrintf(devicePort, "+++");  // ??
+      TUTxWaitCompletion(devicePort);
       Delayms(25);
       if (GetIRIDInput("OK", 2, NULL, NULL, 3500) == 1) {
         StatusCheck();
@@ -1371,13 +1360,13 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       buf[3] = (uchar)((crc_calc & 0xFF00) >> 8);
       buf[4] = (uchar)((crc_calc & 0x00FF));
 
-      // TUTxFlush(DevicePort);
-      // TURxFlush(DevicePort);
+      // TUTxFlush(devicePort);
+      // TURxFlush(devicePort);
       // antMod blockmode for header // ^B, 2 byte length
       sprintf(bmode, "%c%c%c", (uchar)2, 
         (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));
-      TUTxPutBlock(DevicePort, bmode, (long) 3, 1000);
-      TUTxPutBlock(DevicePort, buf, mlength, 10000);
+      TUTxPutBlock(devicePort, bmode, (long) 3, 1000);
+      TUTxPutBlock(devicePort, buf, mlength, 10000);
       // let transmission complete // satellite @ 2400baud = 300/s
       RTCDelayMicroSeconds((long) (mlength * 3333));
 
@@ -1386,20 +1375,20 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     // pause that refreshes
 
 #ifdef DEBUG
-    blklen=tgetq(DevicePort);
+    blklen=tgetq(devicePort);
     if (blklen) {
       cprintf("\n%d+", blklen);
       // blklen=0;
-      // while ((scratch[blklen++]=TURxGetByteWithTimeout(DevicePort, 1)) >= 0) {}
+      // while ((scratch[blklen++]=TURxGetByteWithTimeout(devicePort, 1)) >= 0) {}
       // printsafe( (long) blklen, scratch);
         
       memset( scratch, 0, STRING_SIZE );
-      printsafe( (long) TURxGetBlock(DevicePort, scratch, 
+      printsafe( (long) TURxGetBlock(devicePort, scratch, 
                           (long) STRING_SIZE, (short) 1),
         scratch);
     }
 #else
-    TURxFlush(DevicePort);
+    TURxFlush(devicePort);
     cdrain();
 #endif
     Delayms(2000);
@@ -1528,16 +1517,16 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   // recode ?? getblock with longer timeout
   // how long are we waiting here?
   Delay_AD_Log(1);
-  inputstring[0] = TURxGetByteWithTimeout(DevicePort, 15000);
+  inputstring[0] = TURxGetByteWithTimeout(devicePort, 15000);
   Delay_AD_Log(1);
-  qsize = (long)tgetq(DevicePort);
+  qsize = (long)tgetq(devicePort);
 
   DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
   Delayms(10);
   if (qsize < 7) {
-    inputstring[1] = TURxGetByteWithTimeout(DevicePort, 3000);
+    inputstring[1] = TURxGetByteWithTimeout(devicePort, 3000);
     k = 2;
-    qsize = (long)tgetq(DevicePort);
+    qsize = (long)tgetq(devicePort);
     DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
   }
 
@@ -1546,8 +1535,8 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       cdrain();)
   AD_Check();
 
-  leninput = TURxGetBlock(DevicePort, inputstring + k, qsize,
-                           TUBlockDuration(DevicePort, qsize)) + k;
+  leninput = TURxGetBlock(devicePort, inputstring + k, qsize,
+                           TUBlockDuration(devicePort, qsize)) + k;
   DBG1(printsafe((long) leninput, inputstring);) 
   len = strspn(inputstring, "\r\ncmdsoneNO C");
   DBG(flogf("\n\t|Len of command characters: %d of %ld", len, leninput);)
@@ -1582,10 +1571,10 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
     Delayms(10);
     return 1;
   } else if (resent) { //@@@ Received from RUDICS, Need to Resend
-    hbuf[hbuf_size] = TURxGetByteWithTimeout(DevicePort, 5000);
-    qsize = tgetq(DevicePort);
+    hbuf[hbuf_size] = TURxGetByteWithTimeout(devicePort, 5000);
+    qsize = tgetq(devicePort);
     for (i = hbuf_size + 1; i < qsize; i++) { // Get other 11-bytes from header
-      hbuf[i] = TURxGetByteWithTimeout(DevicePort, 300);
+      hbuf[i] = TURxGetByteWithTimeout(devicePort, 300);
       if (hbuf[i] == '-1') {
         DBG(flogf("\n\t|resent buffer incomplete: %s", hbuf);) return -3;
       } // If any of the 11 are bad, return fail
@@ -1662,11 +1651,11 @@ int Receive_Command(int len) {
 
   AD_Check();
   while (queue == 0 && count < 3) {
-    queue = tgetq(DevicePort);
+    queue = tgetq(devicePort);
     if (queue > 0) {
       DBG(flogf("\n\t|strlen of inputstring: %d", len);)
-      TURxGetBlock(DevicePort, inputstring + len, (long) queue,
-                   TUBlockDuration(DevicePort, queue));
+      TURxGetBlock(devicePort, inputstring + len, (long) queue,
+                   TUBlockDuration(devicePort, queue));
       break;
     }
     count++;
@@ -1758,11 +1747,11 @@ bool HangUp(void) {
     } else {
       flogf("\n\t|Sending +++");
       cdrain();
-      TUTxFlush(DevicePort);
-      TURxFlush(DevicePort);
+      TUTxFlush(devicePort);
+      TURxFlush(devicePort);
 
-      TUTxPrintf(DevicePort, "+++"); // ??
-      TUTxWaitCompletion(DevicePort);
+      TUTxPrintf(devicePort, "+++"); // ??
+      TUTxWaitCompletion(devicePort);
       Delayms(25);
 
       GetIRIDInput("OK", 2, NULL, NULL, wait);
@@ -1814,13 +1803,13 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   // Wait up to wait milliseconds to grab next byte from iridium/gps
   // 3.25.14 up to possibly 20 seconds...
   TickleSWSR(); // another reprieve
-  inputstring[0] = TURxGetByteWithTimeout(DevicePort, wait);
+  inputstring[0] = TURxGetByteWithTimeout(devicePort, wait);
   Delayms(100);
 
-  len = (long) tgetq(DevicePort);
+  len = (long) tgetq(devicePort);
   if (len>STRING_SIZE) len=(long)STRING_SIZE;
-  lenreturn = TURxGetBlock(DevicePort, inputstring + 1, len,
-                           TUBlockDuration(DevicePort, len));
+  lenreturn = TURxGetBlock(devicePort, inputstring + 1, len,
+                           TUBlockDuration(devicePort, len));
   if (len == 0)
     return 0;
 
@@ -1967,11 +1956,11 @@ char *GetGPSInput(char *chars, int *numsats) {
   memset(first, 0, (size_t) STRING_SIZE);
 
   // Wait for first character to come in.
-  // inputstring[0] = TURxGetByteWithTimeout(DevicePort, 5000); 
+  // inputstring[0] = TURxGetByteWithTimeout(devicePort, 5000); 
 
   Delayms(50);
-  // len = (long) tgetq(DevicePort);
-  lenreturn = TURxGetBlock(DevicePort, inputstring, (long) STRING_SIZE, 100);
+  // len = (long) tgetq(devicePort);
+  lenreturn = TURxGetBlock(devicePort, inputstring, (long) STRING_SIZE, 100);
   DBG1(flogf("\nGPS<< %ld '%s'", lenreturn, inputstring);)
 
   if (chars != NULL) {
@@ -1998,8 +1987,8 @@ char *GetGPSInput(char *chars, int *numsats) {
     cdrain();
   }
   // DBG(flogf("\n\t|first string: %s", first);)
-  TURxFlush(DevicePort);
-  TUTxFlush(DevicePort);
+  TURxFlush(devicePort);
+  TUTxFlush(devicePort);
 
   return first;
 

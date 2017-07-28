@@ -27,7 +27,7 @@
 *  LARA.PHASE case 2: case 4:
 *    case 'w': WinchConsole();
 *    case 'p': LARA.PHASE = c;
-*    case 't': CTD_Sample(1);
+*    case 't': CTD_Sample();
 *    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
 *    case 'a': PrintSystemStatus();
 *    case 's': LARA.SURFACED = true;
@@ -206,12 +206,12 @@ void main() {
       Time(&PwrOn);
 
       PhaseThree();
-      CTD_Start_Up(1, true); // ?? why start here, for phase4
-      CTD_SyncMode(1);
       break;
 
     // PHASE 4:  Descend ICE Housing
     case 4:
+      CTD_Start_Up(DEVB, false); // ?? why start here, move to phase4
+      CTD_SyncMode();
       PhaseFour();
       break;
     }
@@ -229,9 +229,9 @@ void main() {
 void shutdown() {
   WISPRSafeShutdown();
 
-  PIOClear(DEVICEPWR); // Make sure Iridium is Off
-  PIOClear(26); // Make sure DIFAR Power Out is off
-  PIOClear(21); // Clear AModem Power
+  PIOClear(ANTMODPWR); // Make sure Iridium is Off
+  PIOClear(DIFARPWR); // Make sure DIFAR Power Out is off
+  PIOClear(AMODEMPWR); // Clear AModem Power
 
   SleepUntilWoken();
   BIOSReset();
@@ -249,20 +249,17 @@ void InitializeLARA(ulong *PwrOn) {
   float volts;
   bool check = false;
 
-  PIOMirrorList(mirrorpins);
-  PIOClear(DEVICEPWR); // Make sure iridium is off...
-  PIOSet(26);
   // Get the system settings running
-  SetupHardware();
-
-  // Initialize and open TPU UART
   TUInit(calloc, free);
-
+  PIOMirrorList(mirrorpins);
+  PIOSet(DIFARPWR);
+  SetupHardware();
   // Count Down Timer to Start Program or go to PICO dos/Settings
   PreRun();
-
   // Get all Platform Settings
   GetSettings();
+  CTD_Init();
+  GPSIRID_Init();
 
   // First Safety Catch. If woken. Reboot
   if (MPC.STARTUPS >= MPC.STARTMAX) {
@@ -343,11 +340,11 @@ void InitializeLARA(ulong *PwrOn) {
     LARA.LOWPOWER = false;
 
   // SETUP CTD
-  CTD_CreateFile(1, MPC.FILENUM);
+  CTD_CreateFile(MPC.FILENUM);
   DBG2( flogf("\n .. setup ctd"); )
-  CTD_OpenTUPort(1, true);
-  CTD_Start_Up(1, true);
-  CTD_SyncMode(1);
+  DevSelect(DEVA);
+  AntMode('S');
+  CTD_SyncMode();
 
   // Initialize More System Parameters
   LARA.PAYOUT = -1;
@@ -400,7 +397,7 @@ void InitializeLARA(ulong *PwrOn) {
     // DBG( if (LARA.STARTPHASE>0) { LARA.PHASE=LARA.STARTPHASE; return; } )
     
 
-    depth = CTD_AverageDepth(1, 5, &velocity);
+    depth = CTD_AverageDepth(5, &velocity);
 
     // Place Buouy in correct state
     if (depth > NIGK.TDEPTH) {
@@ -452,9 +449,9 @@ void InitializeLARA(ulong *PwrOn) {
   VEEStoreShort(STARTUPS_NAME, MPC.STARTUPS);
   if (MPC.STARTUPS >= MPC.STARTMAX) {
     WISPRSafeShutdown();
-    PinClear(22);
-    PinClear(21);
-    PinClear(26);
+    PIOClear(ANTMODPWR);
+    PIOClear(AMODEMPWR);
+    PIOClear(DIFARPWR);
     SleepUntilWoken();
     BIOSReset();
   }
@@ -470,6 +467,7 @@ void InitializeLARA(ulong *PwrOn) {
 
   create_dtx_file(MPC.FILENUM);
 
+/*
   DBG({
   TUChParams *tuch; 
   tuch = TUGetDefaultParams();
@@ -482,6 +480,7 @@ void InitializeLARA(ulong *PwrOn) {
   flogf("\nTUChParams: baud %ld, rx %d, tx %d, pf %d",
     tuch->baud, tuch->rxqsz, tuch->txqsz, tuch->tpfbsz);
   })
+  */
   
 /*
  * typedef struct {
@@ -525,7 +524,7 @@ void PhaseOne() {
       break;
   }
 
-  CTD_AverageDepth(1, 2, NULL);
+  CTD_AverageDepth(2, NULL);
 
   // This would mean the profiling buoy is at//near surface.
   if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
@@ -544,10 +543,17 @@ void PhaseTwo() {
   float velocity = 0.0;
 
   flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
+  // turn off wispr, close wispr ?? here? 
+  // check storm warn
+  if (WISPR_Status()) { // moved here from p3
+    WISPRSafeShutdown();
+  }
+  OpenTUPort_WISPR(false);
+
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
-  LARA.DEPTH = CTD_AverageDepth(1, 3, &velocity);
+  LARA.DEPTH = CTD_AverageDepth(3, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
   if (LARA.DATA) {
@@ -558,7 +564,7 @@ void PhaseTwo() {
   // Else, sensor package deeper than target depth. Ascend.
   if (LARA.BUOYMODE != 1) {
     AscentStart = Winch_Ascend();
-    CTD_Sample(1);
+    CTD_Sample();
     WaitForWinch(1);
   }
 
@@ -593,7 +599,7 @@ void PhaseTwo() {
       if (LARA.TOPDEPTH <= NIGK.TDEPTH)
         LARA.SURFACED = true;
 
-      LARA.AVGVEL = CTD_CalculateVelocity(1);
+      LARA.AVGVEL = CTD_CalculateVelocity();
       if (LARA.AVGVEL == 0.0)
         LARA.AVGVEL = ((float)NIGK.RRATE / 60.0);
 
@@ -628,22 +634,12 @@ void PhaseTwo() {
 void PhaseThree() {
   short result = 0;
   int gpsFails = 0;
-  float depth;
   short count = 0;
   static short IridCallsNoParams = 0;
-  short secs;
-  ulong AscentTime;
-  ulong AscentStop;
   char filenum[9] = "00000000";
   flogf("\n\t|PHASE THREE");
 
-  // close ctd, turn off wispr, close wispr
-  CTD_OpenTUPort(1, false);
-  if (WISPR_Status()) {
-    WISPRSafeShutdown();
-  }
-  OpenTUPort_WISPR(false);
-
+  // should do this at boot
   if (GlobalRestart) { 
     // Added 9.28.2016 after first deployment Lake W.
     ParseStartupParams(true); 
@@ -693,48 +689,7 @@ void PhaseThree() {
         // ?? close ports?
         break;
       } // >=5
-      // does GPSIRID close antenna tup?
-      OpenTUPort_NIGK(true);
-      CTD_OpenTUPort(1, true);
-
-      // Set LARA System back to !Surfaced so CTD will take measurements.
-      LARA.SURFACED = false;
-      LARA.TDEPTH -= 5;
-
-      LARA.DEPTH = CTD_AverageDepth(1, 1, NULL);
-      depth = LARA.DEPTH - LARA.TDEPTH;
-      secs = (short)depth / LARA.AVGVEL;
-      if (secs < 10)
-        secs = 10;
-      flogf("\n\t|Ascend for %d seconds, %fmeters", secs, depth);
-
-      if (LARA.TDEPTH < NIGK_MIN_DEPTH) {
-        LARA.TDEPTH = NIGK_MIN_DEPTH;
-        gpsFails = 5;
-      }
-      AscentTime = Winch_Ascend();
-      // Wait for Acoustic Modem, Get Response. Go into timer loop.
-      WaitForWinch(1);
-
-      // Count++ every 1/10th of a second.
-      while (LARA.DEPTH > LARA.TDEPTH) { 
-        Incoming_Data();
-        Delayms(100);
-        count++;
-        // Break on time being exceeded.
-        if ((count / 10) >= secs) break;
-      } // depth > target
-
-      AscentStop = Winch_Stop();
-      WaitForWinch(0);
-      LARA.ASCENTTIME = (short)AscentStop - AscentTime;
-
-      LARA.TOPDEPTH = LARA.DEPTH;
-      flogf("\n\t|AscentTime: %d", AscentTime);
-
-      // confirm stop
-      CTD_OpenTUPort(1, false);
-      OpenTUPort_NIGK(false);
+      // removed section, go up further
     } // Bad GPS- GPS fails usually from bad reception
   } // while result<=0
 
@@ -747,16 +702,8 @@ void PhaseThree() {
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
   create_dtx_file(MPC.FILENUM);
-  CTD_CreateFile(1, MPC.FILENUM); 
+  CTD_CreateFile(MPC.FILENUM); 
   LARA.TDEPTH = NIGK.TDEPTH;
-
-  CTD_OpenTUPort(1, true);
-
-  // why here ??
-  if (WISP.DUTYCYCL > 50) {
-    OpenTUPort_WISPR(true);
-    WISPRPower(true);
-  }
 
   LARA.DATA = false;
 
@@ -775,6 +722,11 @@ void PhaseFour() {
 
   flogf("\n%s|Phase_Four():", Time(NULL));
   OpenTUPort_NIGK(true);
+  if (WISP.DUTYCYCL > 50) { // moved from p3
+    OpenTUPort_WISPR(true);
+    WISPRPower(true);
+  }
+
 
   LARA.SURFACED = false;
 
@@ -787,12 +739,12 @@ void PhaseFour() {
   }
   // Now descend.
   if (LARA.BUOYMODE != 2) {
-    LARA.TOPDEPTH = CTD_AverageDepth(1, 2, &velocity);
+    LARA.TOPDEPTH = CTD_AverageDepth(2, &velocity);
     DescentStart = Winch_Descend();
     WaitForWinch(2);
-    CTD_Sample(1);
+    CTD_Sample();
   } else
-    CTD_Sample(1);
+    CTD_Sample();
 
   /****
   ADD IN CHECK HERE. if WaitForWinch returns false because of timeout and lack
@@ -837,7 +789,7 @@ void PhaseFour() {
     LARA.MOORDEPTH = LARA.DEPTH;
 
   // Descent Velocity;
-  descentvelocity = CTD_CalculateVelocity(1);
+  descentvelocity = CTD_CalculateVelocity();
   flogf("\n\t|Calculated Descent Velocity: %.2fm/s", descentvelocity);
 
   // Total Vertical depth change. total time change, calculate estimated
@@ -859,6 +811,7 @@ void PhaseFour() {
 } //____ Phase_Four() ____//
 /****************************************************************************\
 ** int Incoming_Data()
+ * ?? very fragile, caution
 \****************************************************************************/
 int Incoming_Data() {
   bool incoming = true;
@@ -873,13 +826,13 @@ int Incoming_Data() {
       if (tgetq(NIGKPort)) {
         // DBG(flogf("NIGK Incoming");)
         AModem_Data();
-      } else if (tgetq(CTDPort)) {
+      } else if (tgetq(devicePort)) { // ?? very messy handling of ctd
         // DBG(flogf("CTD Incoming");)
-        CTD_Data(1);
+        CTD_Data();
         if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
             LARA.PHASE == 0) // if not surfaced (target depth not reached.) and
                              // winch is moving (not stopped)
-          CTD_Sample(1);
+          CTD_Sample();
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());
@@ -897,8 +850,8 @@ int Incoming_Data() {
       if (tgetq(PAMPort)) {
         // DBG(flogf("WISPR Incoming");)
         WISPR_Data();
-      } else if (tgetq(CTDPort)) {
-        CTD_Data(1);
+      } else if (tgetq(devicePort)) {
+        CTD_Data();
       }
       // Console Wake up.
       else if (cgetq()) {
@@ -924,13 +877,13 @@ int Incoming_Data() {
       } else if (tgetq(NIGKPort)) {
         // DBG(flogf("NIGK Incoming");)
         AModem_Data();
-      } else if (tgetq(CTDPort)) {
+      } else if (tgetq(devicePort)) {
         // DBG(flogf("CTD Incoming");)
-        CTD_Data(1);
+        CTD_Data();
         if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
             LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
                                // and winch is moving (not stopped)
-          CTD_Sample(1);
+          CTD_Sample();
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());
@@ -1047,7 +1000,7 @@ void Console(char in) {
     case 'T':
     case 't':
       flogf("\n\t|Take CTD Sample");
-      CTD_Sample(1);
+      CTD_Sample();
       break;
     case 'x':
       // LARA.ON = false;
@@ -1152,7 +1105,7 @@ void CTDSleep(void) {
   Delayms(10);
   IEVInsertAsmFunct(IRQ3_ISR, level3InterruptAutovector); // AModem Interrupt
   IEVInsertAsmFunct(IRQ3_ISR, spuriousInterrupt);
-  IEVInsertAsmFunct(IRQ2_ISR, level2InterruptAutovector); // CTDPort/Seaglider
+  IEVInsertAsmFunct(IRQ2_ISR, level2InterruptAutovector); // devicePort/Seaglider
   IEVInsertAsmFunct(IRQ2_ISR, spuriousInterrupt);
   IEVInsertAsmFunct(IRQ4_ISR, level4InterruptAutovector); // Console Interrupt
   IEVInsertAsmFunct(IRQ4_ISR, spuriousInterrupt);
@@ -1415,8 +1368,8 @@ void WaitForWinch(short expectedBuoyMode) {
         break;
       else if (expectedBuoyMode == 3)
         return;
-    } else if (tgetq(CTDPort)) {
-      CTD_Data(1);
+    } else if (tgetq(devicePort)) {
+      CTD_Data();
 
     } else
       Delayms(250);
