@@ -1838,6 +1838,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
         // overwrite begin of inpstr with match .. num_char
         // ouput numchars = int found after end of match
         strncpy(inputstring, first, num_char_to_reads);
+        // inputstring[num_char_to_reads+1] = 0; // zero terminate?
         *numchars = atoi(inputstring + strlen(Template));
       }
     }
@@ -1849,11 +1850,13 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     // Get String Length
     stringlength = strlen(compstring);
 
+    // test strstr first, may be null
     if (!Template)
-      // no template, so first has not been assigned
+      // no template, so first = scratch
       strncpy(first, strstr(inputstring, compstring), stringlength);
     else
       // first points into inputstring at match Template
+      // cat onto end of inputstring
       strncat(first, strstr(inputstring, compstring), stringlength);
 
     // If compstring was successfully added to inputstring
