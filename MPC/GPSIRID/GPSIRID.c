@@ -190,7 +190,8 @@ short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
-  DevSelect('I');
+  DevSelect(DEVA);
+  AntMode('I');
 
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
@@ -219,7 +220,8 @@ bool GPSstartup() {
     PhonePin();
   }
   // Open the GPS/IRID satellite com...
-  DevSelect('G');
+  DevSelect(DEVA);
+  AntMode('G');
 
   if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
     return true;
@@ -742,7 +744,8 @@ void OpenSatCom(bool onoff) {
   
   if (onoff) { // turn on
     // connect to gps first
-    DevSelect('G'); // turn on and connect
+    DevSelect(DEVA); // turn on and connect
+    AntMode('G');
     DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
     Delay_AD_Log(IRID.WARMUP);
   } else { // !onoff
@@ -751,7 +754,7 @@ void OpenSatCom(bool onoff) {
     SendString("AT*P");
     Delay_AD_Log(3);
     // tell ant mod to power off modem
-    DevSelect('S');
+    DevSelect(DEVX);
     free(inputstring);
     free(scratch);
   } // onoff

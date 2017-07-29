@@ -216,6 +216,7 @@ void CTD_Sample() {
 ** CTD_SampleSleep()
 \********************************************************************************/
 void CTD_SyncMode() {
+  DBG(flogf("\n\t|CTD_SyncMode()");)
   TUTxPrintf(devicePort, "Syncmode=y\r");
   TUTxWaitCompletion(devicePort);
   Delayms(500);
@@ -607,7 +608,7 @@ float CTD_AverageDepth(int i, float *velocity) {
   float returnValue;
   ulong starttime = 0, stoptime = 0;
 
-  DBG2( flogf("\n . CTD_AverageDepth"); )
+  DBG1( flogf("\n . CTD_AverageDepth"); )
   if (tgetq(devicePort))
     TURxFlush(devicePort);
   // This for loop is to understand the profiling buoy's starting position prior
