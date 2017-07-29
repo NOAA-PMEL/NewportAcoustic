@@ -218,7 +218,7 @@ bool GPSstartup() {
   if (!SatComOpen) {
     OpenSatCom(true);
     // echo off
-    SendString("ATE0");
+    // SendString("ATE0");
     PhonePin();
   }
   // Open the GPS/IRID satellite com...
