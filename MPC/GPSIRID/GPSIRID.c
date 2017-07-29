@@ -217,6 +217,8 @@ short UploadFiles() {
 bool GPSstartup() {
   if (!SatComOpen) {
     OpenSatCom(true);
+    // echo off
+    SendString("ATE0");
     PhonePin();
   }
   // Open the GPS/IRID satellite com...
@@ -1762,27 +1764,24 @@ bool HangUp(void) {
     }
     count++;
   }
-
   Delayms(20);
-
   AD_Check();
-
   return false;
-
 } //____ HangUp() ____//
-/*******************************************************************************\
-** GetIRIDInput()
-** 1: Grabs IRID incoming char stream from the turport
-** 2: Look for a character in Template such as ':' and then grab the char
-**    (number=num_char_to_read) proceeding chars
-** 3: From within here, we can see if we need to return a short pointer for
-**    SigQual, and returns
-** 4: Compares Iridium buf[] to compstring. If it sees the same string,
+
+/*
+ * GetIRIDInput()
+ * 1: Grabs IRID incoming char stream from the turport
+ * 2: Look for a character in Template such as ':' and then grab the char
+ *    (number=num_char_to_read) proceeding chars
+ * 3: From within here, we can see if we need to return a short pointer for
+ *    SigQual, and returns
+ * 4: Compares Iridium buf[] to compstring. If it sees the same string,
  * numchars is optional output, atoi 
-**
-** @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
-** 2/27/2015
-\*******************************************************************************/
+ *
+ * @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
+ * 2/27/2015
+ */
 short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
                    int *numchars, short wait) {
   short Match = 0;
@@ -1848,7 +1847,6 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   // If we are looking for the String compstring
   if ((compstring != NULL)) {
-
     // Get String Length
     stringlength = strlen(compstring);
 
