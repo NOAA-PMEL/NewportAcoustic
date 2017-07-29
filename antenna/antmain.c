@@ -45,6 +45,12 @@
 #else               /*  */
 #define DBG(X)      // nothing
 #endif              /*  */
+#define DEBUG1
+#ifdef DEBUG1
+#define DBG1(X) X // template:   DBG( cprintf("\n"); )
+#else               /*  */
+#define DBG1(X)      // nothing
+#endif              /*  */
 #define VERSION 2.0 
 // keep this up to date!!! 
 
@@ -81,15 +87,6 @@
 #define SBE 1
 #define IRID 2
 
-//#define       LPMODE  FastStop                        // choose: FullStop or
-// FastStop or CPUStop
-//
-//
-// short         CustomSYPCR = WDT419s | HaltMonEnable | BusMonEnable | BMT32;
-//#define CUSTOM_SYPCR
-//static void Irq5RxISR(void);
-//static void Irq2RxISR(void);
-//IEV_C_PROTO(CharRuptHandler);
 TUPort* OpenSbePt(bool on);
 TUPort* OpenIridPt(bool on);
 TUPort* OpenBuoyPt(bool on);
@@ -101,7 +98,7 @@ void init();
 void help();
 void status();
 void antennaSwitch(char c);
-void transBlock(int b);
+void transBlock(long b);
 void printchar(char c);
 void prerun();
 
@@ -128,6 +125,7 @@ void main() {
 
   // escape to pico
   prerun();
+  DBG1(echoDn=true;echoUp=true;)
   // set up hw
   init();
   buf = (uchar *)malloc(BUFSIZE);
@@ -138,9 +136,8 @@ void main() {
   // exit via biosreset{topicodos}
   while (true) {
     // look for chars on both sides, process
-    // read bytes not blocks, to see any rs232 errs
     // note: using vars buoy,devport is faster than dev[id].port
-    // get all from dev upstream
+    // get from dev upstream
     if (devPort && TURxQueuedCount(devPort)) {
       // ch=getByte(devPort);
       ch=TURxGetByte(devPort, true); // blocking, best to check queue first
@@ -148,8 +145,8 @@ void main() {
       DBG( if (echoDn) printchar(ch); )
     } // char from device
 
-    // get all from buoy
-    if (buoy && TURxQueuedCount(buoy)) {
+    // get from buoy
+    if (TURxQueuedCount(buoy)) {
       // blocking, best to check queue first
       ch=TURxGetByte(buoy, true) & 0x00FF; 
       if (ch<8) {
@@ -161,8 +158,8 @@ void main() {
             break;
           case 2: // ^B Binary Block 2bytes arg
             // get another byte
-            arg=(int) ((short) arg<<8) + (TURxGetByte(buoy, true) & 0x00FF);
-            transBlock(arg);
+            arg=(int) arg<<8 + (int)(TURxGetByte(buoy, true) & 0x00FF);
+            transBlock((long) arg);
             break;
           case 3: // ^C Connect I|S
             connect(arg);
@@ -180,8 +177,8 @@ void main() {
       } else { 
         // regular char
         TUTxPutByte(devPort, ch, true);
+        DBG( if (echoUp) printchar(ch); )
       }
-      DBG( if (echoUp) printchar(ch); )
     } // if buoy
 
     // console
@@ -493,9 +490,10 @@ short power(short c, bool onoff) {
 void printchar(char c) {
   // < or >
   if ((c>=32)&&(c<=126)) // printable
-    printf("%c", c);
-  else printf("x%02X", c);
+    cprintf("%c", c);
+  else cprintf(" x%02X ", c);
   if (c==10) printf("\n");
+  cdrain();
 }
 
 // short count, exit, first thing
@@ -513,21 +511,21 @@ void prerun() {
 }
 
 // block transfer from buoy to devID
-void transBlock(int b) {
-  short len;
+void transBlock(long b) {
+  int len;
   long count;
   // long TURxGetBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
   // long TUTxPutBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
   count = TURxGetBlock(buoy, buf, b, 50000);
-  if (count != (long) b) 
-    cprintf("Error: getblock %ld != expected %d \n", count, b);
+  if (count != b) 
+    cprintf("Error: getblock %ld != expected %ld \n", count, b);
   count = TUTxPutBlock(devPort, buf, b, 10000);
-  if (count != (long) b) 
-    cprintf("Error: putblock %ld != expected %d \n", count, b);
-  DBG(
-    len = TURxQueuedCount(devPort); // accumulated
-    cprintf(" [[%d]]", count);
-    if (len > 0)
-  	cprintf("%d bytes accumulated on devPort from RUDICS \n", len);
+  if (count != b) 
+    cprintf("Error: putblock %ld != expected %ld \n", count, b);
+  DBG(cprintf(" [[%d]] ", count);)
+  DBG1(
+  len = (int) TURxQueuedCount(devPort); // accumulated
+  if (len > 0)
+      cprintf("%d bytes accumulated on devPort \n", len);
   )
 }
