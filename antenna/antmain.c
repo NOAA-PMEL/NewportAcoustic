@@ -37,7 +37,7 @@
 #include <termios.h>  // PicoDOS POSIX-like Terminal I/O Definitions
 #include <unistd.h>   // PicoDOS POSIX-like UNIX Function Definitions
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 #define DBG(X) X // template:   DBG( cprintf("\n"); )
 #pragma message("!!! "__FILE__                                                 \
@@ -153,6 +153,9 @@ void main() {
         // get argument
         arg=(int) TURxGetByte(buoy, true) & 0x00FF; // blocking
         switch (ch) { // command
+          case 0: // null
+            flogf("\nERR: NULL\n");
+            break;
           case 1: // ^A Antenna G|I
             antennaSwitch(arg);
             break;
