@@ -119,7 +119,7 @@ TUPort *buoy=NULL, *devPort=NULL; // dev port of connnected upstream device
 \******************************************************************************/
 void main() {
   short ch;
-  int arg;
+  int arg, arg2;
   bool echoDn=false;
   bool echoUp=false;
 
@@ -151,14 +151,17 @@ void main() {
       ch=TURxGetByte(buoy, true) & 0x00FF; 
       if (ch<8) {
         // get argument
-        arg= (int) TURxGetByte(buoy, true) & 0x00FF; // blocking
+        arg=(int) TURxGetByte(buoy, true) & 0x00FF; // blocking
         switch (ch) { // command
           case 1: // ^A Antenna G|I
             antennaSwitch(arg);
             break;
           case 2: // ^B Binary Block 2bytes arg
             // get another byte
-            arg=(int) arg<<8 + (int)(TURxGetByte(buoy, true) & 0x00FF);
+            DBG( printchar('-'); printchar((char) arg);)
+            arg2=(int) TURxGetByte(buoy, true) & 0x00FF;
+            arg=(int)(arg<<8) + arg2;
+            DBG( printchar('-'); printchar((char) (arg2)); printchar('-');)
             transBlock((long) arg);
             break;
           case 3: // ^C Connect I|S
@@ -498,7 +501,7 @@ void printchar(char c) {
 
 // short count, exit, first thing
 void prerun() {
-  short i=3;
+  short i=2;
   SCIRxFlush();
   cprintf("Exit to Pico? ");
   while (i--) {
@@ -522,7 +525,7 @@ void transBlock(long b) {
   count = TUTxPutBlock(devPort, buf, b, 10000);
   if (count != b) 
     cprintf("Error: putblock %ld != expected %ld \n", count, b);
-  DBG(cprintf(" [[%d]] ", count);)
+  DBG(cprintf(" [[%ld]] ", count);)
   DBG1(
   len = (int) TURxQueuedCount(devPort); // accumulated
   if (len > 0)
