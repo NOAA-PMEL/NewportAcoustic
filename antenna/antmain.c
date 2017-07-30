@@ -518,7 +518,7 @@ void prerun() {
 
 // block transfer from buoy to devID
 void transBlock(long b) {
-  int len;
+  DBG1(int len;)
   long count;
   // long TURxGetBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
   // long TUTxPutBlock(TUPort *tup, uchar *buffer, long bytes, short millisecs);
