@@ -34,7 +34,8 @@
 #define WISPR_PWR_ON 37
 #define WISPR_PWR_OFF 42
 #define BUOYBAUD 9600L
-#define IRIDBAUD 19200L
+#define IRIDBAUD 9600L
+//#define IRIDBAUD 19200L
 
 // DEVA=AntennaModule, DEVB=BuoyCTD
 #define DEVX 0

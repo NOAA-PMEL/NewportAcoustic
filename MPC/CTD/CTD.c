@@ -39,44 +39,31 @@
 #define STRING_SIZE 1024
 
 time_t CTD_VertVel(time_t);
-
 int Sea_Ice_Algorithm(); 
-// Returns reason: 
-// 1: Stop, should be at surface and ready to send.
-// 2: Stop due to low Temp or other reason
-// 3: Ascend2, careful ascent
-// 4: Descend, definitely ice
-// 5: Stop due to little change in salinity
-// CTDParameters CTD;
 
 extern SystemParameters MPC;
 extern SystemStatus LARA;
-
 CTDParameters CTD;
-
 bool SyncMode;
-
 extern TUPort *devicePort; // GPSIRID
-
+int sbeID=DEVB;  // DEVA:antenna DEVB:buoy
 float SummedVelocity;
 short CTDSamples;
-
 char CTDLogFile[] = "c:00000000.ctd";
+static char *stringin;
+static char *stringout;
 
 // simulation variables: #ifdef LARASIM
 float descentRate = 0.1923; // m/s
 float ascentRate = 0.26;
 
-// global calloc used by CTD
-static char *stringin;
-static char *stringout;
-
-/* CTD_Init() initialize file
+/* 
+ * CTD_Init() initialize file
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
-  stringout = (char *)calloc(STRING_SIZE, 1);
   stringin = (char *)calloc(STRING_SIZE, 1);
+  stringout = (char *)calloc(STRING_SIZE, 1);
   return 0;
 }
 
@@ -85,34 +72,37 @@ int CTD_Init() {
 * open port if needed, send break, get prompt, flush; opt settime
 \*****************************************************************************/
 bool CTD_Start_Up(int sbe, bool settime) {
+  // global int sbeID;
   bool returnval = false;
   DBG( flogf("\n\t|. CTD_Start_Up"); )
+
+  sbeID=sbe;
+  if (devicePort == NULL) DevSelect(sbe);
+
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
-
-  if (devicePort == NULL)
-    DevSelect(sbe);
-
   // leave sync mode
   CTD_SampleBreak();
-  Delay_AD_Log(1);
-
   if (CTD_GetPrompt()) {
     cprintf("successful startup");
     returnval = true;
   } else {
-    if (!CTD_GetPrompt()) {
-      DevSelect(0);
-      Delayms(100);
+    CTD_SampleBreak();
+    Delay_AD_Log(1);
+    if (CTD_GetPrompt()) {
+      returnval = true;
+      cprintf("successful startup2");
+    } else {
+      DevSelect(DEVX);
+      Delay_AD_Log(1);
       DevSelect(sbe);
+      Delay_AD_Log(1);
       CTD_SampleBreak();
+      Delay_AD_Log(1);
       if (CTD_GetPrompt()) {
         returnval = true;
         cprintf("successful startup3");
       }
-    } else {
-      returnval = true;
-      cprintf("sucessful startup2");
-    }
+    } 
   }
   if (settime)
     CTD_DateTime();
@@ -251,6 +241,13 @@ ascend
 ** can be as low as -1.8
 **
 \************************************************************************************/
+// Returns reason: 
+// 1: Stop, should be at surface and ready to send.
+// 2: Stop due to low Temp or other reason
+// 3: Ascend2, careful ascent
+// 4: Descend, definitely ice
+// 5: Stop due to little change in salinity
+// CTDParameters CTD;
 int Sea_Ice_Algorithm() {
   static int ice;
   static float temp_change, current_temp, next_temp;
@@ -393,7 +390,7 @@ int Sea_Ice_Algorithm() {
 * !! CTD_vertvel
 * !! log scientific
 \******************************************************************************/
-bool CTD_Data(sbe) {
+bool CTD_Data() {
   // global stringin CTDLogFile
   char *strin;  // pointer into stringin
   char charin;
@@ -436,14 +433,14 @@ bool CTD_Data(sbe) {
     } else {
       // no < > #, don't know what
       flogf("\nERROR|CTD_Data(): No prompt found, reset ctd");
-      CTD_Start_Up(sbe, true);
+      CTD_Start_Up(sbeID, true);
       CTD_SyncMode();
     }
     return false;
   } // no #
 
   // Split data string up into separate values
-  if (sbe==1) { // buoy sbe
+  if (sbeID==DEVB) { // buoy sbe
     // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
     split_temp = strtok(strin, "#, ");
     split_cond = strtok(NULL, ", "); 
@@ -518,7 +515,7 @@ bool CTD_Data(sbe) {
 
   secs = mktime(&info);
 
-  if (sbe==1) { // buoy sbe
+  if (sbeID==DEVB) { // buoy sbe
     // Log WriteString
     memset(stringout, 0, STRING_SIZE);
     sprintf(stringout, "#%.4f,", temp);
@@ -542,13 +539,12 @@ bool CTD_Data(sbe) {
       flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
       return false;
     }
-  } else { // antMod sbe
-    LARA.DEPTH = pres;
-    // LARA.TEMP = temp;
-    // this incr looks strange, but lara.ctd is not ctdsamples
-    LARA.CTDSAMPLES++;
-    if (LARA.BUOYMODE != 0) CTD_VertVel(secs);
-  }
+  } 
+  LARA.DEPTH = pres;
+  // LARA.TEMP = temp;
+  // this incr looks strange, but lara.ctd is not ctdsamples, not part of averaging
+  LARA.CTDSAMPLES++;
+  if (LARA.BUOYMODE != 0) CTD_VertVel(secs);
   return true;
 } //____ CTD_Data() _____//
 
@@ -627,7 +623,7 @@ float CTD_AverageDepth(int i, float *velocity) {
       }
     }
     if (tgetq(devicePort)) {
-      if (CTD_Data(2)) {
+      if (CTD_Data()) {
         if (firstreading)
           starttime = RTCGetTime(NULL, NULL);
         depth[j] = LARA.DEPTH;

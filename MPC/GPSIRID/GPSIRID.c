@@ -116,7 +116,7 @@ void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
-long GetStringWait(char *str, int wait);
+long GetStringWait(char *str, short wait);
 // G.h
 // bool GPSstartup();
 // int DevSelect(int);
@@ -219,7 +219,7 @@ bool GPSstartup() {
   if (!SatComOpen) OpenSatCom(true);
   AntMode('G');
   SendString("AT");
-  GetStringWait(inputstring, 1000);
+  GetStringWait(inputstring, (short) 1000);
   if (!strstr(inputstring, "OK")) {
     flogf("\nErr GPSstartup(): not OK");
     return false;
@@ -2058,12 +2058,12 @@ void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
  *  1 char long wait, block short wait
  * up to STRINGSIZE
  */
-long GetStringWait(char *str, int wait) {
+long GetStringWait(char *str, short wait) {
   long len;
   char ch;
   TickleSWSR(); // another reprieve
   // long wait
-  ch = TURxGetByteWithTimeout(devicePort, (short) wait);
+  ch = TURxGetByteWithTimeout(devicePort, wait);
   if (ch<0) {
     DBG(flogf("\n\t|GetStringWait() timeout");)
     return 0L;

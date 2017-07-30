@@ -791,7 +791,7 @@ void SetupCTDCmd() {
   while (CmdStdRun(&cia) != CMD_BREAK) {
     PWR(AD_Check();)
     if (tgetq(devicePort))
-      CTD_Data(1);
+      CTD_Data();
     printf("\n%s", cia.errmes);
     fflush(stdout);
   }

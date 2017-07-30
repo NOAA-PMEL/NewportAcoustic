@@ -294,7 +294,7 @@ void InitializeLARA(ulong *PwrOn) {
   LARA.SURFACED = false; // Decided Below
   LARA.DEPTH = 0;        // Received from first CTD
   LARA.MOORDEPTH = 0;    // Eventually init
-  LARA.TOPDEPTH = 0;     // Eventually Init
+  LARA.TOPDEPTH = 0; // depth at start of descent // Eventually Init
   LARA.TDEPTH = 0;       // Decided from Param file
   LARA.AVGVEL = 0;
 
@@ -718,7 +718,7 @@ void PhaseFour() {
 
   flogf("\n%s|Phase_Four():", Time(NULL));
   OpenTUPort_NIGK(true);
-  if (WISP.DUTYCYCL > 50) { // moved from p3
+  if (WISP.DUTYCYCL > 50) { // moved here from p3
     OpenTUPort_WISPR(true);
     WISPRPower(true);
   }
@@ -732,6 +732,7 @@ void PhaseFour() {
   if (LARA.BUOYMODE != 0) {
     Winch_Stop();
     WaitForWinch(0);
+    flogf("\nErr PhaseFour(): buoy was in motion");
   }
   // Now descend.
   if (LARA.BUOYMODE != 2) {
