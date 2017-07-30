@@ -153,6 +153,9 @@ void main() {
         // get argument
         arg=(int) TURxGetByte(buoy, true) & 0x00FF; // blocking
         switch (ch) { // command
+          case 0: // null
+            flogf("\nERR: NULL\n");
+            break;
           case 1: // ^A Antenna G|I
             antennaSwitch(arg);
             break;
