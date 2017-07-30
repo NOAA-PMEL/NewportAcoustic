@@ -583,10 +583,6 @@ void PhaseTwo() {
 
   // What's the best way out of this loop? Do we set a time limit for ascent?
   while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
-
-    // How well does this function wake from sleep?
-    // CTDSleep();
-
     Incoming_Data();
 
     // What if winch tells us its stopping? What AscentStop time do we get?
