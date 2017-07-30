@@ -46,7 +46,7 @@
 #define DBG(X)      // nothing
 #endif              /*  */
 #define DEBUG1
-#ifdef DEBUG1
+// #ifdef DEBUG1
 #define DBG1(X) X // template:   DBG( cprintf("\n"); )
 #else               /*  */
 #define DBG1(X)      // nothing
