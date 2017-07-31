@@ -89,7 +89,7 @@ void OpenSatCom(bool);
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
 short Connect_SendFile_RecCmd(const char *);
-bool InitModem(int);
+bool RudicsConnect(int);
 bool CheckSignal(void);
 short CallStatus(void);
 int PhoneStatus(void);
@@ -363,16 +363,19 @@ short Connect_SendFile_RecCmd(const char *filename) {
   strncpy(IRIDFilename, filename, 14);
   // Figure out file size and how many blocks need to be sent
   stat(IRIDFilename, &info);
-  // Only need to do this once... Unless we Power off the modem.
-  PhonePin();
 
   // Register, call and check SQ, connect the Rudics and login PMEL:
-  while (icall <= IRID.MAXCALLS && FileExist) {
-    // not really init - whole connect sequence
-    ACK = InitModem(status);
-    // ACK received from PMEL. Send a file & check the land resp.
-    // Loop to send multiple files
-    while (ACK && TX_Success != 1 && TX_Success >= -1) {
+  while (icall++ <= IRID.MAXCALLS && FileExist) {
+    ACK = RudicsConnect(status);
+    // fail is bad, we try to connect several times
+    if (!ACK) { // reset
+      OpenSatCom(false);
+      OpenSatCom(true);
+      continue;
+    }
+    while (TX_Success != 1 && TX_Success >= -1) {
+      // ACK received from PMEL. Send a file & check the land resp.
+      // Loop to send multiple files
       TX_Success = Send_File(FileExist, info.st_size);
       // TX_Success=-4, Garbled Response
       //	-3, No Response From Land
@@ -390,8 +393,8 @@ short Connect_SendFile_RecCmd(const char *filename) {
           strncpy(currentfile, filename + 2, 8);
           filenumber = atol(currentfile);
           DOS_Com("move", filenumber, "DAT", "SNT");
-        }
-      }
+        } // (FileExist)
+      } // (TX_Success == 1)
       // If we received new commands
       else if (TX_Success >= 2) {
         if (TX_Success == 3)
@@ -415,11 +418,10 @@ short Connect_SendFile_RecCmd(const char *filename) {
           flogf("\n\t|All files sent!");
           putflush();
           CIOdrain(); // But still commands may be coming
-        }
-      }
+        } // (FileExist)
+      } // (TX_Success >= 2)
 
       else if (TX_Success <= -2) {
-        ACK = false;
         status = 0;
         break;
       } 
@@ -445,20 +447,13 @@ short Connect_SendFile_RecCmd(const char *filename) {
       } else if (icall < IRID.MAXCALLS) {
         TickleSWSR(); // another reprieve
         flogf("\n%s|Connect_SendFile_RecCmd() reset, retry", Time(NULL));
-        OpenSatCom(false);
-        OpenSatCom(true);
-        cdrain();
-        PhonePin();
+        break;
       }
-    }
+    } // while TXSuccess
 
     TX_Success = 0;
-    icall++;
     LostConnect = false;
-    ACK = false; // Reset
-  }
-
-  // DevSelect(DEVX);
+  } // while icall (main loop
 
   if (NewCMDS)
     TX_Success = 3;
@@ -729,7 +724,6 @@ void OpenSatCom(bool onoff) {
   
   if (onoff) { // turn on
     // connect to gps first
-    DevSelect(DEVA); // turn on and connect
     DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
     AntMode('G');
     Delay_AD_Log(IRID.WARMUP);
@@ -741,18 +735,19 @@ void OpenSatCom(bool onoff) {
     // tell modem to power off
     SendString("AT*P");
     Delay_AD_Log(1);
-    // tell ant mod to power off modem
+    // this powers off antMod - better to power off irid modem in antmode ??
     DevSelect(DEVX);
+    AntMode('S');
     Delay_AD_Log(1);
   } // onoff
   SatComOpen=onoff;
 } // OpenSatCom
 
 /******************************************************************************\
- * InitModem()
+ * RudicsConnect()
  * Initialize the Irid modem port.
  ******************************************************************************/
-bool InitModem(int status) {
+bool RudicsConnect(int status) {
   // global int TX_Success;
   // global bool LostConnect;
   bool ACK;
@@ -793,7 +788,7 @@ bool InitModem(int status) {
     ACK = SendProjHdr();
   }
   return ACK;
-} //_____ InitModem _____//
+} //_____ RudicsConnect _____//
 
 /******************************************************************************\
  * Call Status
