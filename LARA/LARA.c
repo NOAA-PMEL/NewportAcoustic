@@ -762,7 +762,7 @@ void PhaseFour() {
   ADD IN CHECK HERE. if WaitForWinch returns false because of timeout and lack
   of AModem Response: then check CTD Average depth and make sure Velocity>0.25
   (descending.)
-  If not, then call Winc_Descend Again.
+  If not, then call Winc_Descend Again. After 10, wait for an hour
   ****/
 
   prevDepth = LARA.DEPTH;

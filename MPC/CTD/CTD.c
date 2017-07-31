@@ -453,6 +453,13 @@ bool CTD_Data() {
     temp = atof(split_temp);
     pres = atof(split_pres);
   }
+  LARA.DEPTH = pres;
+  // LARA.TEMP = temp;
+
+  // if antMod DEVA, we are done, no log
+  if (sbeID==DEVA) { return true; }
+
+  // buoy sbe vvvvv
   // convert date time to secs
   info.tm_mday = atoi(strtok(split_date, " "));
   mon = strtok(NULL, " ");
@@ -498,41 +505,33 @@ bool CTD_Data() {
   }
 
   month = info.tm_mon + 2;
-  sprintf(split_date, ", %d.%d.%d %d:%d:%d", info.tm_mday, month,
+  sprintf(split_date, "%d.%d.%d,%d:%d:%d", info.tm_mday, month,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
-
   secs = mktime(&info);
 
-  if (sbeID==DEVB) { // buoy sbe
-    // Log WriteString
-    memset(stringout, 0, STRING_SIZE);
-    sprintf(stringout, "#%.4f,", temp);
-    strcat(stringout, split_pres);
-    strcat(stringout, ","); // added 9.28 after deploy 2, data 1. 02UTC of
-    strcat(stringout, split_sal);
-    strcat(stringout, split_date);
-    strcat(stringout, "\n");
+  // Log WriteString
+  memset(stringout, 0, STRING_SIZE);
+  sprintf(stringout, "%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%s\n", 
+    temp, cond, pres, flu, par, sal, split_date);
+  DBG1(flogf("\nctd->%s", stringout);)
 
-    TURxFlush(devicePort);
-    filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
-    if (filehandle <= 0) {
-      flogf("\nERROR  |ctdlogfile '%s' fd %d", CTDLogFile, filehandle);
-      flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
-      flogf("\nLog: %s", stringout);
-      return false;
-    }
-    byteswritten = write(filehandle, stringout, strlen(stringout));
-    DBG2( cprintf("\nBytes Written: %d", byteswritten);)
-    if (close(filehandle) != 0) {
-      flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
-      return false;
-    }
-  } 
-  LARA.DEPTH = pres;
-  // LARA.TEMP = temp;
+  TURxFlush(devicePort);
+  filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
+  if (filehandle <= 0) {
+    flogf("\nERROR  |ctdlogfile '%s' fd %d", CTDLogFile, filehandle);
+    flogf("\nERROR  |CTD_Logger() %s open errno: %d", CTDLogFile, errno);
+    return false;
+  }
+  byteswritten = write(filehandle, stringout, strlen(stringout));
+  DBG2( cprintf("\nBytes Written: %d", byteswritten);)
+  if (close(filehandle) != 0) {
+    flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
+    return false;
+  }
   // this incr looks strange, but lara.ctd is not ctdsamples, not part of averaging
   LARA.CTDSAMPLES++;
-  if (LARA.BUOYMODE != 0) CTD_VertVel(secs);
+  if (LARA.BUOYMODE != 0) CTD_VertVel(secs); // ??
+  } // if DEVB
   return true;
 } //____ CTD_Data() _____//
 
