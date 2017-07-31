@@ -74,7 +74,7 @@ int CTD_Init() {
 bool CTD_Start_Up(int sbe, bool settime) {
   // global int sbeID;
   bool returnval = false;
-  DBG( flogf("\n\t|. CTD_Start_Up(%d, %d", sbe, settime); )
+  DBG( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
 
   sbeID=sbe;
   DevSelect(sbe);
@@ -82,26 +82,21 @@ bool CTD_Start_Up(int sbe, bool settime) {
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
   // leave sync mode
   CTD_SampleBreak();
-  if (CTD_GetPrompt()) {
-    cprintf("successful startup");
-    returnval = true;
-  } else {
+  if (CTD_GetPrompt()) 
+    cprintf(" successful startup");
+  else {
     CTD_SampleBreak();
     Delay_AD_Log(1);
-    if (CTD_GetPrompt()) {
-      returnval = true;
-      cprintf("successful startup2");
-    } else {
+    if (CTD_GetPrompt())
+      cprintf(" successful startup1");
+    else {
       DevSelect(DEVX);
       Delay_AD_Log(1);
       DevSelect(sbe);
-      Delay_AD_Log(1);
       CTD_SampleBreak();
       Delay_AD_Log(1);
-      if (CTD_GetPrompt()) {
-        returnval = true;
-        cprintf("successful startup3");
-      }
+      if (CTD_GetPrompt()) 
+        cprintf(" successful startup2");
     } 
   }
   if (settime)
@@ -109,7 +104,7 @@ bool CTD_Start_Up(int sbe, bool settime) {
   CTD_SyncMode();
   TURxFlush(devicePort);
   TUTxFlush(devicePort);
-  return returnval;
+  return true;
 } //_____ CTD_Start_Up() _____//
 
 /******************************************************************************\

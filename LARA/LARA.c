@@ -145,6 +145,8 @@ static void IRQ4_ISR(void);
 static void IRQ5_ISR(void);
 void WaitForWinch(short);
 void SleepUntilWoken();
+bool CurrentWarning();
+
 bool GlobalRestart;
 bool PutInSleepMode = false;
 static char *returnstr;
@@ -389,7 +391,7 @@ void InitializeLARA(ulong *PwrOn) {
     IRID.CALLMODE = 1;
 
     // check for motion
-    depth = CTD_AverageDepth(10, &velocity);
+    depth = CTD_AverageDepth(6, &velocity);
     DevSelect(DEVX);
 
     // Place Buouy in correct state
@@ -517,7 +519,7 @@ void PhaseOne() {
       break;
   }
 
-  CTD_AverageDepth(5, NULL);
+  CTD_AverageDepth(6, NULL);
   DevSelect(DEVX);
 
   // This would mean the profiling buoy is at//near surface.
@@ -535,6 +537,7 @@ void PhaseTwo() {
   ulong AscentStart, AscentStop, timeChange;
   float depthChange;
   float velocity = 0.0;
+  int halfway;
 
   flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
   // turn off wispr, close wispr ?? here? 
@@ -543,12 +546,11 @@ void PhaseTwo() {
     WISPRSafeShutdown();
   }
   OpenTUPort_WISPR(false);
-
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
   CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
-  LARA.DEPTH = CTD_AverageDepth(5, &velocity);
+  LARA.DEPTH = CTD_AverageDepth(6, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
   if (LARA.DATA) {
@@ -557,6 +559,8 @@ void PhaseTwo() {
   }
 
   // Else, sensor package deeper than target depth. Ascend.
+  if (CurrentWarning()) {
+  }
   if (LARA.BUOYMODE != 1) {
     AscentStart = Winch_Ascend();
     CTD_Sample();
@@ -576,9 +580,23 @@ void PhaseTwo() {
   NIGK.PROFILES++;
   VEEStoreShort(NIGKPROFILES_NAME, NIGK.PROFILES);
 
+  // halfway to tdepth, +2 to allow for coasting
+  halfway = ((LARA.DEPTH - NIGK.TDEPTH) / 2) + NIGK.TDEPTH + 2;
   // What's the best way out of this loop? Do we set a time limit for ascent?
   while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
     Incoming_Data();
+
+    if (LARA.DEPTH <= halfway) {
+      AscentStop = Winch_Stop();
+      WaitForWinch(0);
+      if (CurrentWarning()) {
+      }
+      AscentStart = Winch_Ascend();
+      CTD_Sample();
+      WaitForWinch(1);
+      // continue
+      halfway=0;
+    }
 
     // What if winch tells us its stopping? What AscentStop time do we get?
     if (LARA.DEPTH <= NIGK.TDEPTH) {
@@ -593,12 +611,9 @@ void PhaseTwo() {
       LARA.AVGVEL = CTD_CalculateVelocity();
       if (LARA.AVGVEL == 0.0)
         LARA.AVGVEL = ((float)NIGK.RRATE / 60.0);
-
       break;
     }
-
-    if (!LARA.ON)
-      break;
+    if (!LARA.ON) break;
   }
 
   depthChange = LARA.TOPDEPTH - LARA.MOORDEPTH;
@@ -722,7 +737,7 @@ void PhaseFour() {
 
   PrintSystemStatus();
   // sanity check
-  CTD_AverageDepth(10, &velocity);
+  CTD_AverageDepth(6, &velocity);
   if (LARA.BUOYMODE != 0) {
     Winch_Stop();
     WaitForWinch(0);
@@ -1459,3 +1474,10 @@ bool CheckTime(ulong prevTime, short mode, short hour) {
 \**************************************************************************************/
 void LARA_Recovery() {} //____ LARA_Recovery() ____//
 
+/*
+ * CurrentWarning() - current reduces distance between CTD's
+ */
+bool CurrentWarning() {
+  DBG(flogf("\n\t|CurrentWarning()");)
+  return false;
+}

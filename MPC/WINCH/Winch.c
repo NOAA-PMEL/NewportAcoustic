@@ -84,14 +84,14 @@ void AModem_Data(void) {
   // if command from Winch. If stop, why? Update LARA System Statuses
   if (strchr(inString, '#') != NULL) {
     command = strtok(inString, "#");
-    cprintf("\n\t|Command: %s", command);
+    cprintf("\n\t|Command: #%s", command);
     prechar = command[0];
     symbol = true;
   }
   // Confirming a new winch command//response from command
   else if (strchr(inString, '%') != NULL) {
     command = strtok(inString, "%");
-    cprintf("\n\t|Response: %s", command);
+    cprintf("\n\t|Response: %%%s", command);
     prechar = command[0];
     symbol = false;
 
