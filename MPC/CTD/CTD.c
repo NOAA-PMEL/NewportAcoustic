@@ -96,8 +96,9 @@ bool CTD_Start_Up(int sbe, bool settime) {
       DevSelect(sbe);
       CTD_SampleBreak();
       Delay_AD_Log(1);
-      if (!CTD_GetPrompt()) 
+      if (!CTD_GetPrompt()) {
         flogf(" fail startup2");
+      }
     } 
   }
   if (settime)
@@ -162,17 +163,18 @@ bool CTD_GetPrompt() {
   // global char *stringin;
   short count = 0;
   short LastByteInQ;
-
+  DBG1(cprintf("\n\t|CTD_GetPrompt()");)
   memset(stringin, 0, STRING_SIZE);
 
   LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
   while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
                                                     // command line for devicePort
-                                                    // or 7 seconds pass
+                                                    // or 3 seconds pass 
     TUTxPrintf(devicePort, "\r");
     Delayms(1000);
     LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
     count++;
+    DBG1(cprintf("\n\t|CTD_GetPrompt():peek");)
   }
 
   if (count == 2) {
@@ -182,6 +184,7 @@ bool CTD_GetPrompt() {
       TURxFlush(devicePort);
       return true;
     }
+    DBG1(cprintf("\n\t|CTD_GetPrompt():fail");)
     return false;
   }
 
@@ -211,7 +214,7 @@ void CTD_Sample() {
 \********************************************************************************/
 void CTD_SyncMode() {
   DBG1(flogf("\n\t|CTD_SyncMode()");)
-  CTD_SampleBreak();
+  // CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
   TUTxWaitCompletion(devicePort);
   Delayms(500);
