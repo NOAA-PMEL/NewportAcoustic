@@ -85,13 +85,11 @@ bool CTD_Start_Up(int sbe, bool settime) {
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
   // leave sync mode
   CTD_SampleBreak();
-  if (CTD_GetPrompt()) 
-  else {
+  if (!CTD_GetPrompt()) {
     flogf(" fail startup");
     CTD_SampleBreak();
     Delay_AD_Log(1);
-    if (CTD_GetPrompt())
-    else {
+    if (!CTD_GetPrompt()) {
       flogf(" fail startup1");
       DevSelect(DEVX);
       Delay_AD_Log(1);
