@@ -339,12 +339,7 @@ void InitializeLARA(ulong *PwrOn) {
   } else
     LARA.LOWPOWER = false;
 
-  // SETUP CTD
-  CTD_CreateFile(MPC.FILENUM);
-  DBG2( flogf("\n .. setup ctd"); )
-  DevSelect(DEVA);
-  AntMode('S');
-  CTD_SyncMode();
+  CTD_CreateFile(MPC.FILENUM); // for science, descent
 
   // Initialize More System Parameters
   LARA.PAYOUT = -1;
@@ -393,11 +388,11 @@ void InitializeLARA(ulong *PwrOn) {
     // Force IRID.CALLMODE to one even if default.cfg parses a 0
     IRID.CALLMODE = 1;
 
-    // testing
-    // DBG( if (LARA.STARTPHASE>0) { LARA.PHASE=LARA.STARTPHASE; return; } )
-    
-
+    // check for motion
+    CTD_Start_Up(DEVA, true); // antmod ctd, set time. buoy ctd only used for science
+    CTD_SyncMode();
     depth = CTD_AverageDepth(5, &velocity);
+    DevSelect(DEVX);
 
     // Place Buouy in correct state
     if (depth > NIGK.TDEPTH) {

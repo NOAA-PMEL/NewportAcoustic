@@ -277,35 +277,36 @@ int DevSelect(int dev) {
   if (dev==deviceID && devicePort) return 0; // already selected
   DBG(flogf("\n\t|DevSelect(%d)", dev);)
 
-  // if other device open, close
-  if (devicePort) TUClose(devicePort); 
+  // deva devb may share the port // if other device open, close
+  // if (devicePort) TUClose(devicePort); 
   switch (dev) {
   case DEVA: // antenna module dev
+    deviceID=DEVA;
     PIOSet(DEVICECOM); 
-    devicePort = TUOpen(deviceRX, deviceTX, IRIDBAUD, 0);
-    if (devicePort == NULL) {
-      flogf("\nERR DevSelect(): failed %d", dev);
-      return -1;
-    }
+    // deva devb may share the port
     if (PIOTestAssertClear(ANTMODPWR)) { // ant module is off
       PIOSet(ANTMODPWR);
       Delay_AD_Log(5); // power up delay
     }
     break;
+  case DEVX: // power off antenna, port closed
+    PIOClear(ANTMODPWR); // antMod power off
+    // devb is always on, select devb
   case DEVB: // buoy sbe
+    deviceID=DEVB;
     PIOClear(DEVICECOM); // talk to local port // do not turn off ant module
+    break;
+  } //switch
+
+  if (devicePort == NULL) {
     devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
     if (devicePort == NULL) {
       flogf("\nERR DevSelect(): failed %d", dev);
       return -1;
     }
-    break;
-  case DEVX: // power off antenna, port closed
-    PIOClear(ANTMODPWR); // antMod off
-    devicePort=NULL;
-    break;
-  } //switch
-  Delayms(200); // to settle rs232
+    Delayms(200); // to settle rs232
+  }
+  Delayms(20); // to settle hardware
   return 0;
 } //DevSelect
 

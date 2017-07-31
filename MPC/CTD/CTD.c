@@ -429,7 +429,6 @@ bool CTD_Data() {
       // prompt
       flogf("\nERROR|CTD_Data(): got <|> want #, set sync mode");
       CTD_SyncMode();
-      Delay_AD_Log(3);
     } else {
       // no < > #, don't know what
       flogf("\nERROR|CTD_Data(): No prompt found, reset ctd");
