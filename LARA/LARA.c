@@ -746,8 +746,7 @@ void PhaseFour() {
   //
   // turn off antenna, which selects buoy ctd
   DevSelect(DEVX);
-  // unneeded
-  DevSelect(DEVB);
+  CTD_Start_Up(DEVB, true);
 
   // Now descend.
   if (LARA.BUOYMODE != 2) {
