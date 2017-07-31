@@ -750,6 +750,7 @@ void PhaseFour() {
 
   // Now descend.
   if (LARA.BUOYMODE != 2) {
+    DBG1(flogf("\ndown");)
     LARA.TOPDEPTH = LARA.DEPTH;
     DescentStart = Winch_Descend();
     WaitForWinch(2);
@@ -1477,6 +1478,16 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
  * CurrentWarning() - current reduces distance between CTD's
  */
 bool CurrentWarning() {
+  float a, b;
   DBG(flogf("\n\t|CurrentWarning()");)
+  CTD_Start_Up(DEVB, true);
+  CTD_Sample();
+  CTD_Data();
+  b=LARA.DATA;
+  CTD_Start_Up(DEVA, true);
+  CTD_Sample();
+  CTD_Data();
+  a=LARA.DATA;
+  flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
   return false;
 }

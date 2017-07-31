@@ -189,9 +189,10 @@ bool CTD_GetPrompt() {
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_Sample() {
+  DBG(cputc('+');)
   DBG2( flogf("\n . CTD_Sample"); )
   if (SyncMode) {
-    TUTxPrintf(devicePort, "x\r");
+    TUTxPrintf(devicePort, "+\r");
   } else {
     TUTxPrintf(devicePort, "TS\r");
   }
