@@ -169,15 +169,18 @@ bool CTD_GetPrompt() {
   if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
   while (((char)LastByteInQ != '>') && count < 2) { 
     // until a > is read in command line for devicePort or 3 seconds pass 
-    TUTxPutByte(devicePort, '\r');
+    TUTxPrintf(devicePort, "\r");
     Delayms(1000);
     i=tgetq(devicePort);
     if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
     count++;
     DBG1(cprintf("\n\t|CTD_GetPrompt():peek");)
   }
+  cdrain();
+  DBG1(cprintf("\n\t|CTD_GetPrompt()");)
 
   if (count == 2) {
+    DBG1(cprintf("\n\t|CTD_GetPrompt()");)
     TURxGetBlock(devicePort, stringin, (long) STRING_SIZE, (short) 1000);
     if (strstr(stringin, "S>") != NULL) {
       cprintf("\nPrompt from CTDBlock");
@@ -227,6 +230,7 @@ void CTD_SyncMode() {
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_SampleBreak() {
+  cprintf("brk");
   TUTxBreak(devicePort, 5000);
   SyncMode = false;
 } //____ CTD_Sample() ____//
