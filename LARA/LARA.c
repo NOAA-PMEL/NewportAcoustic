@@ -519,6 +519,8 @@ void PhaseOne() {
       break;
   }
 
+  CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
+  CTD_SyncMode();
   CTD_AverageDepth(2, NULL);
 
   // This would mean the profiling buoy is at//near surface.
@@ -548,6 +550,8 @@ void PhaseTwo() {
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
+  CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
+  CTD_SyncMode();
   LARA.DEPTH = CTD_AverageDepth(3, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
@@ -718,7 +722,10 @@ void PhaseFour() {
     WISPRPower(true);
   }
 
-
+  // turn off antenna, which selects buoy ctd
+  DevSelect(DEVX);
+  // unneeded
+  DevSelect(DEVB);
   LARA.SURFACED = false;
 
   PrintSystemStatus();
