@@ -140,7 +140,6 @@ int GPSIRID_Init() {
   scratch = (char *)calloc(STRING_SIZE, 1);
   // deviceRX = TPUChanFromPin(DEVICERX); // moved to SetupHardware
   // deviceTX = TPUChanFromPin(DEVICETX);
-  DevSelect(DEVB); // buoy sbe by default
   return 0;
 }
 

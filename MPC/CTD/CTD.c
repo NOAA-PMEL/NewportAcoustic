@@ -64,7 +64,7 @@ int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
   // startup sets sync mode
   CTD_Start_Up(DEVA, true);
-  DevSelect(DEVX); // turn antmod back off
+  // antmod is going to be used during boot
   CTD_Start_Up(DEVB, true);
   stringin = (char *)calloc(STRING_SIZE, 1);
   stringout = (char *)calloc(STRING_SIZE, 1);
@@ -86,20 +86,20 @@ bool CTD_Start_Up(int sbe, bool settime) {
   // leave sync mode
   CTD_SampleBreak();
   if (CTD_GetPrompt()) 
-    cprintf(" successful startup");
   else {
+    flogf(" fail startup");
     CTD_SampleBreak();
     Delay_AD_Log(1);
     if (CTD_GetPrompt())
-      cprintf(" successful startup1");
     else {
+      flogf(" fail startup1");
       DevSelect(DEVX);
       Delay_AD_Log(1);
       DevSelect(sbe);
       CTD_SampleBreak();
       Delay_AD_Log(1);
-      if (CTD_GetPrompt()) 
-        cprintf(" successful startup2");
+      if (!CTD_GetPrompt()) 
+        flogf(" fail startup2");
     } 
   }
   if (settime)
@@ -140,7 +140,7 @@ void CTD_DateTime() {
   time_t rawtime;
   struct tm *info;
   char buffer[15];
-
+  DBG1(flogf("\n\t|CTD_DateTime()");)
   time(&rawtime);
 
   info = gmtime(&rawtime);
@@ -212,7 +212,7 @@ void CTD_Sample() {
 ** CTD_SampleSleep()
 \********************************************************************************/
 void CTD_SyncMode() {
-  DBG(flogf("\n\t|CTD_SyncMode()");)
+  DBG1(flogf("\n\t|CTD_SyncMode()");)
   CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
   TUTxWaitCompletion(devicePort);

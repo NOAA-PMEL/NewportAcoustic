@@ -745,6 +745,7 @@ void PhaseFour() {
   //
   // turn off antenna, which selects buoy ctd
   DevSelect(DEVX);
+  // redundant?
   CTD_Select(DEVB);
 
   // Now descend.
