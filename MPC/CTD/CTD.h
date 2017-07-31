@@ -12,6 +12,7 @@ void CTD_SyncMode();
 void CTD_GetSettings();
 float CTD_CalculateVelocity();
 float CTD_AverageDepth(int, float *);
+void CTD_Select(int sbe);
 
 extern int SelectDevice(int sbe); // GPSIRID.c
 

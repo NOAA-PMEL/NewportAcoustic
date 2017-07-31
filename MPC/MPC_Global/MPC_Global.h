@@ -44,6 +44,9 @@ struct menu {
   void (*command)();
   char *string;
 };
+// IRIDUM TUPORT Setup
+extern TUPort *devicePort;
+extern short deviceRX, deviceTX;
 
 /***********************************************************
 //Functions defined in MPC.c file

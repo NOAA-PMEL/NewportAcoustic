@@ -45,7 +45,7 @@ extern SystemParameters MPC;
 extern SystemStatus LARA;
 CTDParameters CTD;
 bool SyncMode;
-extern TUPort *devicePort; // GPSIRID
+extern TUPort *devicePort; // MPC_Global
 int sbeID=DEVB;  // DEVA:antenna DEVB:buoy
 float SummedVelocity;
 short CTDSamples;
@@ -62,6 +62,10 @@ float ascentRate = 0.26;
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
+  // startup sets sync mode
+  CTD_Start_Up(DEVA, true);
+  DevSelect(DEVX); // turn antmod back off
+  CTD_Start_Up(DEVB, true);
   stringin = (char *)calloc(STRING_SIZE, 1);
   stringout = (char *)calloc(STRING_SIZE, 1);
   return 0;
@@ -76,8 +80,7 @@ bool CTD_Start_Up(int sbe, bool settime) {
   bool returnval = false;
   DBG( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
 
-  sbeID=sbe;
-  DevSelect(sbe);
+  CTD_Select(sbe);
 
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
   // leave sync mode
@@ -106,6 +109,12 @@ bool CTD_Start_Up(int sbe, bool settime) {
   TUTxFlush(devicePort);
   return true;
 } //_____ CTD_Start_Up() _____//
+
+void CTD_Select(int sbe) {
+  sbeID=sbe;
+  DevSelect(sbe);
+  if (sbe==DEVA) AntMode('S');
+} // CTD_Select
 
 /******************************************************************************\
 ** CTD_CreateFile()
@@ -204,6 +213,7 @@ void CTD_Sample() {
 \********************************************************************************/
 void CTD_SyncMode() {
   DBG(flogf("\n\t|CTD_SyncMode()");)
+  CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
   TUTxWaitCompletion(devicePort);
   Delayms(500);
@@ -422,7 +432,6 @@ bool CTD_Data() {
       // no < > #, don't know what
       flogf("\nERROR|CTD_Data(): No prompt found, reset ctd");
       CTD_Start_Up(sbeID, true);
-      CTD_SyncMode();
     }
     return false;
   } // no #
@@ -531,7 +540,6 @@ bool CTD_Data() {
   // this incr looks strange, but lara.ctd is not ctdsamples, not part of averaging
   LARA.CTDSAMPLES++;
   if (LARA.BUOYMODE != 0) CTD_VertVel(secs); // ??
-  } // if DEVB
   return true;
 } //____ CTD_Data() _____//
 
@@ -588,7 +596,7 @@ float CTD_AverageDepth(int i, float *velocity) {
   ulong dur, starttime = 0, stoptime = 0;
 
   DBG1( flogf("\n . CTD_AverageDepth"); )
-  CTD_Start_Up(DEVA, false);
+  CTD_Select(DEVA);
   TURxFlush(devicePort);
 
   for (j = 0; j < i; j++) {

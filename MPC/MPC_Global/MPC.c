@@ -81,6 +81,8 @@ int DetectionInt;
 
 int DataInterval;
 char time_chr[21];
+// IRIDUM TUPORT Setup
+short deviceRX, deviceTX;
 
 #ifdef TIMING
 volatile clock_t start_clock;
@@ -169,6 +171,8 @@ void SetupHardware(void) {
   char filenum[] = "00000000";
   char logfile[sizeof "00000000.log"];
 
+  deviceRX = TPUChanFromPin(DEVICERX); // moved from GPSIRID_Init
+  deviceTX = TPUChanFromPin(DEVICETX);
 #ifdef REALTIME // Placed here 6/20/2016 -AT bcuz SEAGLIDER
   p = VEEFetchData(FILENUM_NAME).str;
   counter = atol(p);

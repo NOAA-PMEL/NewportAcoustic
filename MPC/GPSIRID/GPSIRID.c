@@ -124,10 +124,8 @@ void DelayTX(int ch);
 // int GPSIRID_Init();
 // short IRIDGPS();
 // void GetIRIDIUMSettings();
-TUPort *devicePort; 
 
-// IRIDUM TUPORT Setup
-short deviceRX, deviceTX;
+TUPort *devicePort;
 int deviceID=0; // 0=off, 1=buoy, 2=antenna
 uchar *inputstring, *first, *scratch;
 
@@ -140,8 +138,8 @@ int GPSIRID_Init() {
   // never freed
   inputstring = (char *)calloc(STRING_SIZE, 1);
   scratch = (char *)calloc(STRING_SIZE, 1);
-  deviceRX = TPUChanFromPin(DEVICERX);
-  deviceTX = TPUChanFromPin(DEVICETX);
+  // deviceRX = TPUChanFromPin(DEVICERX); // moved to SetupHardware
+  // deviceTX = TPUChanFromPin(DEVICETX);
   DevSelect(DEVB); // buoy sbe by default
   return 0;
 }

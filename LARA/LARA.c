@@ -212,8 +212,6 @@ void main() {
 
     // PHASE 4:  Descend ICE Housing
     case 4:
-      CTD_Start_Up(DEVB, false); // ?? why start here, move to phase4
-      CTD_SyncMode();
       PhaseFour();
       break;
     }
@@ -260,8 +258,9 @@ void InitializeLARA(ulong *PwrOn) {
   PreRun();
   // Get all Platform Settings
   GetSettings();
-  CTD_Init();
+  // best to init GPSIRID first
   GPSIRID_Init();
+  CTD_Init();
 
   // First Safety Catch. If woken. Reboot
   if (MPC.STARTUPS >= MPC.STARTMAX) {
@@ -549,7 +548,7 @@ void PhaseTwo() {
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
-  CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
+  CTD_Select(DEVA);
   LARA.DEPTH = CTD_AverageDepth(6, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
@@ -746,7 +745,7 @@ void PhaseFour() {
   //
   // turn off antenna, which selects buoy ctd
   DevSelect(DEVX);
-  CTD_Start_Up(DEVB, true);
+  CTD_Select(DEVB);
 
   // Now descend.
   if (LARA.BUOYMODE != 2) {
@@ -1480,11 +1479,11 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
 bool CurrentWarning() {
   float a, b;
   DBG(flogf("\n\t|CurrentWarning()");)
-  CTD_Start_Up(DEVB, true);
+  CTD_Select(DEVB);
   CTD_Sample();
   CTD_Data();
   b=LARA.DATA;
-  CTD_Start_Up(DEVA, true);
+  CTD_Select(DEVA);
   CTD_Sample();
   CTD_Data();
   a=LARA.DATA;
