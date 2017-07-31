@@ -161,18 +161,18 @@ void CTD_DateTime() {
 \********************************************************************************/
 bool CTD_GetPrompt() {
   // global char *stringin;
-  short count = 0;
+  short i, count = 0;
   short LastByteInQ;
   DBG1(cprintf("\n\t|CTD_GetPrompt()");)
   memset(stringin, 0, STRING_SIZE);
-
-  LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
-  while (((char)LastByteInQ != '>') && count < 2) { // until a > is read in
-                                                    // command line for devicePort
-                                                    // or 3 seconds pass 
-    TUTxPrintf(devicePort, "\r");
+  i=tgetq(devicePort);
+  if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
+  while (((char)LastByteInQ != '>') && count < 2) { 
+    // until a > is read in command line for devicePort or 3 seconds pass 
+    TUTxPutByte(devicePort, '\r');
     Delayms(1000);
-    LastByteInQ = TURxPeekByte(devicePort, (tgetq(devicePort) - 1));
+    i=tgetq(devicePort);
+    if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
     count++;
     DBG1(cprintf("\n\t|CTD_GetPrompt():peek");)
   }
@@ -186,9 +186,7 @@ bool CTD_GetPrompt() {
     }
     DBG1(cprintf("\n\t|CTD_GetPrompt():fail");)
     return false;
-  }
-
-  else {
+  } else {
     cprintf("\nPrompt from CTD");
     TURxFlush(devicePort);
     return true;
