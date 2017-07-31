@@ -77,7 +77,7 @@ bool CTD_Start_Up(int sbe, bool settime) {
   DBG( flogf("\n\t|. CTD_Start_Up"); )
 
   sbeID=sbe;
-  if (devicePort == NULL) DevSelect(sbe);
+  DevSelect(sbe);
 
   // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
   // leave sync mode
@@ -141,7 +141,7 @@ void CTD_DateTime() {
   info = gmtime(&rawtime);
 
   //	strftime(buffer, 15, "%m%d%Y%H%M%S", info);
-  sprintf(buffer, "%02d%02d%04d%02d%02d%02d", info->tm_mon, info->tm_mday,
+  sprintf(buffer, "%02d%02d%04d%02d%02d%02d", info->tm_mon+1, info->tm_mday,
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 

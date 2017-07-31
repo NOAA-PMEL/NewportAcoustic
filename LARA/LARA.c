@@ -389,11 +389,7 @@ void InitializeLARA(ulong *PwrOn) {
     IRID.CALLMODE = 1;
 
     // check for motion
-#ifdef DEBUG
-    CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
-#else
     CTD_Start_Up(DEVA, true); // antmod ctd, set time. buoy ctd only used for science
-#endif
     CTD_SyncMode();
     depth = CTD_AverageDepth(5, &velocity);
     DevSelect(DEVX);
