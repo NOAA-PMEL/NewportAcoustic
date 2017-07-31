@@ -20,5 +20,6 @@ int AntMode(char);
 int GPSIRID_Init();
 bool GPSstartup();
 short IRIDGPS();
+long GetStringWait(char *str, short wait);
 
 extern TUPort *devicePort;

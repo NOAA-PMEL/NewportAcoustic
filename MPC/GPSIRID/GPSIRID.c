@@ -116,8 +116,8 @@ void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
-long GetStringWait(char *str, short wait);
 // G.h
+// long GetStringWait(char *str, short wait);
 // bool GPSstartup();
 // int DevSelect(int);
 // int AntMode(char);
@@ -2050,7 +2050,7 @@ void ConsoleIrid() {
 void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
 
 /*
- * GetStringWait(inputstring, 1000) up to 1000ms wait
+ * GetStringWait(inputstring, 1000) reads devicePort, up to 1000ms wait
  *  1 char long wait, block short wait
  * up to STRINGSIZE
  */

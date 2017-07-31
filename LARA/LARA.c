@@ -389,9 +389,7 @@ void InitializeLARA(ulong *PwrOn) {
     IRID.CALLMODE = 1;
 
     // check for motion
-    CTD_Start_Up(DEVA, true); // antmod ctd, set time. buoy ctd only used for science
-    CTD_SyncMode();
-    depth = CTD_AverageDepth(5, &velocity);
+    depth = CTD_AverageDepth(10, &velocity);
     DevSelect(DEVX);
 
     // Place Buouy in correct state
@@ -519,9 +517,8 @@ void PhaseOne() {
       break;
   }
 
-  CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
-  CTD_SyncMode();
-  CTD_AverageDepth(2, NULL);
+  CTD_AverageDepth(5, NULL);
+  DevSelect(DEVX);
 
   // This would mean the profiling buoy is at//near surface.
   if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
@@ -551,8 +548,7 @@ void PhaseTwo() {
   PrintSystemStatus();
 
   CTD_Start_Up(DEVA, false); // antmod ctd, set time. buoy ctd only used for science
-  CTD_SyncMode();
-  LARA.DEPTH = CTD_AverageDepth(3, &velocity);
+  LARA.DEPTH = CTD_AverageDepth(5, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
   if (LARA.DATA) {
@@ -717,28 +713,30 @@ void PhaseFour() {
 
   flogf("\n%s|Phase_Four():", Time(NULL));
   OpenTUPort_NIGK(true);
-  if (WISP.DUTYCYCL > 50) { // moved here from p3
-    OpenTUPort_WISPR(true);
-    WISPRPower(true);
-  }
+  // if (WISP.DUTYCYCL > 50) { // moved here from p3
+    // OpenTUPort_WISPR(true);
+    // WISPRPower(true);
+  // }
 
-  // turn off antenna, which selects buoy ctd
-  DevSelect(DEVX);
-  // unneeded
-  DevSelect(DEVB);
   LARA.SURFACED = false;
 
   PrintSystemStatus();
-  // First stop buoy ( in case of restart we don't know the state of the buoy.
-  // better to stop
+  // sanity check
+  CTD_AverageDepth(10, &velocity);
   if (LARA.BUOYMODE != 0) {
     Winch_Stop();
     WaitForWinch(0);
     flogf("\nErr PhaseFour(): buoy was in motion");
   }
+  //
+  // turn off antenna, which selects buoy ctd
+  DevSelect(DEVX);
+  // unneeded
+  DevSelect(DEVB);
+
   // Now descend.
   if (LARA.BUOYMODE != 2) {
-    LARA.TOPDEPTH = CTD_AverageDepth(2, &velocity);
+    LARA.TOPDEPTH = LARA.DEPTH;
     DescentStart = Winch_Descend();
     WaitForWinch(2);
     CTD_Sample();
@@ -755,9 +753,7 @@ void PhaseFour() {
   prevDepth = LARA.DEPTH;
 
   while (LARA.BUOYMODE == 2) {
-
-    // CTDSleep();
-
+    // reading a sample triggers a new one, in p4
     Incoming_Data();
 
     // Receive Stop command from Winch...
@@ -782,7 +778,7 @@ void PhaseFour() {
       prevDepth = LARA.DEPTH;
       interval++;
     }
-  }
+  } // while mode==2
 
   if (LARA.BUOYMODE == 0)
     LARA.MOORDEPTH = LARA.DEPTH;

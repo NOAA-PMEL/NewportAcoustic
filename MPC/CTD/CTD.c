@@ -74,7 +74,7 @@ int CTD_Init() {
 bool CTD_Start_Up(int sbe, bool settime) {
   // global int sbeID;
   bool returnval = false;
-  DBG( flogf("\n\t|. CTD_Start_Up"); )
+  DBG( flogf("\n\t|. CTD_Start_Up(%d, %d", sbe, settime); )
 
   sbeID=sbe;
   DevSelect(sbe);
@@ -106,6 +106,7 @@ bool CTD_Start_Up(int sbe, bool settime) {
   }
   if (settime)
     CTD_DateTime();
+  CTD_SyncMode();
   TURxFlush(devicePort);
   TUTxFlush(devicePort);
   return returnval;
@@ -389,13 +390,14 @@ int Sea_Ice_Algorithm() {
 * !! sets lara.depth lara.temp
 * !! CTD_vertvel
 * !! log scientific
+* waits up to 8 seconds - best called after tgetq()
 \******************************************************************************/
 bool CTD_Data() {
   // global stringin CTDLogFile
   char *strin;  // pointer into stringin
-  char charin;
   int filehandle;
-  int i = 0, count = 0, byteswritten, month;
+  int i = 0, byteswritten, month;
+  long len;
   char *split_temp, *split_cond, *split_pres;
   char *split_flu, *split_par, *split_sal;
   float temp, cond, pres, flu, par, sal;
@@ -404,19 +406,10 @@ bool CTD_Data() {
   time_t secs = 0;
 
   DBG2( flogf("\n. CTD_Data()"); )
-
   memset(stringin, 0, STRING_SIZE);
-  // loop until 3 timeouts; should this be loop until \n ?
-  while (count < 3 && i < STRING_SIZE) {
-    charin = TURxGetByteWithTimeout(devicePort, 250);
-    if (charin == -1)
-      count++;
-    else {
-      stringin[i] = charin;
-      i++;
-    }
-  }
 
+  // waits up to 8 seconds - best called after tgetq()
+  len = GetStringWait(stringin, 8000);
   DBG2( flogf("\n%s", stringin);)
 
   // expect to see stringin start with ".*# "
@@ -596,65 +589,42 @@ void CTD_GetSettings() {
 \******************************************************************************/
 float CTD_AverageDepth(int i, float *velocity) {
   int j;
-  float depth[11];
-  float depthchange;
-  float vel;
-  bool firstreading = true;
-  float returnValue;
-  ulong starttime = 0, stoptime = 0;
+  float first, last, diff, vel;
+  ulong dur, starttime = 0, stoptime = 0;
 
   DBG1( flogf("\n . CTD_AverageDepth"); )
-  if (tgetq(devicePort))
-    TURxFlush(devicePort);
-  // This for loop is to understand the profiling buoy's starting position prior
-  // to ascending the water column.
-  Delay_AD_Log(1);
-  // TUTxPrintf(devicePort, "\n");
-  CTD_Sample();
-  for (j = 0; j < i; NULL) {
-    if (AD_Check()) {
-      if (j == 0)
-        CTD_Sample();
-      j++;
-      if (j == i) {
-        *velocity = 0.0;
-        return 0.0;
-      }
-    }
-    if (tgetq(devicePort)) {
-      if (CTD_Data()) {
-        if (firstreading)
-          starttime = RTCGetTime(NULL, NULL);
-        depth[j] = LARA.DEPTH;
-        j++;
-      }
-      if (j == i) {
-        stoptime = RTCGetTime(NULL, NULL);
-        break;
-      }
-      CTD_Sample();
-    }
-  }
-  // Very basic velocity calculation
-  depthchange = depth[j - 1] - depth[0];
-  flogf("\nDepthChange: %f over %d samples", depthchange, j - 1);
-  vel = depthchange / ((float)j - 1.0);
-  *velocity = vel;
-  for (j = 1; j < i; j++)
-    depth[0] = depth[0] + depth[j];
-  depth[0] = depth[0] / (float)i;
-  // if movement of more than 1 meter in duration of function.
-  if (abs(depth[0] - depth[i - 1]) < 1.0) {
-    flogf("\n\t|Profiling Buoy Stationary at %5.2f at %5.2fm/sample", depth[0],
-          vel);
-    returnValue = depth[0];
-  } else {
-    flogf("\n\t|Profiling Buoy Moving currently at %5.2f at %5.2fm/sample",
-          depth[0], vel);
-    returnValue = 0.0;
-  }
+  CTD_Start_Up(DEVA, false);
+  TURxFlush(devicePort);
 
-  return returnValue;
+  for (j = 0; j < i; j++) {
+    CTD_Sample();
+    if (!CTD_Data()) return 0.0; // waits up to 8 sec
+    if (j==0) {
+      starttime = RTCGetTime(NULL, NULL);
+      first = LARA.DEPTH;
+    }
+  } // for j
+  stoptime = RTCGetTime(NULL, NULL);
+  last = LARA.DEPTH;
+  diff = first - last;
+  // Very basic velocity calculation
+  flogf("\nDepthChange: %5.2f over %d samples", diff, i);
+  dur = stoptime-starttime;
+  vel = diff / (float) dur;
+  *velocity = vel;
+  // if movement of more than 1 meter in 6s
+  if (dur<6) 
+    flogf("\n\t|not enough sample time to profile buoy movement");
+  else
+    if (abs(diff) < 1.0) {
+      flogf("\n\t|Profiling Buoy Stationary at %5.2f, %5.2fm/s", last, vel);
+      LARA.BUOYMODE=0;
+    } else {
+      flogf("\n\t|Profiling Buoy Moving currently at %5.2f, %5.2fm/s", last, vel);
+      if (vel>0) LARA.BUOYMODE=1;
+      else LARA.BUOYMODE=2;
+    }
+  return last;
 }
 
 /******************************************************************************\
