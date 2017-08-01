@@ -58,13 +58,14 @@ typedef struct {
                    // Samples
   short TDEPTH; //
   float TOPDEPTH;
-  float AVGVEL;
+  float AVGVEL;  // set at halfway, use at surface
   float PAYOUT;
   short ASCENTTIME;
   short DESCENTTIME;
   short STATUS;
   short CTDSAMPLES;
   bool LOWPOWER;
+  float TEMP; // set in CTD_Data()
 } SystemStatus;
 char *PrintSystemStatus(void);
 int Incoming_Data();

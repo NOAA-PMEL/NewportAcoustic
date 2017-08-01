@@ -5,14 +5,14 @@
 **
 **
 \******************************************************************************/
-void settings(void); // renamed main from pre-FAT32 code
+void settings (void);		// renamed main from pre-FAT32 code
 
-typedef struct // Used to access runtime settings
+typedef struct			// Used to access runtime settings
 {
-  char *optName;    // VEE name for lookup
-  char *optDefault; // default value
-  char *optDesc;    // detailed description text
-  char *optCurrent; // current value
+  char *optName;		// VEE name for lookup
+  char *optDefault;		// default value
+  char *optDesc;		// detailed description text
+  char *optCurrent;		// current value
 } Settings;
 
 #define PROG_NAME "MPC.PROGNAME"
@@ -20,11 +20,11 @@ typedef struct // Used to access runtime settings
 #define PROG_DESC "Program name\n"
 
 #define PROJID_NAME "MPC.PROJID"
-#define PROJID_DEFAULT "QUEH" // QUEH for IRIDIUM RUDICS Login
+#define PROJID_DEFAULT "QUEH"	// QUEH for IRIDIUM RUDICS Login
 #define PROJID_DESC "Project ID\n"
 
 #define PLTFRMID_NAME "MPC.PLTFRMID"
-#define PLTFRMID_DEFAULT "LR01" // RA01 for RUDICS Login
+#define PLTFRMID_DEFAULT "LR01"	// RA01 for RUDICS Login
 #define PLTFRMID_DESC "Platform ID\n"
 
 #define LONGITUDE_NAME "MPC.LONG"
@@ -40,19 +40,19 @@ typedef struct // Used to access runtime settings
 
 // Variable will be written to every software restart
 #define STARTUPS_NAME "MPC.STARTUPS"
-#define STARTUPS_DEFAULT "0" 
+#define STARTUPS_DEFAULT "0"
 #define STARTUPS_DESC "The total number of reboots/startups\n"
 
 #define STARTPHASE_NAME "MPC.STARTPHASE"
-#define STARTPHASE_DEFAULT "0" 
+#define STARTPHASE_DEFAULT "0"
 #define STARTPHASE_DESC "recommended phase to start.\n"
 
 #define STARTMAX_NAME                                                          \
-  "MPC.STARTMAX" //-s to control this valuable through SYSTEM.CFG file
-#define STARTMAX_DEFAULT "9999" //
+  "MPC.STARTMAX"		//-s to control this valuable through SYSTEM.CFG file
+#define STARTMAX_DEFAULT "9999"	//
 #define STARTMAX_DESC "Maximum number of startups allowed.\n"
 
-#define DETECTIONINT_NAME "MPC.DETINT" //-i
+#define DETECTIONINT_NAME "MPC.DETINT"	//-i
 #define DETECTIONINT_DEFAULT "10"
 #define DETECTIONINT_DESC                                                      \
   "System interval time used for calling detections and calculating "          \
@@ -66,33 +66,33 @@ typedef struct // Used to access runtime settings
 #define LOGFILE_DEFAULT "ACTIVITY.LOG"
 #define LOGFILE_DESC "Log file for long term moorings that don't transmit data"
 
-#define DATAXINTERVAL_NAME "MPC.DATAXINT" //-a currently...
+#define DATAXINTERVAL_NAME "MPC.DATAXINT"	//-a currently...
 #define DATAXINTERVAL_DEFAULT "360"
 #define DATAXINTERVAL_DESC                                                     \
   "The time in minutes between data transfers. Whether AModem or just "        \
   "IRIDIUM.\n"
 
 // POWER LOGGING SETTINGS
-#define BATTERYLOGGER_NAME "ADS.BATLOG" // T
+#define BATTERYLOGGER_NAME "ADS.BATLOG"	// T
 #define BATTERYLOGGER_DEFAULT "0"
 #define BATTERYLOGGER_DESC                                                     \
   "To log the energy use of battery or not. 1=calculate.\n"
 
-#define BATTERYCAPACITY_NAME "ADS.BATCAP" // Calculated by hand before
-                                          // deployment
+#define BATTERYCAPACITY_NAME "ADS.BATCAP"	// Calculated by hand before
+					  // deployment
 #define BATTERYCAPACITY_DEFAULT "12000.0"
 #define BATTERYCAPACITY_DESC                                                   \
   "Number of Kilojoules of supplied battery. To be subtracted from and "       \
   "reported to land.\n"
 
-#define MINSYSVOLT_NAME "ADS.MINVOLT" //-v
+#define MINSYSVOLT_NAME "ADS.MINVOLT"	//-v
 #define MINSYSVOLT_DEFAULT "11.5"
 #define MINSYSVOLT_DESC                                                        \
   "The voltage at which the system will go into only recovery mode"
 
 // IRIDIUM VEEPROM SETTINGS
-#define IRIDPHONE_NAME "IRID.PHONE"       //-p?
-#define IRIDPHONE_DEFAULT "0088160000519" // PMEL Rudics
+#define IRIDPHONE_NAME "IRID.PHONE"	//-p?
+#define IRIDPHONE_DEFAULT "0088160000519"	// PMEL Rudics
 #define IRIDPHONE_DESC                                                         \
   "The 13 character phone number the iridium modem uses to call in.\n"
 
@@ -127,7 +127,7 @@ typedef struct // Used to access runtime settings
 #define MAXCALLS_DESC "Maximum Iridium calls per session.\n"
 
 #define CALLHOUR_NAME "IRID.CALLHOUR"
-#define CALLHOUR_DEFAULT "20" // UTC Hour
+#define CALLHOUR_DEFAULT "20"	// UTC Hour
 #define CALLHOUR_DESC "Hour at which to call iridium\n"
 
 #define CALLMODE_NAME "IRID.CALLMODE"
@@ -139,28 +139,28 @@ typedef struct // Used to access runtime settings
 #define LOWFIRST_DESC "Send file name with lowest # in the name first\n"
 
 // WISPR VEEPROM SETTINGS
-#define DETECTIONNUM_NAME "WISP.DETNUM" //-n
+#define DETECTIONNUM_NAME "WISP.DETNUM"	//-n
 #define DETECTIONNUM_DEFAULT "0"
 #define DETECTIONNUM_DESC                                                      \
   "The number of detections at one inquiry to trigger AModem Call"
 
-#define DETECTIONMAX_NAME "WISP.DETMAX" //-d
+#define DETECTIONMAX_NAME "WISP.DETMAX"	//-d
 #define DETECTIONMAX_DEFAULT "10"
 #define DETECTIONMAX_DESC                                                      \
   "[-1-20]Maximum number of detections to be returned at the end of every "    \
   "DETECTIONINTerval.\n"
 
-#define WISPRGAIN_NAME "WISP.GAIN" //-g
+#define WISPRGAIN_NAME "WISP.GAIN"	//-g
 #define WISPRGAIN_DEFAULT "0"
 #define WISPRGAIN_DESC                                                         \
   "[0-3] Gain setting to apply to WISPR which controls EOS_HM1 Pre-amp.\n"
 
-#define WISPRNUM_NAME "WISP.NUM" //-w?
+#define WISPRNUM_NAME "WISP.NUM"	//-w?
 #define WISPRNUM_DEFAULT "1"
 #define WISPRNUM_DESC                                                          \
   "[1-4] The Wispr board number to be operated while WISP.ON = 1. \n"
 
-#define DUTYCYCLE_NAME "WISP.DUTYCYCL" //-c
+#define DUTYCYCLE_NAME "WISP.DUTYCYCL"	//-c
 #define DUTYCYCLE_DEFAULT "100"
 #define DUTYCYCLE_DESC                                                         \
   "[0-100] Percentage of DETINT duration which WISPR is on. The later half "   \
@@ -197,7 +197,7 @@ typedef struct // Used to access runtime settings
   "The offset in seconds for which it takes to send and process gps\n"
 
 #define AMODEMMAXUPLOAD_NAME "AMDM.MAXUPL"
-#define AMODEMMAXUPLOAD_DEFAULT "4000" // BYTES
+#define AMODEMMAXUPLOAD_DEFAULT "4000"	// BYTES
 #define AMODEMMAXUPLOAD_DESC                                                   \
   "The number of bytes inwhich to limit AModem Data Transfers\n"
 
@@ -240,39 +240,20 @@ typedef struct // Used to access runtime settings
 #define NIGKRECOVERY_DEFAULT "0"
 #define NIGKRECOVERY_DESC "1 to set Profiling BUoy in Recovery Mode\n"
 
+/*
 // CTD Sensor Settings
 #define CTDUPLOADFILE_NAME "CTD.UPLOAD"
 #define CTDUPLOADFILE_DEFAULT "1"
-#define CTDUPLOADFILE_DESC                                                     \
-  "\"1\" to upload file via Iridium else \"0\"\n" /*                           \
-                                                  #define                      \
-                                                  CTDSAMPLINGMODE_NAME         \
-                                                  "CTD.POLLED"                 \
-                                                  #define                      \
-                                                  CTDSAMPLINGMODE_DEFAULT "1"  \
-                                                  #define CTDSAMPLINGMODE_DESC                                                          \
-                                                  "1 for Polled, 0 for         \
-                                                  Autonomous\n"                \
-                                                                               \
-                                                  #define                      \
-                                                  CTDSAMPLEDELAY_NAME          \
-                                                  "CTD.DELAY"                  \
-                                                  #define                      \
-                                                  CTDSAMPLEDELAY_DEFAULT  "2"  \
-                                                  #define  CTDSAMPLEDELAY_DESC \
-                                                  "Number of seconds to wait   \
-                                                  before taking another        \
-                                                  sample. Polled Mode only \n" \
-                                                                               \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_NAME       \
-                                                  "CTD.SAMPINT"                \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_DEFAULT    \
-                                                  "6"                          \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_DESC       \
-                                                  "Number of seconds between   \
-                                                  samples. Autonomous sampling \
-                                                  mode only \n"                \
-                                                  */
+#define CTDUPLOADFILE_DESC \
+ "\"1\" to upload file via Iridium else \"0\"\n"
+ 
+#define CTDSAMPLINGMODE_NAME "CTD.POLLED"
+#define CTDSAMPLINGMODE_DEFAULT "1" 
+#define CTDSAMPLINGMODE_DESC "1 for Polled, 0 for Autonomous\n" 
+#define CTDSAMPLEDELAY_NAME "CTD.DELAY" 
+#define CTDSAMPLEDELAY_DEFAULT "2" 
+#define CTDSAMPLEDELAY_DESC "Number of seconds to wait before taking another sample. Polled Mode only \n"
+#define CTDSAMPLEINTERVAL_NAME "CTD.SAMPINT" 
+#define CTDSAMPLEINTERVAL_DEFAULT "6" 
+#define CTDSAMPLEINTERVAL_DESC "Number of seconds between samples. Autonomous sampling mode only \n" 
+*/

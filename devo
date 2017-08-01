@@ -1,0 +1,10 @@
+calc velocity to halfway up, use to predict stop time
+
+do we have alarms? 
+
+low power mode in phase 1
+
+deployment mode - wait at least so long, then look for no change over 10 min
+leave deployment mode if buoy status from surface
+
+lower power during Delay_AD seconds?
