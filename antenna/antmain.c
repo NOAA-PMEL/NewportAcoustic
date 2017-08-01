@@ -37,17 +37,17 @@
 #include <termios.h>  // PicoDOS POSIX-like Terminal I/O Definitions
 #include <unistd.h>   // PicoDOS POSIX-like UNIX Function Definitions
 
-// #define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #define DBG(X) X // template:   DBG( cprintf("\n"); )
-#pragma message("!!! "__FILE__                                                 \
-                ": Don't ship with DEBUG compile flag set!")
 #else               /*  */
 #define DBG(X)      // nothing
 #endif              /*  */
-#define DEBUG1
-// #ifdef DEBUG1
+// #define DEBUG1
+#ifdef DEBUG1
 #define DBG1(X) X // template:   DBG( cprintf("\n"); )
+#pragma message("!!! "__FILE__                                                 \
+                ": Don't ship with DEBUG1 compile flag set!")
 #else               /*  */
 #define DBG1(X)      // nothing
 #endif              /*  */
@@ -78,8 +78,8 @@
 //#define       SYSCLK   8000           // choose: 160 to 32000 (kHz)
 #define SYSCLK 16000            // choose: 160 to 32000 (kHz)
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
-// #define BUOY_BAUD 9600L
-#define BUOY_BAUD 19200L
+#define BUOY_BAUD 9600L
+// #define BUOY_BAUD 19200L
 #define IRID_BAUD 19200L
 #define BUFSIZE 4096
 
@@ -102,10 +102,10 @@ void transBlock(long b);
 void printchar(char c);
 void prerun();
 
+DBG( bool echoDn=false; bool echoUp=false;)
 uchar *buf;
 char *LogFile = {"activity.log"}; 
 char antSw;
-bool run=true; 
 struct { char *name, c; bool power; TUPort *port; } dev[3] = {
   { "BUOY", 'B', false, NULL },
   { "SBE", 'S', false, NULL },
@@ -120,8 +120,6 @@ TUPort *buoy=NULL, *devPort=NULL; // dev port of connnected upstream device
 void main() {
   short ch;
   int arg, arg2;
-  bool echoDn=false;
-  bool echoUp=false;
 
   // escape to pico
   prerun();
@@ -161,10 +159,10 @@ void main() {
             break;
           case 2: // ^B Binary Block 2bytes arg
             // get another byte
-            DBG( printchar('-'); printchar((char) arg);)
+            DBG1( printchar('-'); printchar((char) arg);)
             arg2=(int) TURxGetByte(buoy, true) & 0x00FF;
             arg=(int)(arg<<8) + arg2;
-            DBG( printchar('-'); printchar((char) (arg2)); printchar('-');)
+            DBG1( printchar('-'); printchar((char) (arg2)); printchar('-');)
             transBlock((long) arg);
             break;
           case 3: // ^C Connect I|S
@@ -178,7 +176,7 @@ void main() {
             cdrain();
             break; // exit
         } // switch (command)
-        DBG(printf("cmd:%d arg:%d\n", ch, arg);)
+        DBG1(printf("cmd:%d arg:%d\n", ch, arg);)
       // if (ch<8)
       } else { 
         // regular char
@@ -222,7 +220,7 @@ TUPort* OpenSbePt(bool on) {
   long baud = 9600L;
   short sb39rxch, sb39txch;
   if (on) {
-    DBG(flogf("Opening the SBE port 9600\n");)
+    DBG1(flogf("Opening the SBE port 9600\n");)
     PIOSet(SBEPWR); // turn on SBE serial term power
     sb39rxch = TPUChanFromPin(SBERX);
     sb39txch = TPUChanFromPin(SBETX);
@@ -257,7 +255,7 @@ TUPort* OpenIridPt(bool on) {
   long baud = IRID_BAUD;
   short iridrxch, iridtxch;
   if (on) {
-    DBG(flogf("Opening the high speed IRID/GPS port\n");)
+    DBG1(flogf("Opening the high speed IRID/GPS port\n");)
     PIOSet(A3LAPWR);                   // PWR ON
     iridrxch = TPUChanFromPin(A3LARX); //
     iridtxch = TPUChanFromPin(A3LATX);
@@ -298,7 +296,7 @@ TUPort* OpenBuoyPt(bool on) {
   long baud = BUOY_BAUD;
   short com4rxch, com4txch;
   if (on) {
-    DBG(flogf("Opening the buoy COM4 port at %ld \n", baud);)
+    DBG1(flogf("Opening the buoy COM4 port at %ld \n", baud);)
     PIOSet(COM4PWR); // PWR On COM4 device
     com4rxch = TPUChanFromPin(COM4RX);
     com4txch = TPUChanFromPin(COM4TX);
@@ -320,7 +318,7 @@ TUPort* OpenBuoyPt(bool on) {
     TUClose(dev[BUOY].port);
     dev[BUOY].port=NULL;
     PIOClear(COM4PWR); // Shut down COM4 device
-    DBG(flogf("Close COM4 port\n");)
+    DBG1(flogf("Close COM4 port\n");)
     return NULL;
   }
 } /*OpenBuoyPt(bool on) */
@@ -419,7 +417,7 @@ short getByte(TUPort *tup) {
  */
 void antennaSwitch(char c) {
   // global short antSw
-  DBG(printf("antennaSwitch %c\n", c);)
+  DBG1(printf("antennaSwitch %c\n", c);)
   switch(c) {
     case 'G': PIOClear(ANTSW); break;
     case 'I': PIOSet(ANTSW); break;
@@ -472,7 +470,7 @@ short power(short c, bool onoff) {
     flogf( "ERR connect(%c) '%d'\n", c, (short)c);
     return -1;
   }
-  DBG(printf("dev:%c devid:%d onoff:%d\n", c, id, onoff);)
+  DBG1(printf("dev:%c devid:%d onoff:%d\n", c, id, onoff);)
   if (dev[id].power == onoff) return 1;
   switch (c) {
     case 'I': r=OpenIridPt(onoff); break;
@@ -528,7 +526,7 @@ void transBlock(long b) {
   count = TUTxPutBlock(devPort, buf, b, 10000);
   if (count != b) 
     cprintf("Error: putblock %ld != expected %ld \n", count, b);
-  DBG(cprintf(" [[%ld]] ", count);)
+  DBG(if (echoUp||echoDn) cprintf(" [[%ld]] ", count);)
   DBG1(
   len = (int) TURxQueuedCount(devPort); // accumulated
   if (len > 0)
