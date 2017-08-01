@@ -62,10 +62,6 @@ float ascentRate = 0.26;
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
-  // startup sets sync mode
-  CTD_Start_Up(DEVA, true);
-  // antmod is going to be used during boot
-  CTD_Start_Up(DEVB, true);
   stringin = (char *)calloc(STRING_SIZE, 1);
   stringout = (char *)calloc(STRING_SIZE, 1);
   return 0;
@@ -104,15 +100,13 @@ bool CTD_Start_Up(int sbe, bool settime) {
   if (settime)
     CTD_DateTime();
   CTD_SyncMode();
-  TURxFlush(devicePort);
-  TUTxFlush(devicePort);
   return true;
 } //_____ CTD_Start_Up() _____//
 
 void CTD_Select(int sbe) {
-  sbeID=sbe;
   DevSelect(sbe);
   if (sbe==DEVA) AntMode('S');
+  sbeID=sbe;
 } // CTD_Select
 
 /******************************************************************************\
@@ -165,32 +159,26 @@ bool CTD_GetPrompt() {
   short LastByteInQ;
   DBG1(cprintf("\n\t|CTD_GetPrompt()");)
   memset(stringin, 0, STRING_SIZE);
-  i=tgetq(devicePort);
+  i=TURxQueuedCount(devicePort);
   if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
-  while (((char)LastByteInQ != '>') && count < 2) { 
+  while (((char)LastByteInQ != '>') && count < 8) { 
     // until a > is read in command line for devicePort or 3 seconds pass 
     TUTxPrintf(devicePort, "\r");
     Delayms(1000);
-    i=tgetq(devicePort);
+    i=TURxQueuedCount(devicePort);
     if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
     count++;
-    DBG1(cprintf("\n\t|CTD_GetPrompt():peek");)
   }
-  cdrain();
-  DBG1(cprintf("\n\t|CTD_GetPrompt()");)
-
   if (count == 2) {
-    DBG1(cprintf("\n\t|CTD_GetPrompt()");)
     TURxGetBlock(devicePort, stringin, (long) STRING_SIZE, (short) 1000);
     if (strstr(stringin, "S>") != NULL) {
-      cprintf("\nPrompt from CTDBlock");
+      DBG1(cprintf("\nPrompt from CTDBlock ");)
       TURxFlush(devicePort);
       return true;
     }
-    DBG1(cprintf("\n\t|CTD_GetPrompt():fail");)
     return false;
   } else {
-    cprintf("\nPrompt from CTD");
+    DBG1(cprintf("\nPrompt from CTD ");)
     TURxFlush(devicePort);
     return true;
   }
@@ -200,10 +188,11 @@ bool CTD_GetPrompt() {
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_Sample() {
-  DBG(cputc('+');)
   DBG2( flogf("\n . CTD_Sample"); )
   if (SyncMode) {
     TUTxPrintf(devicePort, "+\r");
+    Delayms(20);
+    TURxFlush(devicePort);
   } else {
     TUTxPrintf(devicePort, "TS\r");
   }
@@ -217,11 +206,9 @@ void CTD_SyncMode() {
   DBG1(flogf("\n\t|CTD_SyncMode()");)
   // CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
-  TUTxWaitCompletion(devicePort);
   Delayms(500);
   TUTxPrintf(devicePort, "QS\r");
-  TUTxWaitCompletion(devicePort);
-  Delayms(1000);
+  Delayms(500);
   SyncMode = true;
   TURxFlush(devicePort);
 } //____ CTD_Sample() ____//
@@ -230,7 +217,6 @@ void CTD_SyncMode() {
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_SampleBreak() {
-  cprintf("brk");
   TUTxBreak(devicePort, 5000);
   SyncMode = false;
 } //____ CTD_Sample() ____//
@@ -414,12 +400,14 @@ bool CTD_Data() {
   struct tm info;
   time_t secs = 0;
 
-  DBG2( flogf("\n. CTD_Data()"); )
+  DBG1( cprintf("\n. CTD_Data()"); )
   memset(stringin, 0, STRING_SIZE);
 
   // waits up to 8 seconds - best called after tgetq()
-  len = GetStringWait(stringin, 8000);
-  DBG2( flogf("\n%s", stringin);)
+  len = GetStringWait(stringin, (short) 8000);
+  cdrain();
+  DBG( cprintf("\n''%s''", stringin);)
+  cdrain();
 
   // expect to see stringin start with ".*# "
   // do better sanity checking
@@ -429,12 +417,16 @@ bool CTD_Data() {
     if ((strchr(stringin, '>') != NULL)
         || (strchr(stringin, '<') != NULL)) {
       // prompt
-      flogf("\nERROR|CTD_Data(): got <|> want #, set sync mode");
-      CTD_SyncMode();
+      cprintf("\nERROR|CTD_Data(): got <|> want #, set sync mode");
+  cdrain();
+      // CTD_SyncMode();
+  cdrain();
     } else {
       // no < > #, don't know what
-      flogf("\nERROR|CTD_Data(): No prompt found, reset ctd");
-      CTD_Start_Up(sbeID, true);
+      cprintf("\nERROR|CTD_Data(): No prompt found, reset ctd");
+  cdrain();
+      // CTD_Start_Up(sbeID, true);
+  cdrain();
     }
     return false;
   } // no #
