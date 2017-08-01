@@ -521,9 +521,6 @@ void PhaseOne() {
       break;
   }
 
-  CTD_AverageDepth(6, NULL);
-  DevSelect(DEVX);
-
   // This would mean the profiling buoy is at//near surface.
   if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
     LARA.PHASE = 3;
