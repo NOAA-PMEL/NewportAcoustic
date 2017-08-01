@@ -62,12 +62,12 @@ float ascentRate = 0.26;
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
+  stringin = (char *)calloc(STRING_SIZE, 1);
+  stringout = (char *)calloc(STRING_SIZE, 1);
   // startup sets sync mode
   CTD_Start_Up(DEVA, true);
   // antmod is going to be used during boot
   CTD_Start_Up(DEVB, true);
-  stringin = (char *)calloc(STRING_SIZE, 1);
-  stringout = (char *)calloc(STRING_SIZE, 1);
   return 0;
 }
 
