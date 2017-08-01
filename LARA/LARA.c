@@ -303,26 +303,9 @@ void InitializeLARA(ulong *PwrOn) {
   // best to init GPSIRID first
   GPSIRID_Init();
   CTD_Init();
-DevSelect(DEVB);
-Delay_AD_Log(10);
-CTD_Start_Up(DEVB,false);
-Delay_AD_Log(10);
-CTD_Sample();
-Delay_AD_Log(10);
-CTD_Data();
-Delay_AD_Log(10);
-CTD_Sample();
-Delay_AD_Log(10);
-CTD_Data();
-Delay_AD_Log(10);
-CTD_Sample();
-Delay_AD_Log(10);
-CTD_Data();
-Delay_AD_Log(10);
-BIOSReset();
   // startup sets sync mode
   CTD_Start_Up(DEVA, true);
-  CTD_Start_Up(DEVB, true);
+  //CTD_Start_Up(DEVB, true);
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {
     MPC.FILENUM--;
@@ -766,7 +749,7 @@ void PhaseFour() {
   // turn off antenna, which selects buoy ctd
   DevSelect(DEVX);
   // redundant?
-  CTD_Select(DEVB);
+  // CTD_Select(DEVB);
 
   // Now descend.
   if (LARA.BUOYMODE != 2) {
@@ -1497,21 +1480,21 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
  * CurrentWarning() - current reduces distance between CTD's
  */
 bool CurrentWarning() {
-  float a, b;
+  // float a, b;
   DBG(flogf("\n\t|CurrentWarning()");)
-  CTD_Select(DEVB);
+  // CTD_Select(DEVB);
   // maybe DBG next two lines? probably just for emulator
-  CTD_SampleBreak();
-  CTD_SyncMode();
-  CTD_Sample();
-  CTD_Data();
-  b=LARA.DATA;
-  CTD_Select(DEVA);
-  CTD_SampleBreak();
-  CTD_SyncMode();
-  CTD_Sample();
-  CTD_Data();
-  a=LARA.DATA;
-  flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
+  // CTD_SampleBreak();
+  // CTD_SyncMode();
+  // CTD_Sample();
+  // CTD_Data();
+  // b=LARA.DATA;
+  // CTD_Select(DEVA);
+  // CTD_SampleBreak();
+  // CTD_SyncMode();
+  // CTD_Sample();
+  // CTD_Data();
+  // a=LARA.DATA;
+  // flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
   return false;
 }
