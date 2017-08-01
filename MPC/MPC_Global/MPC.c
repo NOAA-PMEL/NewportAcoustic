@@ -81,8 +81,6 @@ int DetectionInt;
 
 int DataInterval;
 char time_chr[21];
-// IRIDUM TUPORT Setup
-short deviceRX, deviceTX;
 
 #ifdef TIMING
 volatile clock_t start_clock;
@@ -171,8 +169,6 @@ void SetupHardware(void) {
   char filenum[] = "00000000";
   char logfile[sizeof "00000000.log"];
 
-  deviceRX = TPUChanFromPin(DEVICERX); // moved from GPSIRID_Init
-  deviceTX = TPUChanFromPin(DEVICETX);
 #ifdef REALTIME // Placed here 6/20/2016 -AT bcuz SEAGLIDER
   p = VEEFetchData(FILENUM_NAME).str;
   counter = atol(p);
@@ -765,10 +761,10 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
             break;
         if (i == 8) { // all digits
           if (Lowest && val < minval) {
-            DBG(flogf("\nNew lowest value: %ld", val);)
+            // DBG(flogf("\nNew lowest value: %ld", val);)
             minval = val;
           } else if (val > maxval) {
-            DBG(flogf("\nNew highest value: %ld", val);)
+            // DBG(flogf("\nNew highest value: %ld", val);)
             maxval = val;
           }
         }

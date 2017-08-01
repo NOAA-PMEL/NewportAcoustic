@@ -269,13 +269,24 @@ int AntMode(char r) {
  * DEVX=0 = off, DEVA=1 = antenna, DEVB=2 = buoy
  */
 int DevSelect(int dev) {
-  // global stringout, stringin, deviceID
+  short deviceRX, deviceTX;
+  // global devicePort
   // use a stronger tests for open??
   if (dev==deviceID && devicePort) return 0; // already selected
   DBG(flogf("\n\t|DevSelect(%d)", dev);)
 
-  // deva devb may share the port // if other device open, close
-  // if (devicePort) TUClose(devicePort); 
+  if (devicePort == NULL) {
+    deviceRX = TPUChanFromPin(DEVICERX); 
+    deviceTX = TPUChanFromPin(DEVICETX);
+    devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
+    if (devicePort == NULL) {
+      flogf("\nERR DevSelect(): failed %d", dev);
+      return -1;
+    }
+    Delayms(200); // to settle rs232
+  }
+  Delayms(20); // to settle hardware
+
   switch (dev) {
   case DEVA: // antenna module dev
     deviceID=DEVA;
@@ -294,16 +305,6 @@ int DevSelect(int dev) {
     PIOClear(DEVICECOM); // talk to local port // do not turn off ant module
     break;
   } //switch
-
-  if (devicePort == NULL) {
-    devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
-    if (devicePort == NULL) {
-      flogf("\nERR DevSelect(): failed %d", dev);
-      return -1;
-    }
-    Delayms(200); // to settle rs232
-  }
-  Delayms(20); // to settle hardware
   return 0;
 } //DevSelect
 

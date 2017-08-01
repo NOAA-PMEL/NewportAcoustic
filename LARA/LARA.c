@@ -258,9 +258,6 @@ void InitializeLARA(ulong *PwrOn) {
   PreRun();
   // Get all Platform Settings
   GetSettings();
-  // best to init GPSIRID first
-  GPSIRID_Init();
-  CTD_Init();
 
   // First Safety Catch. If woken. Reboot
   if (MPC.STARTUPS >= MPC.STARTMAX) {
@@ -303,6 +300,12 @@ void InitializeLARA(ulong *PwrOn) {
   Free_Disk_Space(); // Does finding the free space of a large CF card cause
                      // program to crash? or Hang?
 
+  // best to init GPSIRID first
+  GPSIRID_Init();
+  CTD_Init();
+  // startup sets sync mode
+  CTD_Start_Up(DEVA, true);
+  //CTD_Start_Up(DEVB, true);
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {
     MPC.FILENUM--;
@@ -746,11 +749,10 @@ void PhaseFour() {
   // turn off antenna, which selects buoy ctd
   DevSelect(DEVX);
   // redundant?
-  CTD_Select(DEVB);
+  // CTD_Select(DEVB);
 
   // Now descend.
   if (LARA.BUOYMODE != 2) {
-    DBG1(flogf("\ndown");)
     LARA.TOPDEPTH = LARA.DEPTH;
     DescentStart = Winch_Descend();
     WaitForWinch(2);
@@ -1478,16 +1480,21 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
  * CurrentWarning() - current reduces distance between CTD's
  */
 bool CurrentWarning() {
-  float a, b;
+  // float a, b;
   DBG(flogf("\n\t|CurrentWarning()");)
-  CTD_Select(DEVB);
-  CTD_Sample();
-  CTD_Data();
-  b=LARA.DATA;
-  CTD_Select(DEVA);
-  CTD_Sample();
-  CTD_Data();
-  a=LARA.DATA;
-  flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
+  // CTD_Select(DEVB);
+  // maybe DBG next two lines? probably just for emulator
+  // CTD_SampleBreak();
+  // CTD_SyncMode();
+  // CTD_Sample();
+  // CTD_Data();
+  // b=LARA.DATA;
+  // CTD_Select(DEVA);
+  // CTD_SampleBreak();
+  // CTD_SyncMode();
+  // CTD_Sample();
+  // CTD_Data();
+  // a=LARA.DATA;
+  // flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
   return false;
 }
