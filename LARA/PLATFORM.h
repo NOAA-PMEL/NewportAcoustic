@@ -1,4 +1,4 @@
-
+#define DEBUGdeploy
 // DEFINE THE TYPE OF PLATFORM
 #define PLATFORM LARA
 

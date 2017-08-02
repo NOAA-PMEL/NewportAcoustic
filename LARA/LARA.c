@@ -378,7 +378,10 @@ void InitializeLARA(ulong *PwrOn) {
       OpenTUPort_WISPR(true);
 
       // Gather all #WISPRNUMBER freespace and sync time.
+#ifdef DEBUGdeploy
+#else
       GatherWISPRFreeSpace();
+#endif
     }
 
   }
@@ -846,7 +849,11 @@ void PhaseFive() {
   maxT = (ulong) (2*60*60);
   // do nothing for 30minutes
   Delay_AD_Log(30*60);
+#ifdef DEBUGdeploy
+  CTD_Select(DEVB);
+#else
   CTD_Select(DEVA);
+#endif
   Delay_AD_Log(9);
   LARA.DEPTH=0.0;
   flogf("\n\s\t|P5: wait until >10m", Time(NULL));
