@@ -310,7 +310,10 @@ void InitializeLARA(ulong *PwrOn) {
   GPSIRID_Init();
   CTD_Init();
   // startup sets sync mode
+#ifdef DEBUGdeploy
+#else
   CTD_Start_Up(DEVA, true);
+#endif
   CTD_Start_Up(DEVB, true);
   DevSelect(DEVX); // turn antmod off // ??
 
