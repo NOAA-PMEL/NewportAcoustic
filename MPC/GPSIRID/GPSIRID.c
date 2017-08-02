@@ -237,7 +237,7 @@ bool GPSstartup() {
 int AntMode(char r) {
   static char ant='-', dev='-';
   char a, d;
-  DBG1(flogf("\n\t|AntMode(%c)", r);)
+  DBG2(flogf("\n\t|AntMode(%c)", r);)
   DevSelect(DEVA);
   // select ant SBE16, switch ant device
   switch (r) {
@@ -728,6 +728,7 @@ void OpenSatCom(bool onoff) {
     // AntMode set before call to OpenSatCom
     DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
     Delay_AD_Log(IRID.WARMUP);
+    DBG(ConsoleIrid();)
     PhonePin();
     // echo off
     SendString("ATE0");
