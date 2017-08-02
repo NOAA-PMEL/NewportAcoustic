@@ -161,7 +161,7 @@ sleep before
  ********************************************************************************/
 short IRIDGPS() {
   short TX_Result;
-  DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  DBG2(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
   AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
   if (!GPSstartup()) {
@@ -727,7 +727,7 @@ void OpenSatCom(bool onoff) {
   if (onoff) { // turn on
     // AntMode set before call to OpenSatCom
     DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
-    Delay_AD_Log(IRID.WARMUP);
+    Delay_AD_Log((int) IRID.WARMUP);
     PhonePin();
     // echo off
     SendString("ATE0");

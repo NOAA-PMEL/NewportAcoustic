@@ -677,10 +677,9 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 ** Delay_AD_Log()
 ** AD function with time delay.  Do AD_Log at 5 sec incrment.
   **************************************************************************/
-void Delay_AD_Log(short Sec) {
-  short i;
-  long last, rem;
-  DBG1(flogf( " {%d} ", Sec );)
+void Delay_AD_Log(int Sec) {
+  int i, last, rem;
+  DBG2(flogf( " {%d} ", Sec );)
   cdrain();
   last = Sec / 5;
   rem = Sec - last * 5;
@@ -689,10 +688,10 @@ void Delay_AD_Log(short Sec) {
   for (i = 0; i < last; i++) {
 
     AD_Check();
-    Delayms(5000);
+    Delayms(5);
   }
   AD_Check();
-  Delayms(rem * 1000); 
+  Delayms(rem);
   TickleSWSR();                         // another reprieve
 
 } ///////////Delay_AD_Log()///////////////////////////////////////

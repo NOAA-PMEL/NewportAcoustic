@@ -102,7 +102,7 @@ void printsafe (long, uchar *);
         @Param1: Short value, number of seconds for delay while watching Power
    Logging & Tickling Watch Dog Timer
         */
-void Delay_AD_Log(short);
+void Delay_AD_Log(int);
 
 /*Free_Disk_Space:
         @Return: long value of kilobytes of freespace

@@ -10,7 +10,7 @@
 bool AD_Check();
 ushort Setup_ADS(bool, long, ushort);
 float Power_Monitor(ulong, int, ulong *);
-void Delay_AD_Log(short Sec);
+void Delay_AD_Log(int Sec);
 float Get_Voltage();
 float Voltage_Now();
 void Open_Avg_File(long);
