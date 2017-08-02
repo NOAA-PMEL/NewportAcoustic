@@ -515,11 +515,6 @@ void PhaseOne() {
   // Initialize System Timers
   Check_Timers(Return_ADSTIME());
 
-  //if (WISP.DUTYCYCL > 50) { // moved here from p3
-    OpenTUPort_WISPR(true);
-    WISPRPower(true);
-  //}
-
   // Stay here until system_timer says it's time to send data, user input for
   // different phase, NIGK R
   while (!LARA.DATA && LARA.PHASE == 1) {
@@ -555,7 +550,6 @@ void PhaseTwo() {
   int halfway;
 
   flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
-  OpenTUPort_WISPR(false);
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
@@ -654,16 +648,24 @@ void PhaseThree() {
   char filenum[9] = "00000000";
   flogf("\n\t|PHASE THREE");
 
+  if (WISPR_Status()) {
+    WISPRSafeShutdown();
+  }
+  OpenTUPort_WISPR(false);
+
   // should do this at boot
   if (GlobalRestart) { 
-    // Added 9.28.2016 after first deployment Lake W.
     ParseStartupParams(true); 
   } 
+
 
   while (result <= 0) { 
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
     result = IRIDGPS(); 
+#ifdef DEBUG1
+result=1;
+#endif
 
     if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
@@ -719,6 +721,11 @@ void PhaseThree() {
   create_dtx_file(MPC.FILENUM);
   CTD_CreateFile(MPC.FILENUM); 
   LARA.TDEPTH = NIGK.TDEPTH;
+
+  if (WISP.DUTYCYCL > 50) {
+    OpenTUPort_WISPR(true);
+    WISPRPower(true);
+  }
 
   LARA.DATA = false;
 
