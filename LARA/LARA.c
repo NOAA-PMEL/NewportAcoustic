@@ -534,6 +534,7 @@ void PhaseOne() {
   }
   if (WISPR_Status()) { // moved here from p3
     WISPRSafeShutdown();
+  }
 
   // This would mean the profiling buoy is at//near surface.
   // if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
@@ -554,7 +555,6 @@ void PhaseTwo() {
   int halfway;
 
   flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
-  }
   OpenTUPort_WISPR(false);
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
