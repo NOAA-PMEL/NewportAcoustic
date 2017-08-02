@@ -442,7 +442,7 @@ bool CTD_Data() {
     sprintf(stringout, "%.4f,%.3f", temp, pres);
   }
   LARA.DEPTH = pres;
-  // LARA.TEMP = temp;
+  // LARA.TEMP = temp; //??
   DBG(cprintf("\nctd->%s", stringout);)
 
   // buoy sbe vvvvv
@@ -489,7 +489,7 @@ bool CTD_Data() {
   else month = info.tm_mon + 2;
 
   memset(stringin, 0, 32);
-  sprintf(stringin, ",%d/%d/%d,%d:%d:%d", month, info.tm_mday,
+  sprintf(stringin, ",%d/%d/%d,%02d:%02d:%02d", month, info.tm_mday,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
   strcat( stringout, stringin );
   DBG(cprintf("%s", stringin);)

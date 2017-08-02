@@ -136,6 +136,7 @@ void PhaseOne();
 void PhaseTwo();
 void PhaseThree();
 void PhaseFour();
+void PhaseFive();
 void Console(char);
 bool CheckTime(ulong, short, short);
 ulong WriteFile(ulong);
@@ -176,6 +177,11 @@ void main() {
   OpenTUPort_WISPR(true);
   if (WISP.DUTYCYCL == 100)
     WISPRPower(true);
+
+  // PHASE 5:  Deployment
+  if (LARA.PHASE==5) {
+    PhaseFive();
+  }
 
   // Main Loop. Always running unless interrupted by User input of 'x' 
   // if We have reached a full shutdown: below absolute minimum voltage.
@@ -306,6 +312,8 @@ void InitializeLARA(ulong *PwrOn) {
   // startup sets sync mode
   CTD_Start_Up(DEVA, true);
   CTD_Start_Up(DEVB, true);
+  DevSelect(DEVX); // turn antmod off // ??
+
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {
     MPC.FILENUM--;
@@ -317,8 +325,8 @@ void InitializeLARA(ulong *PwrOn) {
                              // startups power consumption.
 
     MPC.FILENUM++;
-  } else
-    Setup_ADS(true, MPC.FILENUM, BITSHIFT);
+  } else // MPC.STARTUPS == 0
+    Setup_ADS(true, MPC.FILENUM, BITSHIFT); // not done > 0 ??
 
   volts = Voltage_Now();
   flogf("\n\t|Check Startup Voltage: %5.2fV", volts);
@@ -358,7 +366,7 @@ void InitializeLARA(ulong *PwrOn) {
     GlobalRestart = false;
     ParseStartupParams(false);
     LARA.BUOYMODE = 0;
-    LARA.PHASE = 1;
+    LARA.PHASE = 5; // deploy phase
     LARA.SURFACED = false;
     Make_Directory("SNT");
     Make_Directory("CTD");
@@ -417,10 +425,11 @@ void InitializeLARA(ulong *PwrOn) {
         LARA.MOORDEPTH = LARA.DEPTH;
         CheckTime(prevTime, prevMode, hour);
       }
-    } else if (depth <=
-               NIGK.TDEPTH) { // Upon restart, Winch must be at or near surface.
-                              // if((Calltime-hours now)-prevTime)<3600 seconds)
-                              // try calling... phase 3? What tuports needed?
+    } // depth> TD
+    else if (depth <= NIGK.TDEPTH) { 
+      // Upon restart, Winch must be at or near surface.
+      // if((Calltime-hours now)-prevTime)<3600 seconds)
+      // try calling... phase 3? What tuports needed?
       LARA.SURFACED = true;
       //   		LARA.BUOYMODE=1; //Removed after first Lake W. Deployment.
       //   This skips the ascent call in phase two
@@ -823,6 +832,53 @@ void PhaseFour() {
   LARA.DATA = false;
 
 } //____ Phase_Four() ____//
+
+/*
+ * PhaseFive for deploy time
+ */
+void PhaseFive() {
+  ulong deployT, maxT;
+  float nowD=0.0, thenD=0.0;
+  int changeless=0;
+
+  deployT = RTCGetTime(NULL, NULL);
+  // give up after two hours
+  maxT = (ulong) (2*60*60);
+  // do nothing for 30minutes
+  Delay_AD_Log(30*60);
+  CTD_Select(DEVA);
+  Delay_AD_Log(9);
+  LARA.DEPTH=0.0;
+  flogf("\n\s\t|P5: wait until >10m", Time(NULL));
+  // wait until deeper than 10m
+  while (LARA.DEPTH<10.0) {
+    CTD_Sample();
+    Delay_AD_Log(3);
+    if (!  CTD_Data()) 
+      flogf("\nERR in P5 - no CTD data");
+    Delay_AD_Log(30);
+    if ((RTCGetTime(NULL, NULL) - deployT) > maxT) break; // too long
+  }
+  flogf("\n\s\t|P5: wait until no depth changes", Time(NULL));
+  // check every half minute; if no change for five minutes, then deployed
+  while (changeless<10) {
+    thenD=LARA.DEPTH;
+    CTD_Sample();
+    Delay_AD_Log(3);
+    if (CTD_Data()) nowD=LARA.DEPTH;
+    else  flogf("\nERR in P5 - no CTD data");
+    if (abs(nowD-thenD) > 1) { // changed
+      flogf("\n\s\t|P5: depth change %4.1f", Time(NULL), (nowD-thenD));
+      changeless=0;
+    } else changeless++;
+    Delay_AD_Log(30);
+    if ((RTCGetTime(NULL, NULL) - deployT) > maxT) break; // too long
+  }
+  // deployed!
+  flogf("\n\s\t|P5: deployed", Time(NULL));
+  LARA.PHASE=1;
+} // PhaseFive()
+
 /****************************************************************************\
 ** int Incoming_Data()
  * ?? very fragile, caution
