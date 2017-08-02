@@ -1366,7 +1366,7 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     } // if bitmap[]
     // pause that refreshes
 
-#ifdef DEBUG
+#ifdef DEBUG1
     blklen=tgetq(devicePort);
     if (blklen) {
       cprintf("\n%d+", blklen);

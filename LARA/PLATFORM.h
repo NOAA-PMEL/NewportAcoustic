@@ -81,7 +81,7 @@ void LARA_Recovery();
 #define POWERLOGGING
 // two levels of debug
 #define DEBUG
-#define DEBUG1
+// #define DEBUG1
 // #define DEBUG2
 #define SYSTEMDIAGNOSTICS
 #define WISPR
