@@ -162,13 +162,15 @@ bool CTD_GetPrompt() {
   memset(stringin, 0, STRING_SIZE);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, (short) 10); //cr echo
-  ch=TURxGetByteWithTimeout(devicePort, (short) 10); //lf echo
+  Delayms(200);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200); //cr echo
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200); //lf echo
   GetStringWait(stringin, (short) 2000);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, (short) 10);
-  ch=TURxGetByteWithTimeout(devicePort, (short) 10);
+  Delayms(200);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
   GetStringWait(stringin, (short) 2000);
   if (strstr(stringin, ">") != NULL) r=true;
   else r=false;
@@ -189,13 +191,14 @@ void CTD_Sample() {
     //TURxFlush(devicePort);
   //} else {
   // TUTxPrintf(devicePort, "TS\r");
+  // consume echo
   TUTxPutByte(devicePort, 'T', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
   TUTxPutByte(devicePort, 'S', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
+  ch=TURxGetByteWithTimeout(devicePort, (short) 200);
   //}
 } //____ CTD_Sample() ____//
 
