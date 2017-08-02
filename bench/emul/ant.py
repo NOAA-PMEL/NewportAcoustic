@@ -127,7 +127,11 @@ def ctdOut():
     # note: modify temp for ice
     #ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
     #    (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
-    ser.put("\r\n %f, %f, %s\r\n" % (temper(), depth(), ctdDateTime() ))
+    ser.put("\r\n %f, %f, %s\r\n" % (temper(), antdepth(), ctdDateTime() ))
+
+def antdepth():
+    "buoy depth + 17, unless there is current"
+    return depth()+17
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"
