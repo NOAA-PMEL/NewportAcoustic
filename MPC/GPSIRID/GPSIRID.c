@@ -252,15 +252,14 @@ int AntMode(char r) {
     // turn on, connect
     TUTxPutByte(devicePort, 3, true);  // ^C connect device
     TUTxPutByte(devicePort, d, true);  
-    Delayms(20);
     dev=d;
   }
   if (a!=ant) {
     TUTxPutByte(devicePort, 1, true);  // ^A antenna
     TUTxPutByte(devicePort, a, true);  // G I
-    Delayms(1000); // wait 1 sec to settle antenna switch noise
     ant=a;
   }
+  Delayms(1000); // wait 1 sec to settle antenna switch noise, dev startup
   return 0;
 } //AntMode
 

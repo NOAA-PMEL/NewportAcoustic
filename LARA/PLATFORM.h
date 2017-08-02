@@ -76,7 +76,7 @@ void LARA_Recovery();
 //#define RAOB
 
 // LARA PROGRAM
-#define PROG_VERSION 3.3 // Keep this up to date!!!
+#define PROG_VERSION 3.40 // Keep this up to date!!!
 
 #define POWERLOGGING
 // two levels of debug
