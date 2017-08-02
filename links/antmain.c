@@ -373,12 +373,9 @@ void help() {
       "Iridium/GPS.\n"
       "Buoy is downstream, connecting to com4 at %d BAUD\n"
       " ^A Antenna G|I \n"
-      " ^B Binary byte \n"
-      " ^C Connect G|I|S \n"
-      " ^D powerDown G|I|S|A \n"
-      " ^E binary lEngth (2byte short) \n"
-      " ^F unused \n"
-      " ^G unused \n"
+      " ^B Binary blocksize (2bytes) \n"
+      " ^C Connect I|S \n"
+      " ^D powerDown I|S|B \n"
       "On console (com1):\n s=status x=exit *=this message\n"
       };
 

@@ -218,7 +218,7 @@ typedef struct // Used to access runtime settings
   "Length in meters from CTD depth sensor to antenna\n"
 
 #define NIGKTARGETDEPTH_NAME "NIGK.TDEPTH"
-#define NIGKTARGETDEPTH_DEFAULT "10"
+#define NIGKTARGETDEPTH_DEFAULT "2"
 #define NIGKTARGETDEPTH_DESC                                                   \
   "Depth in meters at which CTD position is optimum for gps/iridium comms\n"
 

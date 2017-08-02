@@ -82,18 +82,19 @@ bool CTD_Start_Up(int sbe, bool settime) {
   // leave sync mode
   CTD_SampleBreak();
   if (!CTD_GetPrompt()) {
-    flogf(" fail startup");
+    flogf(" fail start getprompt");
     CTD_SampleBreak();
-    Delay_AD_Log(1);
+    DevSelect(sbe);
+    Delay_AD_Log(3);
     if (!CTD_GetPrompt()) {
-      flogf(" fail startup1");
-      DevSelect(DEVX);
+      flogf(" fail start1 getprompt");
+      if (sbe==DEVA) DevSelect(DEVX);
       Delay_AD_Log(1);
       DevSelect(sbe);
       CTD_SampleBreak();
-      Delay_AD_Log(1);
+      Delay_AD_Log(3);
       if (!CTD_GetPrompt()) {
-        flogf(" fail startup2");
+        flogf(" fail start2 getprompt");
       }
     } 
   }

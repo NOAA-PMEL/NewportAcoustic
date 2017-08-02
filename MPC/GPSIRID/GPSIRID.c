@@ -160,11 +160,11 @@ sleep before
 //   return: -1 on hw fail, -2 "lostCarrier" on any upload fail, else UploadFiles result
  ********************************************************************************/
 short IRIDGPS() {
-
   short TX_Result;
   DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  if (!SatComOpen) OpenSatCom(true);
   if (!GPSstartup()) {
-    DevSelect(DEVX);
+    OpenSatCom(false);
     flogf("\n\t|IRIDGPS(): GPS failed");
     return -1;
   }
@@ -172,11 +172,11 @@ short IRIDGPS() {
   TX_Result = UploadFiles();
   if (TX_Result >= 1) {
     flogf("\n\t|IRIDGPS(): upload success %d", TX_Result);
-    DevSelect(DEVX);
+    OpenSatCom(false);
     return TX_Result;
   } else {
     flogf("\n\t|IRIDGPS(): upload fail %d", TX_Result);
-    DevSelect(DEVX);
+    OpenSatCom(false);
     return -2;
   }
 } //____ IRIDGPS() ____//
@@ -732,11 +732,12 @@ void OpenSatCom(bool onoff) {
   } else { // !onoff
     flogf("\n%s|PowerDownCloseComDEVICE() ", Time(NULL));
     // tell modem to power off
+    AntMode('I');
     SendString("AT*P");
     Delay_AD_Log(1);
-    // this powers off antMod - better to power off irid modem in antmode ??
-    DevSelect(DEVX);
     AntMode('S');
+    TUTxPutByte(devicePort, 4, true);  // ^D power off iridium
+    TUTxPutByte(devicePort, 'I', true);  
     Delay_AD_Log(1);
   } // onoff
   SatComOpen=onoff;
@@ -754,7 +755,7 @@ bool RudicsConnect(int status) {
 
   TX_Success=0;
   LostConnect=false;
-  flogf("\n%s|Modem Initialization", Time(NULL));
+  flogf("\n%s|Initalize RudicsConnect()", Time(NULL));
 
   ACK=false;
   // bizarre switch without break
@@ -1778,8 +1779,6 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
 
-  DBG(ConsoleIrid();)  // check if console is asking to stop
-
   memset(inputstring, 0, (size_t) STRING_SIZE);
   memset(first, 0, (size_t) STRING_SIZE);
 
@@ -1923,7 +1922,6 @@ char *GetGPSInput(char *chars, int *numsats) {
   long len, lenreturn;
 
   DBG1(flogf(" .GetGPSInput. ");)
-  DBG(ConsoleIrid();)  // check if console is asking to stop
 
   first = scratch; 
 
