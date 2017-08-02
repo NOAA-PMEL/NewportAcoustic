@@ -548,8 +548,7 @@ void PhaseTwo() {
   float velocity = 0.0;
   int halfway;
 
-  flogf("\n\t|PHASE TWO: Target Depth:%d", LARA.TDEPTH);
-  //flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
+  flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
   // turn off wispr, close wispr ?? here? 
   // check storm warn
   if (WISPR_Status()) { // moved here from p3
@@ -571,14 +570,7 @@ void PhaseTwo() {
   // Else, sensor package deeper than target depth. Ascend.
   if (CurrentWarning()) {
   }
-  if (LARA.BUOYMODE != 1) {
-    AscentStart = Winch_Ascend();
-    CTD_Sample();
-    WaitForWinch(1);
-  }
-
-  if (LARA.DEPTH < LARA.TDEPTH) {
-  // if (LARA.DEPTH < NIGK.TDEPTH) {
+  if (LARA.DEPTH < NIGK.TDEPTH) {
     flogf("\n\t|Profiling Float Already at target depth");
     LARA.TOPDEPTH = LARA.DEPTH;
     LARA.SURFACED = true;
@@ -586,13 +578,18 @@ void PhaseTwo() {
     OpenTUPort_NIGK(false);
     return;
   }
+  if (LARA.BUOYMODE != 1) {
+    AscentStart = Winch_Ascend();
+    CTD_Sample();
+    WaitForWinch(1);
+  }
 
   // Increment Profile number...
   NIGK.PROFILES++;
   VEEStoreShort(NIGKPROFILES_NAME, NIGK.PROFILES);
 
   // halfway to tdepth, +2 to allow for coasting
-  halfway = ((LARA.DEPTH - LARA.TDEPTH) / 2) + LARA.TDEPTH + 2;
+  halfway = ((LARA.DEPTH - NIGK.TDEPTH) / 2) + NIGK.TDEPTH + 2;
   // What's the best way out of this loop? Do we set a time limit for ascent?
   while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
     Incoming_Data();
@@ -603,22 +600,20 @@ void PhaseTwo() {
       if (CurrentWarning()) {
       }
       AscentStart = Winch_Ascend();
-      CTD_Sample();
+//??      CTD_Sample();
       WaitForWinch(1);
       // continue
       halfway=0;
     }
 
     // What if winch tells us its stopping? What AscentStop time do we get?
-    if (LARA.DEPTH <= LARA.TDEPTH) {
-    // if (LARA.DEPTH <= NIGK.TDEPTH) {
+    if (LARA.DEPTH <= NIGK.TDEPTH) {
       cprintf("\n\t|REACHED TARGETDPETH!");
       AscentStop = Winch_Stop();
       WaitForWinch(0);
       LARA.TOPDEPTH = LARA.DEPTH;
       // If we stop at the target Depth
-      if (LARA.TOPDEPTH <= LARA.TDEPTH)
-      // if (LARA.TOPDEPTH <= NIGK.TDEPTH)
+      if (LARA.TOPDEPTH <= NIGK.TDEPTH)
         LARA.SURFACED = true;
 
       LARA.AVGVEL = CTD_CalculateVelocity();
