@@ -162,6 +162,7 @@ sleep before
 short IRIDGPS() {
   short TX_Result;
   DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
   if (!GPSstartup()) {
     OpenSatCom(false);
@@ -213,8 +214,8 @@ short UploadFiles() {
  * GPSstartup()
  */
 bool GPSstartup() {
-  if (!SatComOpen) OpenSatCom(true);
   AntMode('G');
+  if (!SatComOpen) OpenSatCom(true);
   SendString("AT");
   GetStringWait(inputstring, (short) 1000);
   if (!strstr(inputstring, "OK")) {
@@ -236,7 +237,7 @@ bool GPSstartup() {
 int AntMode(char r) {
   static char ant='-', dev='-';
   char a, d;
-  DBG1(flogf("\n\t|AntMode(%c)", r);)
+  DBG2(flogf("\n\t|AntMode(%c)", r);)
   DevSelect(DEVA);
   // select ant SBE16, switch ant device
   switch (r) {
@@ -272,7 +273,7 @@ int DevSelect(int dev) {
   // global devicePort
   // use a stronger tests for open??
   if (dev==deviceID && devicePort) return 0; // already selected
-  DBG(flogf("\n\t|DevSelect(%d)", dev);)
+  DBG2(flogf("\n\t|DevSelect(%d)", dev);)
 
   if (devicePort == NULL) {
     deviceRX = TPUChanFromPin(DEVICERX); 
@@ -367,6 +368,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
     ACK = RudicsConnect(status);
     // fail is bad, we try to connect several times
     if (!ACK) { // reset
+      AntMode('I');
       OpenSatCom(false);
       OpenSatCom(true);
       continue;
@@ -721,9 +723,8 @@ void OpenSatCom(bool onoff) {
   if (SatComOpen == onoff) return;
   
   if (onoff) { // turn on
-    // connect to gps first
+    // AntMode set before call to OpenSatCom
     DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
-    AntMode('G');
     Delay_AD_Log(IRID.WARMUP);
     PhonePin();
     // echo off

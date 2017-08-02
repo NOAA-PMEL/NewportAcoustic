@@ -203,7 +203,7 @@ void CTD_Sample() {
 ** CTD_SampleSleep()
 \********************************************************************************/
 void CTD_SyncMode() {
-  DBG1(flogf("\n\t|CTD_SyncMode()");)
+  DBG(flogf("\n\t|CTD_SyncMode()");)
   // CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
   Delayms(500);
