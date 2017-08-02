@@ -131,7 +131,9 @@ def ctdOut():
 
 def antdepth():
     "buoy depth - 17, unless there is current"
-    return depth()-17
+    dep=depth()-17
+    if dep<0: return 0
+    else: return dep
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"
