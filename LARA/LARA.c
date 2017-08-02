@@ -515,9 +515,10 @@ void PhaseOne() {
   // Initialize System Timers
   Check_Timers(Return_ADSTIME());
 
-  if (WISP.DUTYCYCL < 100)
-    if (WISPR_Status())
-      WISPRSafeShutdown();
+  //if (WISP.DUTYCYCL > 50) { // moved here from p3
+    OpenTUPort_WISPR(true);
+    WISPRPower(true);
+  //}
 
   // Stay here until system_timer says it's time to send data, user input for
   // different phase, NIGK R
@@ -531,6 +532,8 @@ void PhaseOne() {
     if (!LARA.ON)
       break;
   }
+  if (WISPR_Status()) { // moved here from p3
+    WISPRSafeShutdown();
 
   // This would mean the profiling buoy is at//near surface.
   // if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
@@ -551,10 +554,6 @@ void PhaseTwo() {
   int halfway;
 
   flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
-  // turn off wispr, close wispr ?? here? 
-  // check storm warn
-  if (WISPR_Status()) { // moved here from p3
-    WISPRSafeShutdown();
   }
   OpenTUPort_WISPR(false);
   OpenTUPort_NIGK(true);
@@ -738,10 +737,6 @@ void PhaseFour() {
 
   flogf("\n%s|Phase_Four():", Time(NULL));
   OpenTUPort_NIGK(true);
-  // if (WISP.DUTYCYCL > 50) { // moved here from p3
-    // OpenTUPort_WISPR(true);
-    // WISPRPower(true);
-  // }
 
   LARA.SURFACED = false;
 
