@@ -395,7 +395,8 @@ bool WISPRExit() {
   TUTxPrintf(PAMPort, "$EXI*\n");
   TUTxWaitCompletion(PAMPort);
   Delayms(200);
-
+  // ?? delay 3minutes, storm detect
+  Delay_AD_Log(180);
   WISPR_Data();
 
   if (!WISPR_On) {

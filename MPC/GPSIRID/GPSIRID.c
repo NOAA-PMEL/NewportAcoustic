@@ -970,9 +970,11 @@ short SignalQuality(short *signal_quality) {
  * void SendString()
  ******************************************************************************/
 void SendString(const char *StringIn) {
-  char *local[16];
-  strcpy(local, StringIn);
+  char *local[64];
   DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
+
+  TURxFlush(devicePort);
+  strcpy(local, StringIn);
   strcat(local, "\r");
   TUTxPutBlock(devicePort, local, (long) strlen(local), (short) 1000);
 } //_____ SendString() _____//
@@ -987,7 +989,7 @@ void SendString(const char *StringIn) {
 bool Call_Land(void) {
   // global char *PhoneNum;
   char call[32];
-  short wait = 12000;
+  short wait = 20000;
   int length;
   long lenreturn;
 
