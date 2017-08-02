@@ -662,9 +662,10 @@ void PhaseThree() {
   while (result <= 0) { 
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
-    result = IRIDGPS(); 
-#ifdef DEBUG1
+#ifdef DEBUG3
 result=1;
+#else
+    result = IRIDGPS(); 
 #endif
 
     if (result >= 1 || gpsFails > 4) {

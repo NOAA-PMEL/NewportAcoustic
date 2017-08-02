@@ -83,6 +83,7 @@ void LARA_Recovery();
 #define DEBUG
 // #define DEBUG1
 // #define DEBUG2
+#define DEBUG3
 #define SYSTEMDIAGNOSTICS
 #define WISPR
 #define IRIDIUM
