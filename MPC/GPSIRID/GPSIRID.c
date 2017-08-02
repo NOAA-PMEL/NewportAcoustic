@@ -237,7 +237,7 @@ bool GPSstartup() {
 int AntMode(char r) {
   static char ant='-', dev='-';
   char a, d;
-  DBG2(flogf("\n\t|AntMode(%c)", r);)
+  DBG1(flogf("\n\t|AntMode(%c)", r);)
   DevSelect(DEVA);
   // select ant SBE16, switch ant device
   switch (r) {
@@ -254,13 +254,14 @@ int AntMode(char r) {
     TUTxPutByte(devicePort, 3, true);  // ^C connect device
     TUTxPutByte(devicePort, d, true);  
     dev=d;
+    Delayms(3000); // wait 3 sec for device start
   }
   if (a!=ant) {
     TUTxPutByte(devicePort, 1, true);  // ^A antenna
     TUTxPutByte(devicePort, a, true);  // G I
     ant=a;
+    Delayms(1000); // wait 1 sec to settle antenna switch noise
   }
-  Delayms(1000); // wait 1 sec to settle antenna switch noise, dev startup
   return 0;
 } //AntMode
 
@@ -296,6 +297,7 @@ int DevSelect(int dev) {
       PIOSet(ANTMODPWR);
       Delay_AD_Log(5); // power up delay
     }
+    AntMode('S'); // default in antmod, but set our state
     break;
   case DEVX: // power off antenna, port closed
     PIOClear(ANTMODPWR); // antMod power off
@@ -368,8 +370,8 @@ short Connect_SendFile_RecCmd(const char *filename) {
     ACK = RudicsConnect(status);
     // fail is bad, we try to connect several times
     if (!ACK) { // reset
-      AntMode('I');
       OpenSatCom(false);
+      AntMode('I');
       OpenSatCom(true);
       continue;
     }
@@ -724,7 +726,7 @@ void OpenSatCom(bool onoff) {
   
   if (onoff) { // turn on
     // AntMode set before call to OpenSatCom
-    DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
+    DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
     Delay_AD_Log(IRID.WARMUP);
     PhonePin();
     // echo off
@@ -734,7 +736,6 @@ void OpenSatCom(bool onoff) {
     // tell modem to power off
     AntMode('I');
     SendString("AT*P");
-    Delay_AD_Log(1);
     AntMode('S');
     TUTxPutByte(devicePort, 4, true);  // ^D power off iridium
     TUTxPutByte(devicePort, 'I', true);  
