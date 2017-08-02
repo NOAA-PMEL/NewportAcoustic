@@ -162,13 +162,14 @@ bool CTD_GetPrompt() {
   memset(stringin, 0, STRING_SIZE);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10); //cr echo
-  ch=TURxGetByteWithTimeout(devicePort, 10); //lf echo
+  ch=TURxGetByteWithTimeout(devicePort, 50); //cr echo
+  ch=TURxGetByteWithTimeout(devicePort, 50); //lf echo
   GetStringWait(stringin, (short) 2000);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, 50);
+  ch=TURxGetByteWithTimeout(devicePort, 50);
+ 
   GetStringWait(stringin, (short) 2000);
   if (strstr(stringin, ">") != NULL) r=true;
   else r=false;
