@@ -754,6 +754,7 @@ void PhaseFour() {
   CTD_Select(DEVB);
 
   // Now descend.
+  prevDepth = LARA.DEPTH;
   if (LARA.BUOYMODE != 2) {
     LARA.TOPDEPTH = LARA.DEPTH;
     DescentStart = Winch_Descend();
@@ -769,10 +770,9 @@ void PhaseFour() {
   If not, then call Winc_Descend Again. After 10, wait for an hour
   ****/
 
-  prevDepth = LARA.DEPTH;
-
   while (LARA.BUOYMODE == 2) {
     // reading a sample triggers a new one, in p4
+    DBG1(cprintf("\n\t|PhaseFour.Incoming_Data()");)
     Incoming_Data();
 
     // Receive Stop command from Winch...
@@ -785,7 +785,7 @@ void PhaseFour() {
     // doesn't hear the Winch serial coming.
     if (timecheck - DescentStart > interval * 60) {
       flogf("\n\t|PhaseFour() Check depth change");
-      prevDepth -= LARA.DEPTH;
+      prevDepth -= LARA.DEPTH; //??
       if (prevDepth < 0)
         prevDepth = prevDepth * -1.0;
       if (prevDepth < 3) {
@@ -862,7 +862,7 @@ int Incoming_Data() {
       AD_Check();
       // Data coming from WISPR Board
       if (tgetq(PAMPort)) {
-        // DBG(flogf("WISPR Incoming");)
+        DBG(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (tgetq(devicePort)) {
         CTD_Data();
@@ -890,14 +890,11 @@ int Incoming_Data() {
         WISPR_Data();
       } else if (tgetq(NIGKPort)) {
         // DBG(flogf("NIGK Incoming");)
-        AModem_Data();
+        AModem_Data(); //??
       } else if (tgetq(devicePort)) {
         // DBG(flogf("CTD Incoming");)
         CTD_Data();
-        if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
-            LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
-                               // and winch is moving (not stopped)
-          CTD_Sample();
+        CTD_Sample();
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());

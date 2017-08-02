@@ -555,8 +555,6 @@ data	MPC/ADS/ADS.c	/^bool data;$/;"	v
 descentRate	MPC/CTD/CTD.c	/^float descentRate = 0.1923; \/\/ m\/s$/;"	v
 deviceID	MPC/GPSIRID/GPSIRID.c	/^int deviceID=0; \/\/ 0=off, 1=buoy, 2=antenna$/;"	v
 devicePort	MPC/GPSIRID/GPSIRID.c	/^TUPort *devicePort;$/;"	v
-deviceRX	MPC/MPC_Global/MPC.c	/^short deviceRX, deviceTX;$/;"	v
-deviceTX	MPC/MPC_Global/MPC.c	/^short deviceRX, deviceTX;$/;"	v
 dtxrqst	MPC/WISPR/WISPR.c	/^int dtxrqst;$/;"	v
 entries	MPC/MPC_Global/MPC_Global.h	/^  short entries;$/;"	m	struct:menu
 first	MPC/GPSIRID/GPSIRID.c	/^uchar *inputstring, *first, *scratch;$/;"	v

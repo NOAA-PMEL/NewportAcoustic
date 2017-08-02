@@ -135,7 +135,7 @@ void CTD_DateTime() {
   time_t rawtime;
   struct tm *info;
   char buffer[15];
-  DBG1(flogf("\n\t|CTD_DateTime()");)
+  DBG2(flogf("\n\t|CTD_DateTime()");)
   time(&rawtime);
 
   info = gmtime(&rawtime);
@@ -172,7 +172,7 @@ bool CTD_GetPrompt() {
   GetStringWait(stringin, (short) 1000);
   if (strstr(stringin, ">") != NULL) r=true;
   else r=false;
-  DBG1(cprintf("\n\t|CTD_GetPrompt()->%d", r);)
+  DBG2(cprintf("\n\t|CTD_GetPrompt()->%d", r);)
   TURxFlush(devicePort);
   return r;
 }
@@ -400,12 +400,12 @@ bool CTD_Data() {
   struct tm info;
   time_t secs = 0;
 
-  DBG1( cprintf("\n. CTD_Data()"); )
+  DBG2( cprintf("\n. CTD_Data()"); )
   memset(stringin, 0, STRING_SIZE);
 
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
-  DBG( printsafe(len, stringin);)
+  DBG2( printsafe(len, stringin);)
 
   TURxFlush(devicePort);
   strin=stringin;
@@ -554,7 +554,7 @@ void CTD_GetSettings() {
 
   p = VEEFetchData(CTDUPLOADFILE_NAME).str;
   CTD.UPLOAD = atoi(p ? p : CTDUPLOADFILE_DEFAULT);
-  DBG(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
+  DBG2(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
 
 } //____ CTD_GetSettings() ____//
 
