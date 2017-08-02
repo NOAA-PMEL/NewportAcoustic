@@ -100,7 +100,7 @@ bool CTD_Start_Up(int sbe, bool settime) {
   }
   if (settime)
     CTD_DateTime();
-  CTD_SyncMode();
+  // CTD_SyncMode();
   return true;
 } //_____ CTD_Start_Up() _____//
 
@@ -108,6 +108,7 @@ void CTD_Select(int sbe) {
   DevSelect(sbe);
   if (sbe==DEVA) AntMode('S');
   sbeID=sbe;
+  CTD_GetPrompt();
 } // CTD_Select
 
 /******************************************************************************\
@@ -155,49 +156,47 @@ void CTD_DateTime() {
 ** CTD_GetPrompt()
 \********************************************************************************/
 bool CTD_GetPrompt() {
+  char ch;
+  bool r;
   // global char *stringin;
-  short i, count = 0;
-  short LastByteInQ;
-  DBG1(cprintf("\n\t|CTD_GetPrompt()");)
   memset(stringin, 0, STRING_SIZE);
-  i=TURxQueuedCount(devicePort);
-  if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
-  while (((char)LastByteInQ != '>') && count < 8) { 
-    // until a > is read in command line for devicePort or 3 seconds pass 
-    TUTxPrintf(devicePort, "\r");
-    Delayms(1000);
-    i=TURxQueuedCount(devicePort);
-    if (i) LastByteInQ = TURxPeekByte(devicePort, (i - 1));
-    count++;
-  }
-  if (count == 2) {
-    TURxGetBlock(devicePort, stringin, (long) STRING_SIZE, (short) 1000);
-    if (strstr(stringin, "S>") != NULL) {
-      DBG1(cprintf("\nPrompt from CTDBlock ");)
-      TURxFlush(devicePort);
-      return true;
-    }
-    return false;
-  } else {
-    DBG1(cprintf("\nPrompt from CTD ");)
-    TURxFlush(devicePort);
-    return true;
-  }
+  TURxFlush(devicePort);
+  TUTxPutByte(devicePort, '\r', true);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  GetStringWait(stringin, (short) 1000);
+  TURxFlush(devicePort);
+  TUTxPutByte(devicePort, '\r', true);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  GetStringWait(stringin, (short) 1000);
+  if (strstr(stringin, ">") != NULL) r=true;
+  else r=false;
+  DBG1(cprintf("\n\t|CTD_GetPrompt()->%d", r);)
+  TURxFlush(devicePort);
+  return r;
 }
 
 /********************************************************************************\
 ** CTD_Sample()
 \********************************************************************************/
 void CTD_Sample() {
+  char ch;
   DBG2( flogf("\n . CTD_Sample"); )
-  if (SyncMode) {
-    TUTxPrintf(devicePort, "+\r");
-    Delayms(20);
-    TURxFlush(devicePort);
-  } else {
-    TUTxPrintf(devicePort, "TS\r");
-  }
-  Delayms(250);
+  //if (SyncMode) {
+    //TUTxPrintf(devicePort, "+\r");
+    //Delayms(20);
+    //TURxFlush(devicePort);
+  //} else {
+  // TUTxPrintf(devicePort, "TS\r");
+  TUTxPutByte(devicePort, 'T', true);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  TUTxPutByte(devicePort, 'S', true);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  TUTxPutByte(devicePort, '\r', true);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  ch=TURxGetByteWithTimeout(devicePort, 10);
+  //}
 } //____ CTD_Sample() ____//
 
 /********************************************************************************\
@@ -406,36 +405,17 @@ bool CTD_Data() {
 
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
-  cdrain();
-  DBG( cprintf("\n''%s''", stringin);)
-  cdrain();
+  DBG( printsafe(len, stringin);)
 
-  // expect to see stringin start with ".*# "
-  // do better sanity checking
-  strin = strchr(stringin, '#');
-  if (strin == NULL) {
-    // no data #
-    if ((strchr(stringin, '>') != NULL)
-        || (strchr(stringin, '<') != NULL)) {
-      // prompt
-      cprintf("\nERROR|CTD_Data(): got <|> want #, set sync mode");
-  cdrain();
-      // CTD_SyncMode();
-  cdrain();
-    } else {
-      // no < > #, don't know what
-      cprintf("\nERROR|CTD_Data(): No prompt found, reset ctd");
-  cdrain();
-      // CTD_Start_Up(sbeID, true);
-  cdrain();
-    }
-    return false;
-  } // no #
+  TURxFlush(devicePort);
+  strin=stringin;
 
+  memset(stringout, 0, STRING_SIZE);
   // Split data string up into separate values
   if (sbeID==DEVB) { // buoy sbe
     // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50
-    split_temp = strtok(strin, "#, ");
+    // Example: 20.6538,  0.01145,    01 Aug 2016, 12:16:50
+    split_temp = strtok(strin, "\r\n# ");
     split_cond = strtok(NULL, ", "); 
     split_pres = strtok(NULL, ", ");
     split_flu = strtok(NULL, ", ");
@@ -449,26 +429,27 @@ bool CTD_Data() {
     flu = atof(split_flu);
     par = atof(split_par);
     sal = atof(split_sal);
+    sprintf(stringout, "%.4f,%.5f,%.3f,%.4f,%.4f,%.4f", 
+      temp, cond, pres, flu, par, sal);
   } else { // antMod sbe
     // Example: # 20.6538,  0.217,   01 Aug 2016 12:16:50
-    split_temp = strtok(strin, "#, ");
+    split_temp = strtok(strin, "\r\n#, ");
     split_pres = strtok(NULL, ", ");
     split_date = strtok(NULL, "\r\n"); 
 
     temp = atof(split_temp);
     pres = atof(split_pres);
+    sprintf(stringout, "%.4f,%.3f", temp, pres);
   }
   LARA.DEPTH = pres;
   // LARA.TEMP = temp;
-
-  // if antMod DEVA, we are done, no log
-  if (sbeID==DEVA) { return true; }
+  DBG(cprintf("\nctd->%s", stringout);)
 
   // buoy sbe vvvvv
   // convert date time to secs
-  info.tm_mday = atoi(strtok(split_date, " "));
+  info.tm_mday = atoi(strtok(split_date, ", "));
   mon = strtok(NULL, " ");
-  info.tm_year = (atoi(strtok(NULL, " ")) - 1900);
+  info.tm_year = (atoi(strtok(NULL, " ,")) - 1900);
   info.tm_hour = atoi(strtok(NULL, ":"));
   info.tm_min = atoi(strtok(NULL, ":"));
   info.tm_sec = atoi(strtok(NULL, " "));
@@ -501,26 +482,24 @@ bool CTD_Data() {
 
   // need better sanity checks
   if (info.tm_mon == -1) {
-    flogf("\nERROR|CTD_Data(): month %s incorrect. flush tuport ", mon);
-    flogf("\nERROR|CTD_Data(): %s ", stringin );
-    flogf("\nERROR|CTD_Data(): %f, %f, %f, %f, %f, %f, %d, %s, %d ", 
-      temp, cond, pres, flu, par, sal, info.tm_mday, mon, info.tm_year);
-    TURxFlush(devicePort);
+    flogf("\nERROR|CTD_Data(): month %s incorrect. ", mon);
+    flogf("\n\t|''%s''", stringin);
     return false;
-  }
+  } 
+  else month = info.tm_mon + 2;
 
-  month = info.tm_mon + 2;
-  sprintf(split_date, "%d.%d.%d,%d:%d:%d", info.tm_mday, month,
+  memset(stringin, 0, 32);
+  sprintf(stringin, ",%d/%d/%d,%d:%d:%d", month, info.tm_mday,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
+  strcat( stringout, stringin );
+  DBG(cprintf("%s", stringin);)
+
   secs = mktime(&info);
 
-  // Log WriteString
-  memset(stringout, 0, STRING_SIZE);
-  sprintf(stringout, "%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%s\n", 
-    temp, cond, pres, flu, par, sal, split_date);
-  DBG1(flogf("\nctd->%s", stringout);)
+  // if antMod DEVA, we are done, no log
+  if (sbeID==DEVA) { return true; }
 
-  TURxFlush(devicePort);
+  // Log WriteString
   filehandle = open(CTDLogFile, O_APPEND | O_CREAT | O_RDWR);
   if (filehandle <= 0) {
     flogf("\nERROR  |ctdlogfile '%s' fd %d", CTDLogFile, filehandle);

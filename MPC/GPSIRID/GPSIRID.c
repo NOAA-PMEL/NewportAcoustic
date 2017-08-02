@@ -2065,6 +2065,6 @@ long GetStringWait(char *str, short wait) {
   // short wait
   // 1ms chars @ 9600, use timeoutMS=chars
   len = TURxGetBlock(devicePort, str + 1, 
-    STRING_SIZE-1L, (short) STRING_SIZE);
+    STRING_SIZE-1L, (short) 200);
   return len+1L;
 }
