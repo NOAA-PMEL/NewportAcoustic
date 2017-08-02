@@ -378,7 +378,9 @@ void InitializeLARA(ulong *PwrOn) {
       OpenTUPort_WISPR(true);
 
       // Gather all #WISPRNUMBER freespace and sync time.
+#ifndef DEBUG
       GatherWISPRFreeSpace();
+#endif
     }
 
   }
