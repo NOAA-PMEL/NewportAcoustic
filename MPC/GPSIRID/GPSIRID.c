@@ -971,7 +971,7 @@ short SignalQuality(short *signal_quality) {
  ******************************************************************************/
 void SendString(const char *StringIn) {
   char *local[64];
-  DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
+  DBG2(flogf("\n\t|SendString(%s)", local); cdrain();)
 
   TURxFlush(devicePort);
   strcpy(local, StringIn);
@@ -1002,7 +1002,7 @@ bool Call_Land(void) {
   strncat(call, PhoneNum, length);
 
   SendString(call);
-  lenreturn = GetStringWait(inputstring, wait);
+  lenreturn = GetStringWait(inputstring, (short) wait);
 
   DBG1(printsafe(lenreturn, inputstring);)
 
@@ -2058,7 +2058,7 @@ long GetStringWait(char *str, short wait) {
   char ch;
   TickleSWSR(); // another reprieve
   // long wait
-  ch = TURxGetByteWithTimeout(devicePort, wait);
+  ch = TURxGetByteWithTimeout(devicePort, (short) wait);
   if (ch<0) {
     DBG(flogf("\n\t|GetStringWait() timeout");)
     return 0L;

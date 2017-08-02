@@ -949,11 +949,11 @@ int Incoming_Data() {
         AModem_Data();
       } else if (tgetq(devicePort)) {
         // DBG(flogf("CTD Incoming");)
-        CTD_Data();
-        if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
-            LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
+        //?? CTD_Data();
+        //?? if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
+            //?? LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
                                // and winch is moving (not stopped)
-          CTD_Sample();
+          //?? CTD_Sample();
       } else if (cgetq()) {
         // DBG(flogf("Console Incoming");)
         Console(cgetc());
