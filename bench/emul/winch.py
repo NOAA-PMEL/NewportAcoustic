@@ -9,7 +9,7 @@ from threading import Thread, Event
 # buffOut = ''
 #motorRunState = off, down, up
 #cable = 0
-mooring = 20
+mooring = 30
 
 # amodRate measured about 6.5 sec 
 name = 'winch'
@@ -182,7 +182,7 @@ def motorThread():
 
 def slack():
     "determine if the cable is slack"
-    return depth()<.1
+    return depth()<17
 
 def docked():
     "are we docked?"
