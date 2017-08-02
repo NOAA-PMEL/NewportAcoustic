@@ -394,7 +394,7 @@ bool WISPRExit() {
   TURxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$EXI*\n");
   TUTxWaitCompletion(PAMPort);
-  Delayms(200);
+  Delay_AD_Log(150);  Delayms(200);
 
   WISPR_Data();
 

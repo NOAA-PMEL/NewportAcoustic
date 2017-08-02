@@ -383,7 +383,7 @@ int System_Timer() {
 // CTD Measurements
 #ifdef CTDSENSOR
     // Get an average of CTD Depth and calculate velocity
-    depth = CTD_AverageDepth(8, &vel);
+    depth = CTD_AverageDepth(9, &vel);
     // If initial average is less than target depth... why?
     if (depth <= NIGK.TDEPTH) {
       // Average more CTD Depth

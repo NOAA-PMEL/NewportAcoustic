@@ -403,7 +403,7 @@ void InitializeLARA(ulong *PwrOn) {
     IRID.CALLMODE = 1;
 
     // check for motion
-    depth = CTD_AverageDepth(6, &velocity);
+    depth = CTD_AverageDepth(9, &velocity);
     DevSelect(DEVX);
 
     // Place Buouy in correct state
@@ -554,7 +554,7 @@ void PhaseTwo() {
   PrintSystemStatus();
 
   CTD_Select(DEVA);
-  LARA.DEPTH = CTD_AverageDepth(6, &velocity);
+  LARA.DEPTH = CTD_AverageDepth(9, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
   if (LARA.DATA) {
@@ -749,7 +749,7 @@ void PhaseFour() {
 
   PrintSystemStatus();
   // sanity check
-  CTD_AverageDepth(6, &velocity);
+  CTD_AverageDepth(9, &velocity);
   if (LARA.BUOYMODE != 0) {
     Winch_Stop();
     WaitForWinch(0);
