@@ -74,7 +74,7 @@ int CTD_Init() {
 bool CTD_Start_Up(int sbe, bool settime) {
   // global int sbeID;
   bool returnval = false;
-  DBG( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
+  DBG2( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
 
   CTD_Select(sbe);
 
@@ -162,15 +162,15 @@ bool CTD_GetPrompt() {
   memset(stringin, 0, STRING_SIZE);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 50); //cr echo
-  ch=TURxGetByteWithTimeout(devicePort, 50); //lf echo
-  GetStringWait(stringin, (short) 2000);
-  TURxFlush(devicePort);
+//ch=TURxGetByteWithTimeout(devicePort, 50); //cr echo
+  //ch=TURxGetByteWithTimeout(devicePort, 50); //lf echo
+  //GetStringWait(stringin, (short) 2000);
+  //TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
   ch=TURxGetByteWithTimeout(devicePort, 50);
   ch=TURxGetByteWithTimeout(devicePort, 50);
- 
-  GetStringWait(stringin, (short) 2000);
+  Delayms(1000);
+  GetStringWait(stringin, (short) 5000);
   if (strstr(stringin, ">") != NULL) r=true;
   else r=false;
   DBG2(cprintf("\n\t|CTD_GetPrompt()->%d", r);)
@@ -407,6 +407,9 @@ bool CTD_Data() {
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
   DBG2( printsafe(len, stringin);)
+#ifdef DEBUG3
+  printsafe(len, stringin);
+#endif
 
   TURxFlush(devicePort);
   strin=stringin;

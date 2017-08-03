@@ -133,13 +133,21 @@ uchar *inputstring, *first, *scratch;
  * returns 0 success
  */
 int GPSIRID_Init() {
-  // global short deviceRX, deviceTX;
+  short deviceRX, deviceTX;
   // global char *inputstring, *scratch;
   // never freed
   inputstring = (char *)calloc(STRING_SIZE, 1);
   scratch = (char *)calloc(STRING_SIZE, 1);
-  // deviceRX = TPUChanFromPin(DEVICERX); // moved to SetupHardware
-  // deviceTX = TPUChanFromPin(DEVICETX);
+  deviceRX = TPUChanFromPin(DEVICERX); 
+  deviceTX = TPUChanFromPin(DEVICETX);
+  devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
+  if (devicePort == NULL) {
+    flogf("\nERR open devicePort: failed");
+    flogf("\nERR GPSIRID_Init: failed");
+    flogf("\nERR open devicePort: failed");
+    return -1;
+  }
+  Delayms(200); // to settle rs232
   return 0;
 }
 
@@ -270,23 +278,10 @@ int AntMode(char r) {
  * DEVX=0 = off, DEVA=1 = antenna, DEVB=2 = buoy
  */
 int DevSelect(int dev) {
-  short deviceRX, deviceTX;
   // global devicePort
   // use a stronger tests for open??
   if (dev==deviceID && devicePort) return 0; // already selected
   DBG2(flogf("\n\t|DevSelect(%d)", dev);)
-
-  if (devicePort == NULL) {
-    deviceRX = TPUChanFromPin(DEVICERX); 
-    deviceTX = TPUChanFromPin(DEVICETX);
-    devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
-    if (devicePort == NULL) {
-      flogf("\nERR DevSelect(): failed %d", dev);
-      return -1;
-    }
-    Delayms(200); // to settle rs232
-  }
-  Delayms(20); // to settle hardware
 
   switch (dev) {
   case DEVA: // antenna module dev

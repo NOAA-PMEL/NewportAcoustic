@@ -174,9 +174,11 @@ void main() {
   InitializeLARA(&PwrOn);
 
   // Running WISPR Always! //Rebooting TUPort post-Iridium
+#ifndef DEBUG3
   OpenTUPort_WISPR(true);
   if (WISP.DUTYCYCL == 100)
     WISPRPower(true);
+#endif
 
   // PHASE 5:  Deployment
   if (LARA.PHASE==5) {
@@ -306,7 +308,7 @@ void InitializeLARA(ulong *PwrOn) {
   Free_Disk_Space(); // Does finding the free space of a large CF card cause
                      // program to crash? or Hang?
 
-  // best to init GPSIRID first
+  // must init GPSIRID first
   GPSIRID_Init();
   CTD_Init();
   // startup sets sync mode
@@ -344,9 +346,11 @@ void InitializeLARA(ulong *PwrOn) {
                        // turned on again if
     VEEStoreShort(DUTYCYCLE_NAME, WISP.DUTYCYCL);
     // Possibility of WISPR still being on after reboot. Shut it down.
+#ifndef DEBUG3
     OpenTUPort_WISPR(true);
     WISPRSafeShutdown();
     OpenTUPort_WISPR(false);
+#endif
     LARA.LOWPOWER = true;
   } else
     LARA.LOWPOWER = false;
@@ -375,10 +379,10 @@ void InitializeLARA(ulong *PwrOn) {
       if (WISP.NUM != 1)
         WISP.NUM = 1; // current used board
 
+#ifndef DEBUG3
       OpenTUPort_WISPR(true);
 
       // Gather all #WISPRNUMBER freespace and sync time.
-#ifndef DEBUG1
       GatherWISPRFreeSpace();
 #endif
     }
@@ -553,7 +557,11 @@ void PhaseTwo() {
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
+#ifdef DEBUG3
+  CTD_Select(DEVB);
+#else
   CTD_Select(DEVA);
+#endif
   LARA.DEPTH = CTD_AverageDepth(9, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
@@ -662,7 +670,7 @@ void PhaseThree() {
   while (result <= 0) { 
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
-#ifdef DEBUG3
+#ifdef DEBUG4
 result=1;
 #else
     result = IRIDGPS(); 
@@ -837,29 +845,39 @@ void PhaseFour() {
  * PhaseFive for deploy time
  */
 void PhaseFive() {
-  ulong deployT, maxT;
+  ulong nowT, deployT, maxT;
   float nowD=0.0, thenD=0.0;
   int changeless=0;
 
-  deployT = RTCGetTime(NULL, NULL);
+  flogf("\nPhaseFive()");
+  RTCGetTime(&deployT, NULL);
   // give up after two hours
   maxT = (ulong) (2*60*60);
+  Delayms(5000);
+  RTCGetTime(&nowT, NULL);
+#ifdef DEBUG3
+  cprintf("\np5 then: %ld, now: %ld, max %ld", 
+    (long) deployT, (long) nowT, (long) maxT);
+#endif
+#ifndef DEBUG3
   // do nothing for 30minutes
   Delay_AD_Log(30*60);
+#endif
   CTD_Select(DEVA);
   Delay_AD_Log(9);
   LARA.DEPTH=0.0;
-  flogf("\n\s\t|P5: wait until >10m", Time(NULL));
-  // wait until deeper than 10m
+  flogf("\n%s\t|P5: wait until >10m", Time(NULL));
   while (LARA.DEPTH<10.0) {
     CTD_Sample();
     Delay_AD_Log(3);
     if (!  CTD_Data()) 
       flogf("\nERR in P5 - no CTD data");
+    flogf("\nP5 %5.2f", LARA.DEPTH);
     Delay_AD_Log(30);
-    if ((RTCGetTime(NULL, NULL) - deployT) > maxT) break; // too long
+    RTCGetTime(&nowT, NULL);
+    if ((nowT - deployT) > maxT) break; // too long
   }
-  flogf("\n\s\t|P5: wait until no depth changes", Time(NULL));
+  flogf("\n%s\t|P5: wait until no depth changes", Time(NULL));
   // check every half minute; if no change for five minutes, then deployed
   while (changeless<10) {
     thenD=LARA.DEPTH;
@@ -872,11 +890,13 @@ void PhaseFive() {
       changeless=0;
     } else changeless++;
     Delay_AD_Log(30);
-    if ((RTCGetTime(NULL, NULL) - deployT) > maxT) break; // too long
+    RTCGetTime(&nowT, NULL);
+    if ((nowT - deployT) > maxT) break; // too long
   }
   // deployed!
-  flogf("\n\s\t|P5: deployed", Time(NULL));
-  LARA.PHASE=1;
+  flogf("\n%s\t|P5: deployed", Time(NULL));
+  // rise
+  LARA.PHASE=2;
 } // PhaseFive()
 
 /****************************************************************************\
@@ -942,20 +962,21 @@ int Incoming_Data() {
       // ?? does adcheck need to run between each incoming? how often?
       AD_Check();
       if (tgetq(PAMPort)) {
-        // DBG(flogf("WISPR Incoming");)
+        DBG(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (tgetq(NIGKPort)) {
-        // DBG(flogf("NIGK Incoming");)
+        // ??? not hearing on bench test
+        DBG(flogf("NIGK Incoming");)
         AModem_Data();
       } else if (tgetq(devicePort)) {
-        // DBG(flogf("CTD Incoming");)
+        DBG(flogf("CTD Incoming");)
         CTD_Data();
         if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
             LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
                                // and winch is moving (not stopped)
           CTD_Sample();
       } else if (cgetq()) {
-        // DBG(flogf("Console Incoming");)
+        DBG(flogf("Console Incoming");)
         Console(cgetc());
       }
       // No more incoming data
