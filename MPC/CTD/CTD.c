@@ -447,7 +447,7 @@ bool CTD_Data() {
   }
   LARA.DEPTH = pres;
   // LARA.TEMP = temp; //??
-  DBG(cprintf("\nctd->%s", stringout);)
+  DBG(flogf("\nctd->%s", stringout);)
 
   // buoy sbe vvvvv
   // convert date time to secs
@@ -496,7 +496,7 @@ bool CTD_Data() {
   sprintf(stringin, ",%d/%d/%d,%02d:%02d:%02d", month, info.tm_mday,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
   strcat( stringout, stringin );
-  DBG(cprintf("%s", stringin);)
+  DBG(flogf("%s", stringin);)
 
   secs = mktime(&info);
 
