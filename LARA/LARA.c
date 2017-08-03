@@ -859,10 +859,6 @@ void PhaseFive() {
   cprintf("\np5 then: %ld, now: %ld, max %ld", 
     (long) deployT, (long) nowT, (long) maxT);
 #endif
-#ifndef DEBUG3
-  // do nothing for 30minutes
-  Delay_AD_Log(30*60);
-#endif
   CTD_Select(DEVA);
   Delay_AD_Log(9);
   LARA.DEPTH=0.0;
@@ -878,21 +874,25 @@ void PhaseFive() {
     if ((nowT - deployT) > maxT) break; // too long
   }
   flogf("\n%s\t|P5: wait until no depth changes", Time(NULL));
-  // check every half minute; if no change for five minutes, then deployed
-  while (changeless<10) {
+  // check every minute; if no change for five minutes, then deployed
+  while (changeless<5) {
     thenD=LARA.DEPTH;
     CTD_Sample();
     Delay_AD_Log(3);
     if (CTD_Data()) nowD=LARA.DEPTH;
     else  flogf("\nERR in P5 - no CTD data");
-    if (abs(nowD-thenD) > 1) { // changed
+    if (abs(nowD-thenD) > 2) { // changed
       flogf("\n\s\t|P5: depth change %4.1f", Time(NULL), (nowD-thenD));
       changeless=0;
     } else changeless++;
-    Delay_AD_Log(30);
+    Delay_AD_Log(60);
     RTCGetTime(&nowT, NULL);
     if ((nowT - deployT) > maxT) break; // too long
   }
+#ifndef DEBUG3
+  // do nothing for 30minutes
+  Delay_AD_Log(30*60);
+#endif
   // deployed!
   flogf("\n%s\t|P5: deployed", Time(NULL));
   // rise
