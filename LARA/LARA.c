@@ -627,13 +627,14 @@ void PhaseTwo() {
     if (!LARA.ON) break;
   }
 
+  if (CurrentWarning()) {}
   depthChange = LARA.TOPDEPTH - LARA.MOORDEPTH;
   timeChange = AscentStop - AscentStart;
   LARA.PAYOUT = ((float)LARA.ASCENTTIME / 60.0) * NIGK.RRATE;
   flogf("\n\t|Rate of Ascent: %5.2fMeters/Minute",
         (depthChange / ((float)timeChange / 60.0)));
   flogf("\n\t|Calculated Cable Payout: %5.1fMeters", LARA.PAYOUT);
-  flogf("\n\t|Time for Ascent: %lu", timeChange);
+  flogf("\n%s\t|Time for Ascent: %lu", Time(NULL), timeChange);
   PrintSystemStatus();
 
   if (LARA.SURFACED)
@@ -882,7 +883,7 @@ void PhaseFive() {
     if (CTD_Data()) nowD=LARA.DEPTH;
     else  flogf("\nERR in P5 - no CTD data");
     if (abs(nowD-thenD) > 2) { // changed
-      flogf("\n\s\t|P5: depth change %4.1f", Time(NULL), (nowD-thenD));
+      flogf("\n%s\t|P5: depth change %4.1f", Time(NULL), (nowD-thenD));
       changeless=0;
     } else changeless++;
     Delay_AD_Log(60);
@@ -1560,13 +1561,14 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
  */
 bool CurrentWarning() {
   float a, b;
-  DBG(flogf("\nCurrentWarning()");)
+  DBG(flogf("\n%s\t|CurrentWarning()", Time(NULL));)
   CTD_Select(DEVB);
   CTD_Sample();
   CTD_Data();
   b=LARA.DEPTH;
   CTD_Select(DEVA);
   CTD_Sample();
+  Delayms(1000);
   CTD_Data();
   a=LARA.DEPTH;
   flogf("\n\t|CurrentWarning(): a=%5.2f, b=%5.2f", a, b);
