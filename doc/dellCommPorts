@@ -1,0 +1,4 @@
+set DEVMGR_SHOW_NONPRESENT_DEVICES=1
+> devmgmt.msc
+Enable "Show hidden devices" in the menu, and uninstall grayed-out COM ports.
+
