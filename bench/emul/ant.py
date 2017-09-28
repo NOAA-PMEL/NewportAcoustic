@@ -15,7 +15,7 @@ import time
 
 name = 'sbe39'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS4'
+port = '/dev/ttyS3'
 baudrate = 9600
 CTD_DELAY = 1
 

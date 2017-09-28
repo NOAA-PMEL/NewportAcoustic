@@ -14,7 +14,7 @@ mooring = 30
 # amodRate measured about 6.5 sec 
 name = 'winch'
 eol = '\n'
-port = '/dev/ttyS6'
+port = '/dev/ttyS5'
 baudrate = 4800
 amodDelay = 5.5
 

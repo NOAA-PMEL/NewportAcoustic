@@ -15,7 +15,7 @@ import time
 
 name = 'ctd'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS5'
+port = '/dev/ttyS4'
 baudrate = 9600
 CTD_DELAY = 3.8
 
