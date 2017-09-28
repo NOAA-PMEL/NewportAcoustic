@@ -80,7 +80,7 @@
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
 #define BUOY_BAUD 9600L
 // #define BUOY_BAUD 19200L
-#define IRID_BAUD 19200L
+#define IRID_BAUD 9600L
 #define BUFSIZE 4096
 
 #define BUOY 0

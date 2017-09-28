@@ -33,8 +33,8 @@ void GetIRIDIUMSettings();
 void OpenTUPort_AntMod(bool);
 bool PowerOn_GPS();
 
-#define IRIDBAUD 19200L
-// #define IRIDBAUD 9600L
+// #define IRIDBAUD 19200L
+#define IRIDBAUD 9600L
 
 // defines for pins moved to platform.h
 
