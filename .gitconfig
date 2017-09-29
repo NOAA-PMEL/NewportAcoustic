@@ -1,0 +1,7 @@
+[user]
+	name = Brian Kahn
+	email = brian.kahn@noaa.gov
+[alias]
+  lg = log --graph --decorate --oneline --date=local --date-order --pretty=format:'%C(blue)%h  %C(yellow)%ad  %C(green)%d %Creset %n%B' 
+  ls = log --name-status --pretty=format:'%C(blue)%h  %C(yellow)%ad  %C(green)%d %Creset %n%B'
+  recommit = commit -a --amend -C HEAD
