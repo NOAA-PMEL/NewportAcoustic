@@ -152,7 +152,7 @@ ushort Setup_ADS(bool ads_on, long filecounter, ushort val) {
   } else if (!ADSOn) {
     PITSet100usPeriod(PITOff); // Stop sampling
     PITRemoveChore(0);
-    RTCDelayMicroSeconds(10000);
+    Delayms(10);
     data = true;
     ADCounter = 0;
   }
@@ -164,7 +164,7 @@ ushort Setup_ADS(bool ads_on, long filecounter, ushort val) {
 void Open_Avg_File(long counter) {
 
   sprintf(&ADAvgFileName[2], "%08ld.pwr", counter);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
   ADSFileHandle = creat(ADAvgFileName, 0);
   if (ADSFileHandle <= 0) {
     flogf("\nCouldn't Open %s file, errno%d", ADAvgFileName, errno);
@@ -173,7 +173,7 @@ void Open_Avg_File(long counter) {
   if (close(ADSFileHandle) != 0)
     flogf("\nERROR  |Open_Avg_File() %s Close error: %d", ADAvgFileName, errno);
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 
 } //_____ void OpenAvgFile() _____//
 /************************************************\
@@ -188,7 +188,7 @@ void Setup_Acquisition(ushort BitShift) {
   PITSet51msPeriod(PITOff); // Assert Both PIT Timers off at this point.
   PITSet100usPeriod(PITOff);
 
-  RTCDelayMicroSeconds(20000L);
+  Delayms(20);
 
   ADSample = (short *)malloc(2 * sizeof(short));
   // TotalPower= (long*) malloc(2*sizeof(long));
@@ -216,7 +216,7 @@ void Setup_Acquisition(ushort BitShift) {
   ADSTIME = (10 * SAMPLES * (PITRATE * PITPERIOD));
 
   DBG(flogf("\n\t|Writing every %4.1fSeconds", ADSTIME / 10.0);)
-  RTCDelayMicroSeconds(1000L);
+  Delayms(1);
 
   // Set the Rate and start the PIT
   Nsamps = 0;
@@ -246,7 +246,7 @@ void AD_Log(void) {
   ADCounter++;
 
   //   AveragedEnergy = (ushort *) calloc(3, sizeof(short));
-  RTCDelayMicroSeconds(5000L);
+  Delayms(5);
 
   if (data == true) {
     AveragedEnergy[0] = (ushort)(TotalPower[0] >> BitShift); // Voltage
@@ -307,7 +307,7 @@ void AD_Write(ushort *AveragedEnergy) {
   CLK(start_clock = clock();)
 
   write(ADSFileHandle, AveragedEnergy, 3 * sizeof(ushort));
-  RTCDelayMicroSeconds(25000);
+  Delayms(25);
   CLK(stop_clock = clock();
       print_clock_cycle_count(start_clock, stop_clock, "AD_Write: write");)
 
@@ -317,7 +317,7 @@ void AD_Write(ushort *AveragedEnergy) {
     flogf("\nERROR  |AD_Write() %s Close error: %d", ADAvgFileName, errno);
   // DBG(   else      flogf("\n\t|AD_Write() %s Closed", ADAvgFileName);)
  
-  RTCDelayMicroSeconds(10000);
+  Delayms(10);
 
 } //_____ AD_Write() _____//
 /******************************************************************************\
@@ -398,16 +398,16 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
       flogf("\nERROR  |PowerMonitor: File Close error: %d", errno);
     DBG(else flogf("\n\t|PowerMonitor: ADSFile Closed");)
 
-    RTCDelayMicroSeconds(25000L);
+    Delayms(25);
     if (DataCount != 0) {
       energy[0] = (ushort)(TotalAmp / DataCount);
       energy[1] = (ushort)(TotalVolts / DataCount);
     }
 
     amps = CFxADRawToVolts(ad, energy[0], VREF, true);
-    RTCDelayMicroSeconds(10000L);
+    Delayms(10);
     voltage = CFxADRawToVolts(ad, energy[1], VREF, true) * 100;
-    RTCDelayMicroSeconds(10000L);
+    Delayms(10);
     TotalTime = TotalTime / 10;
     kjoules = (amps * voltage * TotalTime) / 1000.0;
   }
@@ -440,7 +440,7 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
   if (filehandle > 0)
     byteswritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
 
-  RTCDelayMicroSeconds(150000L);
+  Delayms(150);
 
   return floater;
 

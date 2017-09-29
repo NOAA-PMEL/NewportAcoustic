@@ -44,6 +44,9 @@ struct menu {
   void (*command)();
   char *string;
 };
+// IRIDUM TUPORT Setup
+extern TUPort *devicePort;
+extern short deviceRX, deviceTX;
 
 /***********************************************************
 //Functions defined in MPC.c file
@@ -91,10 +94,6 @@ float Check_Timers(ushort);
         @Return: Boolean true of successful appendage
         */
 bool Append_Files(int, const char *, bool, long);
-
-// easy delay millisec
-// mad into macro
-// void Delayms(int);
 
 // print ascii, non-ascii
 void printsafe (long, uchar *);

@@ -84,14 +84,14 @@ void AModem_Data(void) {
   // if command from Winch. If stop, why? Update LARA System Statuses
   if (strchr(inString, '#') != NULL) {
     command = strtok(inString, "#");
-    cprintf("\n\t|Command: %s", command);
+    flogf("\n%s\t|Command: #%s", Time(NULL), command);
     prechar = command[0];
     symbol = true;
   }
   // Confirming a new winch command//response from command
   else if (strchr(inString, '%') != NULL) {
     command = strtok(inString, "%");
-    cprintf("\n\t|Response: %s", command);
+    flogf("\n%s\t|Response: %%%s", Time(NULL), command);
     prechar = command[0];
     symbol = false;
 
@@ -102,12 +102,12 @@ void AModem_Data(void) {
     free(inString);
     return;
   } else
-    cprintf("%s", inString);
+    flogf("\n%s\t|other: %s", Time(NULL), inString);
 
   if (prechar == 'R') {
 
     if (LARA.BUOYMODE == 0)
-      CTD_Sample();
+      CTD_Sample(1);
     LARA.BUOYMODE = 1;
     WINCH.ASCENTRCV++;
     // if(!symbol)
@@ -115,7 +115,7 @@ void AModem_Data(void) {
   } else if (prechar == 'F') {
 
     if (LARA.BUOYMODE == 0)
-      CTD_Sample();
+      CTD_Sample(1);
     LARA.BUOYMODE = 2;
     WINCH.DESCENTRCV++;
 
@@ -166,7 +166,7 @@ ulong Winch_Ascend(void) {
 
   TUTxPrintf(NIGKPort, "#R,01,03\n");
   TUTxWaitCompletion(NIGKPort);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
   WINCH.ASCENTCALLS++;
   return (time(NULL) + (ulong)NIGK.DELAY);
 } //____ Ascend() ____//
@@ -178,7 +178,7 @@ ulong Winch_Descend(void) {
 
   TUTxPrintf(NIGKPort, "#F,01,00\n");
   TUTxWaitCompletion(NIGKPort);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
   WINCH.DESCENTCALLS++;
   return (time(NULL) + (ulong)NIGK.DELAY);
 } //____ Descend() ____//
@@ -194,7 +194,7 @@ ulong Winch_Stop(void) {
 
   TUTxPrintf(NIGKPort, "#S,01,00\n");
   TUTxWaitCompletion(NIGKPort);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
 
   WINCH.STOPCALLS++;
   return (time(NULL) + (ulong)NIGK.DELAY);
@@ -220,8 +220,7 @@ void Buoy_Status(void) {
       NIGKPort, "%%B,01,%c%c\n", B_Status[0],
       B_Status[1]); // Send rest of status via acoustic remote to deck unit
   TUTxWaitCompletion(NIGKPort);
-  RTCDelayMicroSeconds(
-      5000000);        // Make sure all the Buoy Calls have been received....
+  Delayms(5000);        // Make sure all the Buoy Calls have been received....
   TURxFlush(NIGKPort); // Before clearing the NIGKPort Rx
   WINCH.BUOYRCV++;
 
@@ -239,24 +238,24 @@ void OpenTUPort_NIGK(bool on) {
     AModem_TX = TPUChanFromPin(AMODEMTX);
 
     PIOClear(AMODEMPWR);
-    RTCDelayMicroSeconds(250000L);
+    Delayms(250);
     PIORead(48);
     PIOSet(AMODEMPWR); // Powers up the DC-DC for the Acoustic Modem Port
     NIGKPort = TUOpen(AModem_RX, AModem_TX, AMODEMBAUD, 0);
-    RTCDelayMicroSeconds(150000L);
+    Delayms(150);
     if (NIGKPort == 0)
       flogf("\n\t|Bad Winch TUPort\n");
     else {
       TUTxFlush(NIGKPort);
       TURxFlush(NIGKPort);
-      RTCDelayMicroSeconds(5000000L); // Wait 5 seconds for NIGKPort to power up
+      Delayms(5000); // Wait 5 seconds for NIGKPort to power up
       TUTxPrintf(NIGKPort, "\n");
-      RTCDelayMicroSeconds(250000L);
+      Delayms(250);
       TUTxFlush(NIGKPort);
       TURxFlush(NIGKPort);
     }
   } else {
-    RTCDelayMicroSeconds(500000L);
+    Delayms(500);
     PIOClear(AMODEMPWR);
     TUClose(NIGKPort);
   }

@@ -227,7 +227,7 @@ void Make_Directory(char *path) {
   putflush();
   CIOdrain();
   execstr(DOSCommand);
-  RTCDelayMicroSeconds(1000000L);
+  Delayms(1000);
 }
 /****************************************************************************
 ** MakeDirectory()
@@ -281,7 +281,7 @@ void DOS_Com(char *command, long filenum, char *ext, char *extt) {
   putflush();
   CIOdrain();
   execstr(Com);
-  RTCDelayMicroSeconds(250000L);
+  Delayms(250);
 }
 
 /******************************************************************************\
@@ -368,7 +368,7 @@ int System_Timer() {
     if (WISPR_Status()) {
       flogf("\n\t|Detection Call: Requesting %d DTX", WISP.DETMAX);
       WISPRDet(WISP.DETMAX);
-      RTCDelayMicroSeconds(100000L);
+      Delayms(100);
       WISPRExpectedReturn(3, false);
       if (WISP.DUTYCYCL < 100) {
         flogf("\n\t|WISPR Duty Cycle");
@@ -383,11 +383,11 @@ int System_Timer() {
 // CTD Measurements
 #ifdef CTDSENSOR
     // Get an average of CTD Depth and calculate velocity
-    depth = CTD_AverageDepth(3, &vel);
+    depth = CTD_AverageDepth(9, &vel);
     // If initial average is less than target depth... why?
     if (depth <= NIGK.TDEPTH) {
       // Average more CTD Depth
-      depth = CTD_AverageDepth(5, &vel);
+      depth = CTD_AverageDepth(20, &vel);
       // Still Less than target depth? Set in recovery mode. Set calling
       // interval to 30 minutes.
       if (depth < NIGK.TDEPTH) {
@@ -609,7 +609,7 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
   // char filename[]="c:00000000.xxx";
   int byteswritten;
 
-  RTCDelayMicroSeconds(50000L);
+  Delayms(50);
 
   stat(SourceFileName, &fileinfo);
   if (fileinfo.st_size <= 0) {
@@ -689,10 +689,10 @@ void Delay_AD_Log(short Sec) {
   for (i = 0; i < last; i++) {
 
     AD_Check();
-    RTCDelayMicroSeconds(5000000L); // Wait until get sat signal gets better
+    Delayms(5000);
   }
   AD_Check();
-  RTCDelayMicroSeconds(rem * 1000000L); // Wait until get sat signal gets better
+  Delayms(rem * 1000); 
   TickleSWSR();                         // another reprieve
 
 } ///////////Delay_AD_Log()///////////////////////////////////////
@@ -761,10 +761,10 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
             break;
         if (i == 8) { // all digits
           if (Lowest && val < minval) {
-            DBG(flogf("\nNew lowest value: %ld", val);)
+            // DBG(flogf("\nNew lowest value: %ld", val);)
             minval = val;
           } else if (val > maxval) {
-            DBG(flogf("\nNew highest value: %ld", val);)
+            // DBG(flogf("\nNew highest value: %ld", val);)
             maxval = val;
           }
         }
@@ -820,7 +820,7 @@ bool SaveParams(const char *Command) {
   strncpy(params, Command, strlen(Command));
   flogf("\n\t|param: %s", params);
   paramfilehandle = open("SYSTEM.CFG", O_WRONLY | O_CREAT | O_TRUNC);
-  RTCDelayMicroSeconds(25000);
+  Delayms(25);
   if (paramfilehandle <= 0) {
     flogf("\nERROR  |SYSTEM.CFG open errno: %d", errno);
     return false;
@@ -831,7 +831,7 @@ bool SaveParams(const char *Command) {
 
   byteswritten = write(paramfilehandle, params, strlen(Command));
   DBG(flogf("\n\t|BytesWritten: %d", byteswritten);)
-  RTCDelayMicroSeconds(25000);
+  Delayms(25);
   if (close(paramfilehandle) < 0)
     flogf("\nERROR  |SYSTEM.CFG close errno: %d", errno);
   DBG(else flogf("\n\t|SYSTEM.CFG Closed"); cdrain(); coflush();)
@@ -881,7 +881,7 @@ void ParseStartupParams(bool DefaultSettings) {
     paramfilehandle = open("SYSTEM.CFG", O_RDONLY);
   }
 
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
   if (paramfilehandle < 0) {
     flogf("\nERROR  |ParseStartupParams() open errno: %d", errno);
     return;
@@ -1333,7 +1333,8 @@ DBG(uprintf("HIBERNATE=%u (%s)\n", MPC.HIBERNATE, p ? "vee" : "def"); cdrain();)
 #endif
 
 #ifdef CTDSENSOR
-  GetCTDSettings();
+  CTD_GetSettings(0);
+  CTD_GetSettings(1);
 #endif
 
 #ifdef BLUETOOTH
@@ -1386,9 +1387,4 @@ void printsafe (long l, uchar *b) {
   cprintf("''\n");
   cdrain();
 } // printsafe
-
-// made into macro, mpcglobal.h
-// void Delayms(int d) {
-//  RTCDelayMicroSeconds((long) 1000 * (long) d);
-//} // Delayms
 

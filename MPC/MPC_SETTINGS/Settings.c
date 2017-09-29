@@ -425,7 +425,7 @@ CmdTable IridiumCmdTable[] =
         "IRID>", PDCCmdStdInteractive, 0, 0, 1, 1, "Iridium Command Menu\n",
         "SYSTEM", SystemSettings, 0, 0, 0, 0, "System Menu", "LIST",
         SetupListCmd, 0, 0, 0, 0, "List settings [/V] (verbose)", "SET",
-        PDCSetCmd, 0, 0, 0, 0, "[var=[str]] [/SLFE?]", "GPS", PowerOn_GPS, 0, 0,
+        PDCSetCmd, 0, 0, 0, 0, "[var=[str]] [/SLFE?]", "GPS", GPSstartup, 0, 0,
         0, 0, "Gathering GPS Time", "GETSET", GetIRIDIUMSettings, 0, 0, 0, 0,
         "Get IRIDUM Settings", "IRIDGPS", IRIDGPS, 0, 0, 0, 0, "Full Test"
         //   ,"UPLOAD"		, UploadFiles,			0, 0, 0, 0, "Upload
@@ -754,7 +754,7 @@ void SetupIridiumCmd() {
 
   char *ProgramDescription = {"\n"
                               "Type HELP to view commands\n"};
-  // OpenTUPort_AntMod(true);
+  // Device_OpenTUPort(true);
   // printf(ProgramDescription);
   SettingsPointer = IRIDSettings;
   CmdStdSetup(&cia, IridiumCmdTable, 0);
@@ -767,7 +767,7 @@ void SetupIridiumCmd() {
     fflush(stdout);
   }
 
-  // OpenTUPort_AntMod(false);
+  // Device_OpenTUPort(false);
   SystemSettings();
 }
 #endif
@@ -790,7 +790,7 @@ void SetupCTDCmd() {
 
   while (CmdStdRun(&cia) != CMD_BREAK) {
     PWR(AD_Check();)
-    if (tgetq(CTDPort))
+    if (tgetq(devicePort))
       CTD_Data();
     printf("\n%s", cia.errmes);
     fflush(stdout);
@@ -798,8 +798,8 @@ void SetupCTDCmd() {
 
   SystemSettings();
 }
-void StartCTDCmd() { CTD_Start_Up(false); }
-void StopCTDCmd() { OpenTUPort_CTD(false); }
+void StartCTDCmd() { CTD_Start_Up(1, false); }
+void StopCTDCmd() { DevSelect(DEVX); }
 #endif
 /******************************************************************************\
 ** FetchSettings(Settings)
@@ -1035,7 +1035,7 @@ void DisplayParameters(FILE *stream) {
   VEEData vdp;
   Settings *setp = SYSSettings;
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 
   fprintf(stream, "SETTING NAME:       SETTING VALUE:\n");
 
@@ -1054,5 +1054,5 @@ void DisplayParameters(FILE *stream) {
     setp++;
   }
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 }

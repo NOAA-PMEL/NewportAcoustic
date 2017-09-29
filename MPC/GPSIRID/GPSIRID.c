@@ -1,20 +1,20 @@
 /******************************************************************************\
-**	GPSIRID.c				Iridium communication and
+ *	GPSIRID.c				Iridium communication and
 IridFile transfer
-**
-** 02/25/2014  Sorqan Chang-Gilhooly
-** 04/01/2015  Haru Matsumoto, Alex Turpin
-*****************************************************************************
-**	Upload a file to Rudics per a command received.  Currently max number
+ *
+ * 02/25/2014  Sorqan Chang-Gilhooly
+ * 04/01/2015  Haru Matsumoto, Alex Turpin
+ ****************************************************************************
+ *	Upload a file to Rudics per a command received.  Currently max number
 of commands
-** can be sent from Rudics is 10. So up to 10 files can be uploaded per one
-** telemetry session (or connection).
-**
-**
-****************************************************************'************
-**
-**
-\******************************************************************************/
+ * can be sent from Rudics is 10. So up to 10 files can be uploaded per one
+ * telemetry session (or connection).
+ *
+ *
+ ***************************************************************'************
+ *
+ *
+ ******************************************************************************/
 
 #include <cfxbios.h> // Persistor BIOS and I/O Definitions
 #include <cfxpico.h> // Persistor PicoDOS Definitions
@@ -57,9 +57,8 @@ of commands
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
 #define STRING_SIZE 1024
-#define RUDICSBLOCK 1000
+#define RUDICSBLOCK 2000
 // #define RUDICSBLOCK 2000
-
 
 IridiumParameters IRID;
 extern SystemParameters MPC;
@@ -86,15 +85,14 @@ static int IRIDFileHandle;
 static short IRIDStatus;
 static char IRIDFilename[sizeof "c:00000000.dat"];
 
-void OpenTUPort_CTD(bool); // CTD.c
-void OpenTUPort_AntMod(bool);
+void OpenSatCom(bool);
 void shutdown(); // defined in lara.c
 bool GetUTCSeconds();
 short Connect_SendFile_RecCmd(const char *);
-bool InitModem(int);
+bool RudicsConnect(int);
 bool CheckSignal(void);
 short CallStatus(void);
-short PhoneStatus(void);
+int PhoneStatus(void);
 short PhonePin(void);
 short UploadFiles();
 
@@ -113,65 +111,93 @@ short GetIRIDInput(char *, short, uchar *, int *, short wait);
 char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
-short SwitchAntenna(char);
-void SelectModule(char);
 short StringSearch(char *, char *, uchar *);
 void StatusCheck();
 bool CompareCoordinates(char *, char *);
-DBG( void ConsoleIrid(); ) // check console for interrupt, redirect 
+void ConsoleIrid(); // check console for interrupt, redirect 
+void DelayTX(int ch);
+// G.h
+// long GetStringWait(char *str, short wait);
+// bool GPSstartup();
+// int DevSelect(int);
+// int AntMode(char);
+// int GPSIRID_Init();
+// short IRIDGPS();
+// void GetIRIDIUMSettings();
 
-// IRIDUM TUPORT Setup
-TUPort *AntModPort;
-short ANTMOD_RX, ANTMOD_TX;
-
+TUPort *devicePort;
+int deviceID=0; // 0=off, 1=buoy, 2=antenna
 uchar *inputstring, *first, *scratch;
+
+/* GPSIRID_Init() initialize file
+ * returns 0 success
+ */
+int GPSIRID_Init() {
+  short deviceRX, deviceTX;
+  // global char *inputstring, *scratch;
+  // never freed
+  inputstring = (char *)calloc(STRING_SIZE, 1);
+  scratch = (char *)calloc(STRING_SIZE, 1);
+  deviceRX = TPUChanFromPin(DEVICERX); 
+  deviceTX = TPUChanFromPin(DEVICETX);
+  devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
+  if (devicePort == NULL) {
+    flogf("\nERR open devicePort: failed");
+    flogf("\nERR GPSIRID_Init: failed");
+    flogf("\nERR open devicePort: failed");
+    return -1;
+  }
+  Delayms(200); // to settle rs232
+  return 0;
+}
+
 //
 /********************************************************************************\
-** GPSIRID-3.0 12/15/2015-AT
-**
-** Incorporating Sleep Mode, So this communications protocol will be run in
+ * GPSIRID-3.0 12/15/2015-AT
+ *
+ * Incorporating Sleep Mode, So this communications protocol will be run in
 stages.
-** Each time there is down time, the program reverts back to the main file and
+ * Each time there is down time, the program reverts back to the main file and
 sleep before
-** more is serial transfer is needed to be dealt with.
+ * more is serial transfer is needed to be dealt with.
 // Get GPS, sync RTC, call Rudics phone number, send platform ID, log on server,
 // send a file and receive a command.
 //
 //   Block size should be 1024 or 2048
 //   Cyclic Redundancy Check, CRC-CCITT(0x1D0F)
 //   return: -1 on hw fail, -2 "lostCarrier" on any upload fail, else UploadFiles result
-*********************************************************************************/
+ ********************************************************************************/
 short IRIDGPS() {
-
   short TX_Result;
-
-  if (!PowerOn_GPS()) {
-    OpenTUPort_AntMod(false);
+  DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  AntMode('G');
+  if (!SatComOpen) OpenSatCom(true);
+  if (!GPSstartup()) {
+    OpenSatCom(false);
+    flogf("\n\t|IRIDGPS(): GPS failed");
     return -1;
   }
 
   TX_Result = UploadFiles();
   if (TX_Result >= 1) {
-    flogf("\n\t|ANTMOD SUccess");
-    OpenTUPort_AntMod(false);
+    flogf("\n\t|IRIDGPS(): upload success %d", TX_Result);
+    OpenSatCom(false);
     return TX_Result;
-  }
-
-  else {
-    flogf("\nLOST CARRIER");
-    OpenTUPort_AntMod(false);
+  } else {
+    flogf("\n\t|IRIDGPS(): upload fail %d", TX_Result);
+    OpenSatCom(false);
     return -2;
   }
-
 } //____ IRIDGPS() ____//
-/*********************************************************************************\
-** UploadFiles();
-\*********************************************************************************/
+
+/*
+ * UploadFiles();
+ */
 short UploadFiles() {
   // ProjID, PltfrmID, PhoneNum
   short TX_Result;
   static char fname[] = "c:00000000.dat";
-  SwitchAntenna('I');
+  AntMode('I');
 
   MinSQ = IRID.MINSIGQ; // Min signal quality
 
@@ -191,96 +217,129 @@ short UploadFiles() {
   return TX_Result;
 
 } //____ UploadFiles() ____//
-/*********************************************************************************\
-** PowerOn_GPS()
-\*********************************************************************************/
-bool PowerOn_GPS() {
-  // Open the GPS/IRID satellite com...
-  OpenTUPort_AntMod(true);
-  SwitchAntenna('G');
+
+/*
+ * GPSstartup()
+ */
+bool GPSstartup() {
+  AntMode('G');
+  if (!SatComOpen) OpenSatCom(true);
+  SendString("AT");
+  GetStringWait(inputstring, (short) 1000);
+  if (!strstr(inputstring, "OK")) {
+    flogf("\nErr GPSstartup(): not OK");
+    return false;
+  }
 
   if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
     return true;
   else
     return false;
 }
-/**********************************************************************************\
- * SwitchAntenna(G|I|S)
+
+/*
+ * AntMode(G|I|S)
  * Switch antenna module between SBE39 TD, Iridium and GPS.  
- * ^A Antenna G|I * ^B Binary byte * ^C Connect I|S * ^D powerDown I|S * ^E binary lEngth
-\**********************************************************************************/
-short SwitchAntenna(char r) {
+ * ^A Antenna G|I * ^B Binary byte * ^C Connect I|S * ^D powerDown I|S 
+ */
+int AntMode(char r) {
+  static char ant='-', dev='-';
   char a, d;
-  DBG(flogf("\n\t|SwitchAntenna(%c)", r);)
-  // select antMod vs SBE16, switch antMod device
+  DBG2(flogf("\n\t|AntMode(%c)", r);)
+  DevSelect(DEVA);
+  // select ant SBE16, switch ant device
   switch (r) {
     case 'G': { a='G'; d='I'; break; }
     case 'I': { a='I'; d='I'; break; }
-    case 'S': { a='0'; d='S'; break; }
+    case 'S': { a=ant; d='S'; break; }
     default: { // bad case
-      flogf("\nError SwitchAntenna(%c): bad choice", r);
+      flogf("\nError DevSelect(%c): bad choice", r);
       return -1;
     }
   }
-
-  TUTxPutByte(AntModPort, 3, true);  // connect
-  TUTxPutByte(AntModPort, d, true);  // I S
-  if (a) {
-    TUTxPutByte(AntModPort, 1, true);  // antenna
-    TUTxPutByte(AntModPort, a, true);  // G I
-    RTCDelayMicroSeconds(1000000L); // wait 1 sec to settle antenna switch noise
+  if (d!=dev) {
+    // turn on, connect
+    TUTxPutByte(devicePort, 3, true);  // ^C connect device
+    TUTxPutByte(devicePort, d, true);  
+    dev=d;
+    Delayms(3000); // wait 3 sec for device start
+  }
+  if (a!=ant) {
+    TUTxPutByte(devicePort, 1, true);  // ^A antenna
+    TUTxPutByte(devicePort, a, true);  // G I
+    ant=a;
+    Delayms(1000); // wait 1 sec to settle antenna switch noise
   }
   return 0;
-} //____ SwitchAntenna ____//
+} //AntMode
 
-/***
- * SelectModule(A|S) - select antMod vs SBE16
+/*
+ * int DevSelect(DEVA);
+ * DEVX=0 = off, DEVA=1 = antenna, DEVB=2 = buoy
  */
-void SelectModule(char m) {
-  // select is slow, but com port speeds differ
-  switch (m) {
-    case 'A': OpenTUPort_CTD(false); OpenTUPort_AntMod(true); break;
-    case 'S': OpenTUPort_AntMod(false); OpenTUPort_CTD(true); break;
-    default: flogf("\nError SelectModule(%c)", m);
-  }
-  Delayms(500);
-} // SelectModule()
+int DevSelect(int dev) {
+  // global devicePort
+  // use a stronger tests for open??
+  if (dev==deviceID && devicePort) return 0; // already selected
+  DBG2(flogf("\n\t|DevSelect(%d)", dev);)
 
-/******************************************************************************\
-** Connect_SendFile_RecCmd
-** 1) Switch antenna to IRID
-**    If connection is lost anytime, goto 6) and restart from 2).
-** 2) Call, Connect, and Log on
-** 3) Send Platform ID and get ACK
-** 4) Send a file
-** 5) Receive command (until receives 'done' from land)
-**    R    - Resend
-**    cmds - TX was success. Check if it is a real command, receive it and save
+  switch (dev) {
+  case DEVA: // antenna module dev
+    deviceID=DEVA;
+    PIOSet(DEVICECOM); 
+    // deva devb may share the port
+    if (PIOTestAssertClear(ANTMODPWR)) { // ant module is off
+      PIOSet(ANTMODPWR);
+      Delay_AD_Log(5); // power up delay
+    }
+    AntMode('S'); // default in antmod, but set our state
+    break;
+  case DEVX: // power off antenna, port closed
+    PIOClear(ANTMODPWR); // antMod power off
+    // devb is always on, select devb
+  case DEVB: // buoy sbe
+    deviceID=DEVB;
+    PIOClear(DEVICECOM); // talk to local port // do not turn off ant module
+    break;
+  } //switch
+  return 0;
+} //DevSelect
+
+/*
+ * Connect_SendFile_RecCmd
+ * 1) Switch antenna to IRID
+ *    If connection is lost anytime, goto 6) and restart from 2).
+ * 2) Call, Connect, and Log on
+ * 3) Send Platform ID and get ACK
+ * 4) Send a file
+ * 5) Receive command (until receives 'done' from land)
+ *    R    - Resend
+ *    cmds - TX was success. Check if it is a real command, receive it and save
 it,
-**             if it is Senddata(), discard the command
-**    done - TX was success. No command is comming -> goto 6)
-**
-**    Check if there is a next file,
-**          Yes- send the file -> goto 4)
-**          No - send 'done'   -> goto 5)
-** 6) Hung up
-**
-** Three kinds of response from Rudics land
-** 'R' for Resend, 'cmds' for command to receive, and 'done' for no more commands
-** Two kinds of cmds: Real =2, fake (Senddata)=1.  Otherwise =0
-**
-** Returns TX_Success
-** TX_Success=-2, Lost carrier
-**            -1, Garbled
-**             0, resent request received. This should not happen.
-**             1, "done" received
-**             2  "cmds" received. Senddata.
-**             3  parameters
-** Can upload up to ComMax (=10) files per connection
-**
-\******************************************************************************/
+ *             if it is Senddata(), discard the command
+ *    done - TX was success. No command is comming -> goto 6)
+ *
+ *    Check if there is a next file,
+ *          Yes- send the file -> goto 4)
+ *          No - send 'done'   -> goto 5)
+ * 6) Hung up
+ *
+ * Three kinds of response from Rudics land
+ * 'R' for Resend, 'cmds' for command to receive, and 'done' for no more commands
+ * Two kinds of cmds: Real =2, fake (Senddata)=1.  Otherwise =0
+ *
+ * Returns TX_Success
+ * TX_Success=-2, Lost carrier
+ *            -1, Garbled
+ *             0, resent request received. This should not happen.
+ *             1, "done" received
+ *             2  "cmds" received. Senddata.
+ *             3  parameters
+ * Can upload up to ComMax (=10) files per connection
+ *
+ */
 short Connect_SendFile_RecCmd(const char *filename) {
-
+  // global char *IRIDFilename, *filename;
   short icall = 0;
   short CmdType = 0;
   bool ACK = false;
@@ -293,28 +352,27 @@ short Connect_SendFile_RecCmd(const char *filename) {
   int status = 0;
 
   // FileType="DAT";
-  DBG(flogf("\n%s|Connect_SendFile_RecCmd()", Time(NULL)); putflush();
-      CIOdrain();)
-
+  DBG(flogf("\n%s|Connect_SendFile_RecCmd()", Time(NULL)); cdrain();)
   TickleSWSR(); // another reprieve
-
   memset(currentfile, 0, (size_t) 9);
 
   strncpy(IRIDFilename, filename, 14);
   // Figure out file size and how many blocks need to be sent
   stat(IRIDFilename, &info);
-  // Only need to do this once... Unless we Power off the modem.
-  PhonePin();
 
   // Register, call and check SQ, connect the Rudics and login PMEL:
-  while (icall <= IRID.MAXCALLS && FileExist) {
-    // not really init - whole connect sequence
-    ACK = InitModem(status);
-
-    // ACK received from PMEL. Send a file & check the land resp.
-    // Loop to send multiple files
-    while (ACK && TX_Success != 1 && TX_Success >= -1) {
-
+  while (icall++ <= IRID.MAXCALLS && FileExist) {
+    ACK = RudicsConnect(status);
+    // fail is bad, we try to connect several times
+    if (!ACK) { // reset
+      OpenSatCom(false);
+      AntMode('I');
+      OpenSatCom(true);
+      continue;
+    }
+    while (TX_Success != 1 && TX_Success >= -1) {
+      // ACK received from PMEL. Send a file & check the land resp.
+      // Loop to send multiple files
       TX_Success = Send_File(FileExist, info.st_size);
       // TX_Success=-4, Garbled Response
       //	-3, No Response From Land
@@ -324,19 +382,16 @@ short Connect_SendFile_RecCmd(const char *filename) {
       //         1, "done" received.
       //         2  "SendData" received. 
       //	 3, Real Commands
-
       AD_Check();
-
       // TX Received Done From Land, Time to Hang up.
       if (TX_Success == 1) {
-
         // flogf("\n\t|Received Done");putflush();CIOdrain();
         if (FileExist) {
           strncpy(currentfile, filename + 2, 8);
           filenumber = atol(currentfile);
           DOS_Com("move", filenumber, "DAT", "SNT");
-        }
-      }
+        } // (FileExist)
+      } // (TX_Success == 1)
       // If we received new commands
       else if (TX_Success >= 2) {
         if (TX_Success == 3)
@@ -360,16 +415,14 @@ short Connect_SendFile_RecCmd(const char *filename) {
           flogf("\n\t|All files sent!");
           putflush();
           CIOdrain(); // But still commands may be coming
-        }
-
-      }
+        } // (FileExist)
+      } // (TX_Success >= 2)
 
       else if (TX_Success <= -2) {
-        ACK = false;
         status = 0;
         break;
-      }
-    }
+      } 
+    } // while success == -1, 0, 2, >2
 
     if (TX_Success == 1)
       break;
@@ -387,26 +440,17 @@ short Connect_SendFile_RecCmd(const char *filename) {
       } // status=3;}
       if (icall == IRID.MAXCALLS) {
         flogf(" Max Number of Iridium Calls.");
-        putflush();
-        CIOdrain();
+        cdrain();
       } else if (icall < IRID.MAXCALLS) {
         TickleSWSR(); // another reprieve
-        flogf("\n%s|Connect_SendFile_RecCmd() Rest for %d sec", Time(NULL),
-              IRID.REST);
-        cdrain();
-        if (TX_Success != 1)
-          Delay_AD_Log(IRID.REST); // give some time to recover from bad TX
-        TickleSWSR();              // another reprieve
+        flogf("\n%s|Connect_SendFile_RecCmd() reset, retry", Time(NULL));
+        break;
       }
-    }
+    } // while TXSuccess
 
     TX_Success = 0;
-    icall++;
     LostConnect = false;
-    ACK = false; // Reset
-  }
-
-  // OpenTUPort_AntMod(false);
+  } // while icall (main loop
 
   if (NewCMDS)
     TX_Success = 3;
@@ -415,118 +459,114 @@ short Connect_SendFile_RecCmd(const char *filename) {
 
 } //____ Connect_SendFile_RecCmd ____//
 /******************************************************************************\
-** bool GetGPS_SyncRTC)
-** Get GPS loc, time and synchronizes CF2 RTC with offset seconds
-\******************************************************************************/
+ * bool GetGPS_SyncRTC)
+ * Get GPS loc, time and synchronizes CF2 RTC with offset seconds
+ ******************************************************************************/
 bool GetGPS_SyncRTC() {
-  // char* Location;
-  char *Latitude;
-  char *Longitude;
-  char *Coordinates;
+  static bool firstGPS = true;
+  char *Latitude, *Longitude, *Coordinates;
   short sat_num = 0;
   short count = 0;
   ulong total_seconds = 0;
   int byteswritten = 0;
-  static bool firstGPS = true;
   int datafilehandle;
   char uploadfname[] = "c:00000000.bot";
   bool pole = false;
 
   bool returnvalue = true;
   char* first;
+
+  flogf("\n\t|GetGPS_SyncRTC()");
   first = scratch;
 
-  if (MPC.STARTUPS == 0 && firstGPS)
+  if (MPC.STARTUPS == 0 && firstGPS) // ??
     firstGPS = true;
   else
     firstGPS = false;
 
-  // while sat number is less than 4
-  flogf("\n\t|GetGPS_SyncRTC()");
-  while (sat_num < 6 && count < GPS_TRIES) {
+  while (sat_num < 5) {
+    if (count++ > GPS_TRIES) return false; // give up
     SendString("AT+PD");
-    RTCDelayMicroSeconds(10000); // HM
+    // Delayms(10); // HM
     GetGPSInput(NULL, &sat_num);
     flogf("\n\t|Sat num: %d", sat_num);
     cdrain();
     Delay_AD_Log(8);
-    count++;
   }
-  if (count > 9)
-    return false;
-  // When sat number is minimum to be acceptable
+  // sat number is acceptable
 
-  if (sat_num >= 6) {
+  // freed?
+  // Latitude = (char *)calloc(16, 1);
+  // Longitude = (char *)calloc(16, 1);
+  Coordinates = (char *)calloc(33, 1);
 
-    // freed?
-    // Location=(char*)calloc(100,1);
-    Latitude = (char *)calloc(16, 1);
-    Longitude = (char *)calloc(16, 1);
-    Coordinates = (char *)calloc(33, 1);
+  // Synchronize the RTC time with GPS
+  if (GetUTCSeconds())
+    flogf("\n%s|Successful New Time", Time(NULL));
+  else
+    flogf("\n\t|Failed gathering GPS Time");
+  cdrain();
 
-    // Synchronize the RTC time with GPS
-    if (GetUTCSeconds())
-      flogf("\n%s|Successful New Time", Time(NULL));
-    else
-      flogf("\n\t|Failed gathering GPS Time");
-    cdrain();
-
-    SendString("AT+PL");
-    RTCDelayMicroSeconds(100000); // blk - seems to miss part of reply
-    if (GetGPSInput("PL", &sat_num) != NULL) {
-      Latitude = strtok(first, "|");
-      Longitude = strtok(NULL, "|");
-      sprintf(Coordinates, "%s %s", Latitude, Longitude);
-      flogf("\n\t|Coords: %s", Coordinates);
-      if (!CompareCoordinates(Latitude, Longitude)) {
-        SendString("AT+PL");
-        if (GetGPSInput("PL", &sat_num) != NULL) {
-          Latitude = strtok(first, "|");
-          Longitude = strtok(NULL, "|");
-          sprintf(Coordinates, "%s|%s", Latitude, Longitude);
-          flogf("\n\t|Coords: %s", Coordinates);
-          if (!CompareCoordinates(Latitude, Longitude) && !firstGPS) {
-            LARA_Recovery();
-          }
+  // Lat Long
+  SendString("AT+PL");
+  Delayms(100); // blk - seems to miss part of reply
+  if (GetGPSInput("PL", &sat_num) != NULL) {
+    Latitude = strtok(first, "|");
+    Longitude = strtok(NULL, "|");
+    sprintf(Coordinates, "%s %s", Latitude, Longitude);
+    flogf("\n\t|Coords: %s", Coordinates);
+    if (!CompareCoordinates(Latitude, Longitude)) {
+      SendString("AT+PL");
+      if (GetGPSInput("PL", &sat_num) != NULL) {
+        Latitude = strtok(first, "|");
+        Longitude = strtok(NULL, "|");
+        sprintf(Coordinates, "%s|%s", Latitude, Longitude);
+        flogf("\n\t|Coords: %s", Coordinates);
+        if (!CompareCoordinates(Latitude, Longitude) && !firstGPS) {
+          LARA_Recovery();
         }
       }
-      strncpy(MPC.LAT, Coordinates, 16);
-      //	   	VEEStoreStr(LATITUDE_NAME, strtok(Coordinates, "|"));
-      strncpy(MPC.LONG, &Coordinates[17], 16);
-      //	   	VEEStoreStr(LONGITUDE_NAME, strtok(NULL, "|"));
-      firstGPS = false;
-      flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
-
-      sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
-      DBG(flogf("\n\t|Write to file: %s", uploadfname);)
-      datafilehandle = open(uploadfname, O_RDWR);
-      RTCDelayMicroSeconds(25000L); // ??
-      if (datafilehandle <= 0) {
-        flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
-              errno);
-        // not a fatal err, did not log ??
-        returnvalue = false;
-      } else {
-        DBG2(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
-        lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
-        RTCDelayMicroSeconds(25000L); // ??
-        byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
-        DBG2(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
-        if (close(datafilehandle) != 0)
-          flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
-        DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
-      }
     }
-    cdrain();
-  }
+    strncpy(MPC.LAT, Coordinates, 16);
+    //	   	VEEStoreStr(LATITUDE_NAME, strtok(Coordinates, "|"));
+    strncpy(MPC.LONG, &Coordinates[17], 16);
+    //	   	VEEStoreStr(LONGITUDE_NAME, strtok(NULL, "|"));
+    firstGPS = false;
+    flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
+
+    sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
+    DBG2(flogf("\n\t|Write to file: %s", uploadfname);)
+    datafilehandle = open(uploadfname, O_RDWR);
+    // Delayms(25); // ??
+    if (datafilehandle <= 0) {
+      flogf("\nERROR|GetGPS_SyncRTC(): %s open errno: %d", uploadfname,
+            errno);
+      // not a fatal err, did not log ??
+      returnvalue = false;
+    } else {
+      DBG2(flogf("\n\t|GetGPS_SyncRTC() %s Opened", uploadfname);)
+      lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
+      Delayms(25); // ??
+      byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
+      DBG(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
+      if (close(datafilehandle) != 0)
+        flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
+      DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
+    } // open(upload)
+  } // GetGPSInput
+  cdrain();
+  // free(Latitude);
+  // free(Longitude);
+  free(Coordinates);
+  DBG1(flogf("\n\t|GetGPS_SyncRTC free buffers");)
 
   return returnvalue;
 }
 //_____ GetGPS_SyncRTC) _____//
 /******************************************************************************\
-** ulong GetUTCSeconds(char*, char*)
+ * ulong GetUTCSeconds(char*, char*)
 * Returns seconds since 1970
-\******************************************************************************/
+ ******************************************************************************/
 bool GetUTCSeconds() {
 
   struct tm t;
@@ -537,7 +577,7 @@ bool GetUTCSeconds() {
   ulong time_now = 0;
 
   time = (char *)calloc(24, sizeof(char));
-  TURxFlush(AntModPort);
+  TURxFlush(devicePort);
   SendString("AT+PD");
   strncpy(time, GetGPSInput("PD", NULL), 10);
   CLK(start_clock = clock();)
@@ -591,8 +631,8 @@ bool GetUTCSeconds() {
   return false;
 } //_____ GetUTCSeconds() _____//
 /*******************************************************************************************
-** CopmareCoordinates()
-\*******************************************************************************************/
+ * CopmareCoordinates()
+ *******************************************************************************************/
 bool CompareCoordinates(char *LAT, char *LONG) {
 
   int degrees, Degrees;
@@ -643,66 +683,12 @@ bool CompareCoordinates(char *LAT, char *LONG) {
   return returnvalue;
 
 } //____ CompareCoordinates ____//
+
 /******************************************************************************\
-** Close COM2 for Iridium/GPS unit and power down
-\******************************************************************************/
-void OpenTUPort_AntMod(bool on) {
-
-  short wait = 10000;
-  int warm;
-
-  DBG2(flogf("  ..OpenTUPort_AntMod() ");)
-  if (on) {
-    ANTMOD_RX = TPUChanFromPin(ANTMODRX);
-    ANTMOD_TX = TPUChanFromPin(ANTMODTX);
-
-    // Power ON
-    PIOSet(ANTMODPWR);
-    PIOSet(ANTMODCOM);
-
-    AntModPort = TUOpen(ANTMOD_RX, ANTMOD_TX, IRIDBAUD, 0);
-    if (AntModPort == 0) {
-      flogf("\n\t|Bad IridiumPort");
-      return;
-    }
-    TUTxFlush(AntModPort);
-    TURxFlush(AntModPort);
-
-    warm = IRID.WARMUP;
-    DBG(flogf("\n%s|Warmup GPS for %d Sec", Time(NULL), warm); cdrain();)
-    // connect to gps
-    SwitchAntenna('G');
-
-    inputstring = (char *)calloc(STRING_SIZE, 1);
-    scratch = (char *)calloc(STRING_SIZE, 1);
-
-    Delay_AD_Log(warm);
-
-    TURxFlush(AntModPort);
-    SatComOpen = true;
-
-  } else if (!on) {
-
-    flogf("\n%s|PowerDownCloseComANTMOD() ", Time(NULL));
-    SendString("AT*P");
-
-    Delay_AD_Log(3);
-
-    PIOClear(ANTMODCOM);
-    PIOClear(ANTMODPWR);
-    TUClose(AntModPort);
-
-    free(inputstring);
-    free(scratch);
-
-    SatComOpen = false;
-  }
-}
-/******************************************************************************\
-** CheckSignal
+ * CheckSignal
    returns true if good signal.
    false if too many bad hits.
-\******************************************************************************/
+ ******************************************************************************/
 bool CheckSignal() {
 
   short signal_quality = 0, no_sigQ_chk = 0;
@@ -712,12 +698,9 @@ bool CheckSignal() {
   flogf("\n\t|CheckSignal() ");
 
   while ((no_sigQ_chk < Max_No_SigQ_Chk)) {
-
     TickleSWSR();                   // another reprieve
     SignalQuality(&signal_quality); // Check IRIDIUM signal quality
-    flogf("\n\t|CSQ: %d", signal_quality);
-    putflush();
-    CIOdrain();
+    flogf("\n\t|CSQ: %d", signal_quality); cdrain();
     if (signal_quality >= MinSQ && last_SQ >= MinSQ)
       return true;
     last_SQ = signal_quality;
@@ -728,29 +711,55 @@ bool CheckSignal() {
   return false;
 
 } //____ CheckSignal() ____//
-/******************************************************************************\
-** InitModem()
-** Initialize the Irid modem port.
-\******************************************************************************/
-bool InitModem(int status) {
-  bool ACK;
-  short ret;
 
-  TX_Success = 0;
-  LostConnect = false;
-
-  flogf("\n%s|Modem Initialization", Time(NULL));
-
-  if (!SatComOpen) {
-    OpenTUPort_AntMod(true);
+/* OpenSatCom(bool) - turn on/off modem, init gps
+ * set SatComOpen=bool
+ */
+void OpenSatCom(bool onoff) {
+  // global bool SatComOpen
+  if (SatComOpen == onoff) return;
+  
+  if (onoff) { // turn on
+    // AntMode set before call to OpenSatCom
+    DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
+    Delay_AD_Log(IRID.WARMUP);
+    DBG(ConsoleIrid();)
     PhonePin();
-  }
-  ACK = false;
+    // echo off
+    SendString("ATE0");
+  } else { // !onoff
+    flogf("\n%s|PowerDownCloseComDEVICE() ", Time(NULL));
+    // tell modem to power off
+    AntMode('I');
+    SendString("AT*P");
+    AntMode('S');
+    TUTxPutByte(devicePort, 4, true);  // ^D power off iridium
+    TUTxPutByte(devicePort, 'I', true);  
+    Delay_AD_Log(1);
+  } // onoff
+  SatComOpen=onoff;
+} // OpenSatCom
+
+/******************************************************************************\
+ * RudicsConnect()
+ * Initialize the Irid modem port.
+ ******************************************************************************/
+bool RudicsConnect(int status) {
+  // global int TX_Success;
+  // global bool LostConnect;
+  bool ACK;
+  int i, tries=3;
+
+  TX_Success=0;
+  LostConnect=false;
+  flogf("\n%s|Initalize RudicsConnect()", Time(NULL));
+
+  ACK=false;
   // bizarre switch without break
   switch (status) {
   case 0:
-    ret = PhoneStatus();
-    if (ret == 0) // ready
+    i=PhoneStatus();
+    if (i == 0) // ready
       status++;
     // should wait if ringing or in data call ??
     else
@@ -766,33 +775,32 @@ bool InitModem(int status) {
     else
       return false;
   case 3:
-    if (Call_Land())
-      status++;
-    else
-      return false;
-
+    i=0; 
+    while(++i) {
+      if (Call_Land()) break;
+      if (i>tries) return false;
+    }
+    status++;
   case 4:
     ACK = SendProjHdr();
-    break;
   }
-
   return ACK;
+} //_____ RudicsConnect _____//
 
-} //_____ InitModem _____//
 /******************************************************************************\
-** Call Status
-**    A.8.77 +CLCC - Request Current Call Status
-**       Exec Command: +CLCC
-**
-**       Retern: +CLCC: <stat>
-**
-** stat: 0  Active
-**       1  Call Held
-**       2  Dialing (MO Call)
-**       4  Incoming (MT Call)
-**       6  Idle
-**
-\******************************************************************************/
+ * Call Status
+ *    A.8.77 +CLCC - Request Current Call Status
+ *       Exec Command: +CLCC
+ *
+ *       Retern: +CLCC: <stat>
+ *
+ * stat: 0  Active
+ *       1  Call Held
+ *       2  Dialing (MO Call)
+ *       4  Incoming (MT Call)
+ *       6  Idle
+ *
+ ******************************************************************************/
 short CallStatus() {
 
   int status = -1;
@@ -802,7 +810,7 @@ short CallStatus() {
   putflush();
   CIOdrain();
   SendString("AT+CLCC");
-  RTCDelayMicroSeconds(150000L);
+  // Delayms(150);
   if (GetIRIDInput(":00", 4, "OK", &status, wait) == 1) {
     switch (status) {
     case 0:
@@ -835,23 +843,23 @@ short CallStatus() {
 
 } //____ CallStatus() ____//
 /******************************************************************************\
-** PhoneStatus
-**    A.8.29 +CPAS - Modem Activity Status
-**       Exec Command: +CPAS<x>
-**
-**    x: 0  Ready
-**       1  Unavailable
-**       2  Unknown
-**       3  Data Call Ringing
-**       4  Data Call In Progress
-**
-** Check whether a call is in progress or if commands are accepted.
-** CPAS status, which is 0 if "Ready"
-** Returns -1 CPAS query fails, i.e. CarrierLoss/Error
-** Oregon State University, 2/15/2015
-\******************************************************************************/
-short PhoneStatus() {
-  int status;
+ * PhoneStatus
+ *    A.8.29 +CPAS - Modem Activity Status
+ *       Exec Command: +CPAS<x>
+ *
+ *    x: 0  Ready
+ *       1  Unavailable
+ *       2  Unknown
+ *       3  Data Call Ringing
+ *       4  Data Call In Progress
+ *
+ * Check whether a call is in progress or if commands are accepted.
+ * CPAS status, which is 0 if "Ready"
+ * Returns -1 CPAS query fails, i.e. CarrierLoss/Error
+ * Oregon State University, 2/15/2015
+ ******************************************************************************/
+int PhoneStatus() {
+  int status=-1;
   short wait = 10000;
 
   flogf("\n\t|PhoneStatus()");
@@ -889,28 +897,28 @@ short PhoneStatus() {
 
 } //____ PhoneStatus() ____//
 /******************************************************************************\
-** PhonePin
-**    A.8.48 +CPIN - Enter PIN
-**       Read Command: +CPIN?
-**       Results: +CPIN: <code>
-**
-**    Different Values:
-**       READY    not waiting for password
-**       PH PIN   waiting for Phone Unlock Code
-**       SIM PIN  waiting for SIM card PIN1 code
-**       SIM PUK  waiting for SIM PUK code (SIM PIN1 is blocked)
-**       SIM PIN2 waiting for SIMPIN2*
-**       SIM PUK2 waiting for SIM PUK2  code (SIM PIN2 is blocked)
-**
-**       *1) PIN1 successfully entered == READY
-**        2) No PIN1 required ==READY
-**        3) waiting for PIN2
-**
-** Check whether a call is in progress or if commands are accepted.
-** Returns 0 if "Ready", "Data Call Ringing", " Data Call In Progress".
-** Returns -1 if "Unavailable" or "Unknown."
-** Oregon State University, 2/17/2015
-\******************************************************************************/
+ * PhonePin
+ *    A.8.48 +CPIN - Enter PIN
+ *       Read Command: +CPIN?
+ *       Results: +CPIN: <code>
+ *
+ *    Different Values:
+ *       READY    not waiting for password
+ *       PH PIN   waiting for Phone Unlock Code
+ *       SIM PIN  waiting for SIM card PIN1 code
+ *       SIM PUK  waiting for SIM PUK code (SIM PIN1 is blocked)
+ *       SIM PIN2 waiting for SIMPIN2*
+ *       SIM PUK2 waiting for SIM PUK2  code (SIM PIN2 is blocked)
+ *
+ *       *1) PIN1 successfully entered == READY
+ *        2) No PIN1 required ==READY
+ *        3) waiting for PIN2
+ *
+ * Check whether a call is in progress or if commands are accepted.
+ * Returns 0 if "Ready", "Data Call Ringing", " Data Call In Progress".
+ * Returns -1 if "Unavailable" or "Unknown."
+ * Oregon State University, 2/17/2015
+ ******************************************************************************/
 short PhonePin(void) {
   short wait = 10000;
   flogf("\n\t|no PhonePin on this sim card");
@@ -943,12 +951,8 @@ short SignalQuality(short *signal_quality) {
   short returnvalue = 0;
   int sig = -1;
 
+  TURxFlush(devicePort);
   SendString("AT+CSQ");
-  RTCDelayMicroSeconds(10000L);
-  TURxFlush(AntModPort);
-  TURxGetByteWithTimeout(AntModPort, 5000);
-  RTCDelayMicroSeconds(3000000L);
-
   GetIRIDInput("CSQ:", 5, NULL, &sig, 20000);
 
   *signal_quality = (short)sig;
@@ -957,42 +961,57 @@ short SignalQuality(short *signal_quality) {
 
   return returnvalue;
 }
+
 /******************************************************************************\
-** void SendString()
-\******************************************************************************/
+ * void SendString()
+ ******************************************************************************/
 void SendString(const char *StringIn) {
-  DBG(flogf("\n\t|SendString(%s)", StringIn); cdrain();)
-  strcpy(scratch, StringIn);
-  strcat(scratch, "\r");
-  TUTxPutBlock(AntModPort, scratch, (long) strlen(scratch), (short) 10000);
+  char *local[16];
+  strcpy(local, StringIn);
+  DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
+  strcat(local, "\r");
+  TUTxPutBlock(devicePort, local, (long) strlen(local), (short) 1000);
 } //_____ SendString() _____//
 
 /******************************************************************************\
-** Call_Land
-**
-** Call phone number specified.
-** Haru Matsumoto, 4/15/2005, NOAA
-** Revised by Sorqan Chang-Gilhooly, 12/04/2013
-\******************************************************************************/
+ * Call_Land
+ *
+ * Call phone number specified.
+ * Haru Matsumoto, 4/15/2005, NOAA
+ * Revised by Sorqan Chang-Gilhooly, 12/04/2013
+ ******************************************************************************/
 bool Call_Land(void) {
-  short j = 0;
-  bool CallOK = false;
-  char call[] = "ATD";
+  // global char *PhoneNum;
+  char call[32];
   short wait = 12000;
-  short length;
-  short num = 0;
-  short status;
+  int length;
+  long lenreturn;
 
-  TickleSWSR(); // another reprieve
-
-  length = strlen(PhoneNum);
   flogf("\n%s|Call_Land()", Time(NULL));
-  putflush();
-  CIOdrain();
+  memset(inputstring, 0, (size_t) STRING_SIZE);
+  memset(call, 0, 32);
+  strcpy(call, "ATD");
+  length = strlen(PhoneNum);
+  cdrain();
   strncat(call, PhoneNum, length);
 
   SendString(call);
+  lenreturn = GetStringWait(inputstring, wait);
 
+  DBG1(printsafe(lenreturn, inputstring);)
+
+  if (strstr(inputstring, "CONNECT")) {
+    flogf("%s\n\t|Call_Land: CONNECT", Time(NULL));
+    return true;
+  }
+  if (strstr(inputstring, "NO CARRIER")) 
+    flogf("%s\n\t|Call_Land: NO CARRIER", Time(NULL));
+  if (strstr(inputstring, "ERROR")) 
+    flogf("%s\n\t|Call_Land: ERROR", Time(NULL));
+  return false;
+} //____ Call_Land() ____//
+
+  /* pulled out of Call_land
   // Looks for ATD followed by phonenum
   if (GetIRIDInput("ATD", 3, PhoneNum, NULL, 5000) != 1) {
     CallOK = false;
@@ -1009,12 +1028,10 @@ bool Call_Land(void) {
       return true;
   } else
     CallOK = true;
-
   if (CallOK) {
     num = GetIRIDInput("CONNECT", 7, "192", NULL, wait);
     if (num == 1)
       flogf("\n\t|Connected!");
-
     else if (num == 0) {
       CallOK = false;
       if (GetIRIDInput("CONNECT", 7, "192", NULL, wait) != 1) {
@@ -1038,33 +1055,31 @@ bool Call_Land(void) {
       CallOK = false;
     }
   }
-
   fflush(NULL);
+  */
 
-  return CallOK; // successful
-
-} //____ Call_Land() ____//
 /******************************************************************************\
-** SendProjHdr
-** After connection is established, send platform ID twice and check if
-** ACK is received. If successful, return true.
-** HM, NOAA, CIMRS
-\******************************************************************************/
+ * SendProjHdr
+ * After connection is established, send platform ID AckMax and check if
+ * ACK is received. If successful, return true.
+ * HM, NOAA, CIMRS
+ ******************************************************************************/
 bool SendProjHdr() {
   bool Ack = false;
   short Num_ACK = 0;
   short AckMax = 20;
-  short wait = 2500; // in millisec //was 1500 8.29.2016
+  short wait = 15000; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
   // need an extra char for null terminated
-  unsigned char buf[16], proj[8], bmode[4];
+  unsigned char buf[16], proj[12], bmode[4];
 
   // Flush IO Buffers
-  TUTxFlush(AntModPort); TURxFlush(AntModPort);
-  DBG(flogf("\n%s|SendProjHdr(%4s%4s)", Time(NULL), MPC.PROJID, MPC.PLTFRMID);)
+  TUTxFlush(devicePort); TURxFlush(devicePort);
 
+  // note - sprintf is zero terminated, strncpy is not
   sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
+  DBG(flogf("\n%s|SendProjHdr(%s)", Time(NULL), proj);)
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
@@ -1078,10 +1093,11 @@ bool SendProjHdr() {
 
   while (Ack == false && Num_ACK < AckMax) { // Repeat
     AD_Check();
-    TUTxPutBlock(AntModPort, bmode, 3, 10000);
-    TUTxPutBlock(AntModPort, buf, 13, 10000); // 13 bytes + crlf
-    RTCDelayMicroSeconds(16 * 3333L);
+    TUTxPutBlock(devicePort, bmode, 3, 10000);
+    TUTxPutBlock(devicePort, buf, 13, 10000); // 13 bytes + crlf
+    DelayTX(16);
     // give rudics a chance to reply
+    Delayms(500);
     TickleSWSR(); // another reprieve
 
     Status = GetIRIDInput("ACK", 3, NULL, NULL, wait);
@@ -1105,15 +1121,15 @@ bool SendProjHdr() {
       flogf("\n\t|LostConnection");
       cdrain();
       StatusCheck();
-      RTCDelayMicroSeconds(20000L);
+      Delayms(20);
     } else {
-      TUTxFlush(AntModPort);
-      TURxFlush(AntModPort);
+      TUTxFlush(devicePort);
+      TURxFlush(devicePort);
 
       // Exit in-call data mode to check phone status.
-      TUTxPrintf(AntModPort, "+++");  // ??
-      TUTxWaitCompletion(AntModPort);
-      RTCDelayMicroSeconds(25000L);
+      TUTxPrintf(devicePort, "+++");  // ??
+      TUTxWaitCompletion(devicePort);
+      Delayms(25);
       if (GetIRIDInput("OK", 2, NULL, NULL, 3500) == 1) {
         StatusCheck();
         HangUp();
@@ -1127,24 +1143,24 @@ bool SendProjHdr() {
     putflush();
     CIOdrain();
     TX_Success = -1;
-    RTCDelayMicroSeconds(20000L);
+    Delayms(20);
   } // Num_ACK >= AckMax
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   return Ack;
 
 } //____ SendProjHdr() ____//
 /******************************************************************************\
-** Send_File
-** Send the ASC data file after connection and ACK. After the successful file
-** upload, it checks if "cmds", "done" or resend request from land. Returns the
-** land request as:
-**
-**	LandResp  = 2, "cmds" Prepare to receice the command
-**           = 1, "done" Prepare to send done
-**           = 0, @@@ string.  Resend request came. Prepare to resend blocks.
-**		       =-1, something else, usually message garbled. Reconnect.
-**           =-2, No carrier.  Power off/on
-\******************************************************************************/
+ * Send_File
+ * Send the ASC data file after connection and ACK. After the successful file
+ * upload, it checks if "cmds", "done" or resend request from land. Returns the
+ * land request as:
+ *
+ *	LandResp  = 2, "cmds" Prepare to receice the command
+ *           = 1, "done" Prepare to send done
+ *           = 0, @@@ string.  Resend request came. Prepare to resend blocks.
+ *		       =-1, something else, usually message garbled. Reconnect.
+ *           =-2, No carrier.  Power off/on
+ ******************************************************************************/
 short Send_File(bool FileExist, long filelength) {
   char bitmap[64]; // 63-byte array corresponds to 64-bit map, val0 and val1 for
                    // resending the data block
@@ -1225,11 +1241,11 @@ short Send_File(bool FileExist, long filelength) {
       flogf("\n\t|TX INCOMPLETE. Reply=%d", Reply);
       putflush();
       CIOdrain();
-      RTCDelayMicroSeconds(10000L);
+      Delayms(10);
       if (Reply == 0) { // Request to resend bad blocks
         Convert_BitMap_To_CharBuf(val0, val1, &bitmap);
         DBG2(flogf("\n\t|Resend"); cdrain();
-            RTCDelayMicroSeconds(20000L);)
+            Delayms(20);)
         Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
       }
       //-1 Someting bad happened. TX Failed. Restart Modem
@@ -1277,9 +1293,9 @@ short Send_File(bool FileExist, long filelength) {
 } //____ Send_File() ____//
 
 /******************************************************************************\
-** Send_Blocks
-** Send or resend the data. The blocks to be sent are in bitmap field.
-\******************************************************************************/
+ * Send_Blocks
+ * Send or resend the data. The blocks to be sent are in bitmap field.
+ ******************************************************************************/
 int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
                 ushort LastBlkLength) {
 
@@ -1332,32 +1348,37 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       buf[3] = (uchar)((crc_calc & 0xFF00) >> 8);
       buf[4] = (uchar)((crc_calc & 0x00FF));
 
-      // TUTxFlush(AntModPort);
-      // TURxFlush(AntModPort);
+      // TUTxFlush(devicePort);
+      // TURxFlush(devicePort);
       // antMod blockmode for header // ^B, 2 byte length
       sprintf(bmode, "%c%c%c", (uchar)2, 
         (uchar)((mlength >> 8) & 0x00FF), (uchar)(mlength & 0x00FF));
-      TUTxPutBlock(AntModPort, bmode, (long) 3, 1000);
-      TUTxPutBlock(AntModPort, buf, mlength, 10000);
-      // let transmission complete // satellite @ 2400baud*10bit bytes = 240/s
-      // 1/240 = 4.167millisec
-      RTCDelayMicroSeconds(mlength * 4167L);
+      TUTxPutBlock(devicePort, bmode, (long) 3, 1000);
+      TUTxPutBlock(devicePort, buf, mlength, 10000);
+      DelayTX(mlength);
 
       AD_Check();
     } // if bitmap[]
     // pause that refreshes
 
-#ifdef DEBUG
-    if (tgetq(AntModPort)) {
-      printsafe( TURxGetBlock(AntModPort, scratch, 
-          (long) STRING_SIZE, (short) 100),
+#ifdef DEBUG1
+    blklen=tgetq(devicePort);
+    if (blklen) {
+      cprintf("\n%d+", blklen);
+      // blklen=0;
+      // while ((scratch[blklen++]=TURxGetByteWithTimeout(devicePort, 1)) >= 0) {}
+      // printsafe( (long) blklen, scratch);
+        
+      memset( scratch, 0, STRING_SIZE );
+      printsafe( (long) TURxGetBlock(devicePort, scratch, 
+                          (long) STRING_SIZE, (short) 1),
         scratch);
     }
 #else
-    TURxFlush(AntModPort);
+    TURxFlush(devicePort);
     cdrain();
 #endif
-    Delayms(1000);
+    Delayms(2000);
   }
 
   free(buf);
@@ -1369,12 +1390,12 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
 
 /********************************************************************************************\
-** Calc_Crc
-** Calculate 16-bit CRC of contents of buf. Use long integer for calculation,
+ * Calc_Crc
+ * Calculate 16-bit CRC of contents of buf. Use long integer for calculation,
 but returns 16-bit int.
-** Converted from P. McLane's C code.
-** H. Matsumoto
-\********************************************************************************************/
+ * Converted from P. McLane's C code.
+ * H. Matsumoto
+ ********************************************************************************************/
 int Calc_Crc(uchar *buf, int cnt) {
   long accum;
   int i, j;
@@ -1410,8 +1431,8 @@ int Calc_Crc(uchar *buf, int cnt) {
 } //____Calc_Crc()____//
 
 /******************************************************************************\
-** Convert_BitMap_To_CharBuf     Conver the BitMap to a readable Char string
-\******************************************************************************/
+ * Convert_BitMap_To_CharBuf     Conver the BitMap to a readable Char string
+ ******************************************************************************/
 void Convert_BitMap_To_CharBuf(ulong val0, ulong val1, char *bin_str) {
   ulong remainder;
   int count, type_size;
@@ -1444,24 +1465,24 @@ void Convert_BitMap_To_CharBuf(ulong val0, ulong val1, char *bin_str) {
   flogf("\n%s|Convert_BitMap_To_CharBuf() NUM OF BAD BLKS=%d", Time(NULL),
         NumBadBlks);
   putflush();
-  CIOdrain(); // RTCDelayMicroSeconds(10000L);
-  //	flogf("\n%s", bin_str); RTCDelayMicroSeconds(20000L);
+  CIOdrain(); // Delayms(10);
+  //	flogf("\n%s", bin_str); Delayms(20);
   // debug end
 
 } //____Convert_BitMap_To_CharBuf____//
 /******************************************************************************\
-** Check_If_Cmds_Done_Or_Resent
-** Check if all data received. A "done" or a "cmds" string tells the data was
+ * Check_If_Cmds_Done_Or_Resent
+ * Check if all data received. A "done" or a "cmds" string tells the data was
 OK.
-**	Returns 2, if "cmds"
-**         1, if "done"
-**         0, if @@@ string.  Resend request.
-**		    -1, something else, usually message garbled.
-**        -2, NO CARRIER
-**        -3, No Queue... Wait longer?
-**        -4, Resend Request Garbled
-**        -5, Inaccurate reply from land
-\******************************************************************************/
+ *	Returns 2, if "cmds"
+ *         1, if "done"
+ *         0, if @@@ string.  Resend request.
+ *		    -1, something else, usually message garbled.
+ *        -2, NO CARRIER
+ *        -3, No Queue... Wait longer?
+ *        -4, Resend Request Garbled
+ *        -5, Inaccurate reply from land
+ ******************************************************************************/
 short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
 
   uchar hbuf[16], bfo[8];
@@ -1483,16 +1504,16 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   // recode ?? getblock with longer timeout
   // how long are we waiting here?
   Delay_AD_Log(1);
-  inputstring[0] = TURxGetByteWithTimeout(AntModPort, 15000);
+  inputstring[0] = TURxGetByteWithTimeout(devicePort, 15000);
   Delay_AD_Log(1);
-  qsize = (long)tgetq(AntModPort);
+  qsize = (long)tgetq(devicePort);
 
   DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   if (qsize < 7) {
-    inputstring[1] = TURxGetByteWithTimeout(AntModPort, 3000);
+    inputstring[1] = TURxGetByteWithTimeout(devicePort, 3000);
     k = 2;
-    qsize = (long)tgetq(AntModPort);
+    qsize = (long)tgetq(devicePort);
     DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
   }
 
@@ -1501,8 +1522,8 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       cdrain();)
   AD_Check();
 
-  leninput = TURxGetBlock(AntModPort, inputstring + k, qsize,
-                           TUBlockDuration(AntModPort, qsize)) + k;
+  leninput = TURxGetBlock(devicePort, inputstring + k, qsize,
+                           TUBlockDuration(devicePort, qsize)) + k;
   DBG1(printsafe((long) leninput, inputstring);) 
   len = strspn(inputstring, "\r\ncmdsoneNO C");
   DBG(flogf("\n\t|Len of command characters: %d of %ld", len, leninput);)
@@ -1534,13 +1555,13 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
     flogf("\n\t|TX COMPLETED, done");
     putflush();
     CIOdrain();
-    RTCDelayMicroSeconds(10000L);
+    Delayms(10);
     return 1;
   } else if (resent) { //@@@ Received from RUDICS, Need to Resend
-    hbuf[hbuf_size] = TURxGetByteWithTimeout(AntModPort, 5000);
-    qsize = tgetq(AntModPort);
+    hbuf[hbuf_size] = TURxGetByteWithTimeout(devicePort, 5000);
+    qsize = tgetq(devicePort);
     for (i = hbuf_size + 1; i < qsize; i++) { // Get other 11-bytes from header
-      hbuf[i] = TURxGetByteWithTimeout(AntModPort, 300);
+      hbuf[i] = TURxGetByteWithTimeout(devicePort, 300);
       if (hbuf[i] == '-1') {
         DBG(flogf("\n\t|resent buffer incomplete: %s", hbuf);) return -3;
       } // If any of the 11 are bad, return fail
@@ -1553,7 +1574,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
         crc_chk == crc_rec) { // Compare new and old CRC, Header OK, proceed.
       flogf("\n\t|Resend CRC Matches");
       putflush();
-      CIOdrain(); // RTCDelayMicroSeconds(20000L);
+      CIOdrain(); // Delayms(20);
       for (i = 0; i < 8; i++) {
         bfo[i] = 0x00; // clear
         for (j = 0; j < 8; j++)
@@ -1567,7 +1588,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       return 0;
     } else {
       DBG(flogf("\n\t|Resend request garbled: %s", hbuf); putflush();
-          CIOdrain(); RTCDelayMicroSeconds(10000L);)
+          CIOdrain(); Delayms(10);)
       return -4;
     }
   }
@@ -1579,31 +1600,31 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
 
 } //____Check_If_Cmds_Done_Or_Resent____//
 /******************************************************************************\
-**	Receive_Command   Here is where we receive the command header from the
+ *	Receive_Command   Here is where we receive the command header from the
 RUDICS
-** system after sending the Platform ID. The 10 byte header consists of:
-** 1: "@@@" (3-bytes of 0x40)
-** 2: CRC Checksum (2-byte)     -CRC includes everything below here \/ \/ \/ \/
-\/
-** 3: Message length (2-byte)   -Includes everything below here\/ \/ \/ \/ \/
-** 4: Message Type (1-byte)     - should be ASCII
-** 5: Block Number (1-byte)     - should be one
-** 6: Number of Blocks (1-byte) - should be one
-** 7: Command: should be less than 64 bytes
-**
-** LOGICS
-**   Receive command (until receives 'done' from land
-**   else if it is a real command, save it,
-**   else if it is Senddata(), prepare to send another file if there is one
-**   TX of the file iss success, rename and move it another direcory
-**   Check if there is a next file,
-**          Yes- send 'data' and upload the file
-**          No - send 'done'
-**   If received 'done' break out
-**   Return 1 if Senddata(),
-**          2 if it is a real command.
-**          0 if no command received
-\******************************************************************************/
+ * system after sending the Platform ID. The 10 byte header consists of:
+ * 1: "@@@" (3-bytes of 0x40)
+ * 2: CRC Checksum (2-byte)     -CRC includes everything below here \/ \/ \/ \/
+ /
+ * 3: Message length (2-byte)   -Includes everything below here\/ \/ \/ \/ \/
+ * 4: Message Type (1-byte)     - should be ASCII
+ * 5: Block Number (1-byte)     - should be one
+ * 6: Number of Blocks (1-byte) - should be one
+ * 7: Command: should be less than 64 bytes
+ *
+ * LOGICS
+ *   Receive command (until receives 'done' from land
+ *   else if it is a real command, save it,
+ *   else if it is Senddata(), prepare to send another file if there is one
+ *   TX of the file iss success, rename and move it another direcory
+ *   Check if there is a next file,
+ *          Yes- send 'data' and upload the file
+ *          No - send 'done'
+ *   If received 'done' break out
+ *   Return 1 if Senddata(),
+ *          2 if it is a real command.
+ *          0 if no command received
+ ******************************************************************************/
 int Receive_Command(int len) {
   int cmds = 1;
   uchar *commands;
@@ -1617,11 +1638,11 @@ int Receive_Command(int len) {
 
   AD_Check();
   while (queue == 0 && count < 3) {
-    queue = tgetq(AntModPort);
+    queue = tgetq(devicePort);
     if (queue > 0) {
       DBG(flogf("\n\t|strlen of inputstring: %d", len);)
-      TURxGetBlock(AntModPort, inputstring + len, (long) queue,
-                   TUBlockDuration(AntModPort, queue));
+      TURxGetBlock(devicePort, inputstring + len, (long) queue,
+                   TUBlockDuration(devicePort, queue));
       break;
     }
     count++;
@@ -1654,7 +1675,7 @@ int Receive_Command(int len) {
   // Calc_CRC needs everything after crc bytes in header + length/#of bytes
   crc_chk = Calc_Crc(commands + (offset - 5), cmdLength);
   DBG(flogf("\n\t|Calc CRC: %#4x", crc_chk);)
-  RTCDelayMicroSeconds(20000L);
+  Delayms(20);
 
   if (crc_chk == crc_irid) { // If our crc values match up...
     flogf("\n\t|%s", commands + 10);
@@ -1687,10 +1708,10 @@ int Receive_Command(int len) {
   return cmds;
 } //____ Receive_Command() ____//
 /******************************************************************************\
-** HangUp
-**  Escape sequence and hang up the call.  Just hang up.  It does not
-**  power off.
-\******************************************************************************/
+ * HangUp
+ *  Escape sequence and hang up the call.  Just hang up.  It does not
+ *  power off.
+ ******************************************************************************/
 bool HangUp(void) {
   short wait = 5000;
   short count = 0;
@@ -1699,7 +1720,7 @@ bool HangUp(void) {
         Time(NULL), TX_Success);
   putflush();
   CIOdrain();
-  RTCDelayMicroSeconds(20000L);
+  Delayms(20);
 
   SendString("ATH");
   while (status != 1 && count < 2) {
@@ -1713,53 +1734,47 @@ bool HangUp(void) {
     } else {
       flogf("\n\t|Sending +++");
       cdrain();
-      TUTxFlush(AntModPort);
-      TURxFlush(AntModPort);
+      TUTxFlush(devicePort);
+      TURxFlush(devicePort);
 
-      TUTxPrintf(AntModPort, "+++"); // ??
-      TUTxWaitCompletion(AntModPort);
-      RTCDelayMicroSeconds(25000L);
+      TUTxPrintf(devicePort, "+++"); // ??
+      TUTxWaitCompletion(devicePort);
+      Delayms(25);
 
       GetIRIDInput("OK", 2, NULL, NULL, wait);
       SendString("ATH");
     }
     count++;
   }
-
-  RTCDelayMicroSeconds(20000L);
-
+  Delayms(20);
   AD_Check();
-
   return false;
-
 } //____ HangUp() ____//
-/*******************************************************************************\
-** GetIRIDInput()
-** 1: Grabs IRID incoming char stream from the turport
-** 2: Look for a character in Template such as ':' and then grab the char
-**    (number=num_char_to_read) proceeding chars
-** 3: From within here, we can see if we need to return a short pointer for
-**    SigQual, and returns
-** 4: Compares Iridium buf[] to compstring. If it sees the same string,
+
+/*
+ * GetIRIDInput()
+ * 1: Grabs IRID incoming char stream from the turport
+ * 2: Look for a character in Template such as ':' and then grab the char
+ *    (number=num_char_to_read) proceeding chars
+ * 3: From within here, we can see if we need to return a short pointer for
+ *    SigQual, and returns
+ * 4: Compares Iridium buf[] to compstring. If it sees the same string,
  * numchars is optional output, atoi 
-**
-** @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
-** 2/27/2015
-\*******************************************************************************/
+ *
+ * @RETURN: if match: 1, no match: 0 and NoCarrier/Error: -1.
+ * 2/27/2015
+ */
 short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
                    int *numchars, short wait) {
   short Match = 0;
   int i = 0;
   short stringlength;
-  long len;
   long lenreturn;
   char *first;
 
   first = scratch; // blk - first is a problem
 
   DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
-
-  DBG(ConsoleIrid();)  // check if console is asking to stop
 
   memset(inputstring, 0, (size_t) STRING_SIZE);
   memset(first, 0, (size_t) STRING_SIZE);
@@ -1768,29 +1783,18 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   // Wait up to wait milliseconds to grab next byte from iridium/gps
   // 3.25.14 up to possibly 20 seconds...
-  TickleSWSR(); // another reprieve
-  inputstring[0] = TURxGetByteWithTimeout(AntModPort, wait);
-  RTCDelayMicroSeconds(100000L);
-
-  len = (long) tgetq(AntModPort);
-  if (len>STRING_SIZE) len=(long)STRING_SIZE;
-  lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
-                           TUBlockDuration(AntModPort, len));
-  if (len == 0)
-    return 0;
+  lenreturn = GetStringWait(inputstring, wait);
+  if (lenreturn == 0) return 0;
 
   DBG1(printsafe(lenreturn, inputstring);)
-  // RTCDelayMicroSeconds(25000L);
-
-  TickleSWSR(); // another reprieve
-
+  // Delayms(25);
 
   // If we are looking for the string Template
   if (Template != NULL) {
     // if we did not find Template
     // first!! ptr into inputstring
     if ((first = strstr(inputstring, Template)) == NULL) {
-      RTCDelayMicroSeconds(50000L);
+      Delayms(50);
       Match = 0;
     }
     // successful Template search
@@ -1804,6 +1808,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
         // overwrite begin of inpstr with match .. num_char
         // ouput numchars = int found after end of match
         strncpy(inputstring, first, num_char_to_reads);
+        // inputstring[num_char_to_reads+1] = 0; // zero terminate?
         *numchars = atoi(inputstring + strlen(Template));
       }
     }
@@ -1811,15 +1816,16 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   // If we are looking for the String compstring
   if ((compstring != NULL)) {
-
     // Get String Length
     stringlength = strlen(compstring);
 
+    // test strstr first, may be null
     if (!Template)
-      // no template, so first has not been assigned
+      // no template, so first = scratch
       strncpy(first, strstr(inputstring, compstring), stringlength);
     else
       // first points into inputstring at match Template
+      // cat onto end of inputstring
       strncat(first, strstr(inputstring, compstring), stringlength);
 
     // If compstring was successfully added to inputstring
@@ -1829,7 +1835,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     else {
       Match = 0;
       first[2] = 0;
-      RTCDelayMicroSeconds(20000L);
+      Delayms(20);
     } // strstr(first, compstring)
   } // (compstring != NULL)
   if (Match > 0)
@@ -1856,15 +1862,15 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     Match = StringSearch(inputstring, Template, compstring);
   }
 
-  RTCDelayMicroSeconds(20000L);
+  Delayms(20);
 
   return Match;
 } //_____ GetIRIDInput() _____//
 /********************************************************************************************\
-** StringSearch
-**    Powerful search function to look through each string input from Iridium
-**    and determine if the characters match at least half of what we expect
-\********************************************************************************************/
+ * StringSearch
+ *    Powerful search function to look through each string input from Iridium
+ *    and determine if the characters match at least half of what we expect
+ ********************************************************************************************/
 short StringSearch(char *inString, char *Template, uchar *compstring) {
   short tempLength;
   short compLength;
@@ -1898,80 +1904,68 @@ short StringSearch(char *inString, char *Template, uchar *compstring) {
 
 } //____ IRIDString Search() ____//
 /*******************************************************************************\
-** char* GetGPSInput()
-** 1: Grabs whatever ANTMOD data is incoming from the turport
-** 2: Can look for a character "chars" such as ':' and then grab the number
+ * char* GetGPSInput()
+ * 1: Grabs whatever DEVICE data is incoming from the turport
+ * 2: Can look for a character "chars" such as ':' and then grab the number
 (numchars) proceeding chars
-** 2.1:  From within here, we can see if we need to return a short pointer for
+ * 2.1:  From within here, we can see if we need to return a short pointer for
 SigQual, and returns
-** 3: Compares that string str1 to input char* compstring and returns "true"
-\*******************************************************************************/
+ * 3: Compares that string str1 to input char* compstring and returns "true"
+ *******************************************************************************/
 char *GetGPSInput(char *chars, int *numsats) {
   // global inputstring first 
   bool good = false;
   int count = 0;
-  long len;
-  long lenreturn;
+  long len, lenreturn;
 
-  DBG(ConsoleIrid();)  // check if console is asking to stop
+  DBG1(flogf(" .GetGPSInput. ");)
 
-  first = scratch; // blk - first is a problem
+  first = scratch; 
 
   memset(inputstring, 0, (size_t) STRING_SIZE);
   memset(first, 0, (size_t) STRING_SIZE);
 
-  inputstring[0] = TURxGetByteWithTimeout(
-      AntModPort, 5000); // Wait for first character to come in.
-
-  RTCDelayMicroSeconds(50000L);
-  len = (long)tgetq(AntModPort);
-  RTCDelayMicroSeconds(20000L);
-  // ?? why flush here
-  cdrain();
-
-  lenreturn = TURxGetBlock(AntModPort, inputstring + 1, len,
-                           TUBlockDuration(AntModPort, len));
-  DBG(flogf("\nGPS<< %s", inputstring);)
+  // Wait for first character to come in.
+  inputstring[0] = TURxGetByteWithTimeout(devicePort, 5000); 
+  // wait long enough for 100 chars @ 9600
+  Delayms(100);
+  len = (long) STRING_SIZE - 1L;
+  lenreturn = TURxGetBlock(devicePort, inputstring+1, len, (short) len);
+  DBG1(flogf("\nGPS<< %ld '%s'", lenreturn, inputstring);)
 
   if (chars != NULL) {
     strtok(inputstring, "=");
 
     if (chars == "PL") {
+      // concatenates long by tokenizing next '='
       strncpy(first, strtok(NULL, "="), 16); // concatenates lat
       strcat(first, "|"); // Places a | for distinction between lat and long
-      strncat(first, strtok(NULL, "="),
-              16); // concatenates long by tokenizing next '='
-      RTCDelayMicroSeconds(20000L);
+      strncat(first, strtok(NULL, "="), 16); 
+      Delayms(20);
     }
-
     else if (chars == "PD")
       strncpy(first, strtok(NULL, "="), 10);
-
     else if (chars == "PT")
       strncpy(first, strtok(NULL, "="), 12);
-
     else
       first = NULL;
-
-  }
+  } // chars
 
   else if (strstr(inputstring, "Used=") != NULL) {
     *numsats = atoi(strrchr(inputstring, '=') + 1);
-    RTCDelayMicroSeconds(20000L);
+    Delayms(20);
     cdrain();
   }
-  DBG(flogf("\n\t|first string: %s", first);)
-  TURxFlush(AntModPort);
-  TUTxFlush(AntModPort);
-
+  // DBG(flogf("\n\t|first string: %s", first);)
+  TURxFlush(devicePort);
+  TUTxFlush(devicePort);
   return first;
-
 } //_____ GetGPSInput() _____//
-  /*******************************************************************************************
-  ** void GetIRIDIUMSettings()
-  **********************************************************************************************/
-void GetIRIDIUMSettings() {
 
+/*
+ * void GetIRIDIUMSettings()
+ */
+void GetIRIDIUMSettings() {
   char *p;
 
   //"u" maxupload
@@ -2016,9 +2010,9 @@ void GetIRIDIUMSettings() {
   IRID.CALLMODE = atoi(p ? p : CALLMODE_DEFAULT);
 }
 
-/*******************************************************************************************
-** void StatusCheck()
-*******************************************************************************************/
+/*
+ * void StatusCheck()
+ */
 void StatusCheck() {
 
   flogf("\n\t|PhoneStatus: %d", PhoneStatus());
@@ -2026,7 +2020,7 @@ void StatusCheck() {
 
   flogf("\n\t|Call Status: %d", CallStatus());
   cdrain();
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
 
 } //____ StatusCheck() ____//
 
@@ -2034,7 +2028,6 @@ void StatusCheck() {
  * ConsoleIrid()
  * check for console input during IRID modem use
  */
-DBG(
 void ConsoleIrid() {
   // flush pending, look at most recent char
   char c=0;
@@ -2045,4 +2038,30 @@ void ConsoleIrid() {
     break;
   }
 }
-)
+
+// DelayTX(40) delay long enough for transmit 40 chars at 2400bd
+void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
+
+/*
+ * GetStringWait(inputstring, 1000) reads devicePort, up to 1000ms wait
+ *  1 char long wait, block short wait
+ * up to STRINGSIZE
+ */
+long GetStringWait(char *str, short wait) {
+  long len;
+  char ch;
+  TickleSWSR(); // another reprieve
+  // long wait
+  ch = TURxGetByteWithTimeout(devicePort, wait);
+  if (ch<0) {
+    DBG(flogf("\n\t|GetStringWait() timeout");)
+    return 0L;
+  }
+  str[0] = ch;
+  TickleSWSR(); // another reprieve
+  // short wait
+  // 1ms chars @ 9600, use timeoutMS=chars
+  len = TURxGetBlock(devicePort, str + 1, 
+    STRING_SIZE-1L, (short) 200);
+  return len+1L;
+}

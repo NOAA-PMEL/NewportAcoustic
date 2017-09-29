@@ -1,20 +1,20 @@
 #define SBE19
 
-bool CTD_Start_Up(bool settime);
+int CTD_Init();
+bool CTD_Start_Up(int sbe, bool settime);
 bool CTD_GetPrompt();
 void CTD_DateTime();
-bool CTD_Data(void);
+bool CTD_Data();
 void CTD_Sample();
 void CTD_SampleBreak();
 void CTD_CreateFile(long);
 void CTD_SyncMode();
-void GetCTDSettings();
-void SwitchTD(char);
-void OpenTUPort_CTD(bool);
+void CTD_GetSettings();
 float CTD_CalculateVelocity();
 float CTD_AverageDepth(int, float *);
-extern TUPort *CTDPort;
-#define BAUD 9600L
+void CTD_Select(int sbe);
+
+extern int SelectDevice(int sbe); // GPSIRID.c
 
 typedef struct {
 

@@ -125,5 +125,42 @@ good example of fail
 http://eclipse.pmel.noaa.gov/cgi-bin/ALL_RUDICS/dialin/show_call_events.cgi?logfile_date=07-24-17&n_call=400&platform_id=QUEH_RA01
 
 ---
+Sun, Jul 30, 2017 10:25:45 AM
+New highest value: 506
+	|New maxval: 506
+17:17:58|GetFileName(): C:00000506.DAT
+	|filecounter: 70
+	|SendString(data)
+17:17:58|Send_File(C:00000506.DAT):
+	|440 Bytes, 1 BLKS .Send_Blocks() , clear 450 bytes
+	|Bytes Read: 440
+	|SENDING BLK #1 450 BYTES {5} 
+17:18:07|Waiting for Land {1}  {1} 
+	|Check Queue: 19
+17:18:09+20'' x0D done x0A 
+ x0D  x0A 
+NO CARSIEZ x0D  x9A ''
 
+	|Len of command characters: 12 of 20
+	|StringSearch(Count: 1 of 4)
+	|StringSearch(Count: 4 of 4)
+	|TX COMPLETED, done
+17:18:09|COMDos() copy c:00000506.DAT c:SNT\00000506.SNT
+00000506.DAT
+
+       1 file(s) copied
+
+17:18:10|COMDos() del c:00000506.DAT
+1 file(s) erased
+
+	|IRIDGPS(): upload success 1
+	|Successful IRID Call: 1
+
+---
+
+entered recovery mode
+
+---
+
+read cmds. called it bad.
 

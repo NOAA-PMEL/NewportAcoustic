@@ -73,7 +73,7 @@ void WISPRPower(bool power) {
 
     flogf("\n%s|WISPR: ON", Time(NULL));
     PIOSet(WISPR_PWR_ON);
-    RTCDelayMicroSeconds(10000);
+    Delayms(10);
     PIOClear(WISPR_PWR_ON);
     WISPR_On = true;
     WISPRGPSSends = 0;
@@ -81,10 +81,10 @@ void WISPRPower(bool power) {
   } else {
     flogf("\n%s|WISPR: OFF", Time(NULL));
     PIOSet(WISPR_PWR_OFF);
-    RTCDelayMicroSeconds(10000);
+    Delayms(10);
     PIOClear(WISPR_PWR_OFF);
     WISPR_On = false;
-    RTCDelayMicroSeconds(1000000L);
+    Delayms(1000);
   }
 
 } //_____ WISPRInit() _____//
@@ -179,7 +179,7 @@ short WISPR_Data() {
 
     if (!SendWISPRGPS) {
       WISPRGPS(124.5, 45);
-      RTCDelayMicroSeconds(150000);
+      Delayms(150);
       TUTxFlush(PAMPort);
       TURxFlush(PAMPort);
       WISPRGain(-1);
@@ -200,7 +200,7 @@ short WISPR_Data() {
 
     DBG(flogf("\n\t|DTX file: %s", DTXFilename);)
     WISPRFile = open(DTXFilename, O_APPEND | O_RDWR | O_CREAT);
-    RTCDelayMicroSeconds(25000L);
+    Delayms(25);
     if (WISPRFile <= 0)
       flogf("\nERROR  |WISPR_Data() %s open errno: %d", DTXFilename, errno);
     DBG(else flogf("\n\t|WISPR_Data() %s opened", DTXFilename);)
@@ -257,7 +257,7 @@ short WISPR_Data() {
   else if (strncmp(WisprString, "$NGN", 4) == 0) {
     if (!SendWISPRGPS) {
       WISPRGPS();
-      RTCDelayMicroSeconds(50000);
+      Delayms(50);
     }
 
     WISPRGain(-1);
@@ -267,8 +267,7 @@ short WISPR_Data() {
 
   else if (strncmp(WisprString, "$FIN", 4) == 0) {
     flogf(": Found Exit");
-    RTCDelayMicroSeconds(
-        2000000L);     // Gives a little bit of time to WISPR to umount /mnt
+    Delayms(2000);     // Gives a little bit of time to WISPR to umount /mnt
     WISPRPower(false); // Powers off Wispr
     return 6;
   } else if (strcmp(WisprString, NULL) == 0) {
@@ -296,13 +295,13 @@ void WISPRDet(int dtx) {
 
   dtxrqst = dtx;
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   TUTxFlush(PAMPort);
   TURxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$DX?,%d*\n", dtx);
   TUTxWaitCompletion(PAMPort);
 
-  RTCDelayMicroSeconds(500000L);
+  Delayms(500);
 
 } //_____ WISPRDet() _____//
 /*************************************************************************\
@@ -355,7 +354,7 @@ void WISPRGain(short c) {
   TUTxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$NGN,%d*\n", c);
   TUTxWaitCompletion(PAMPort);
-  RTCDelayMicroSeconds(2000L);
+  Delayms(2);
 
 } //_____ WISPRGain() _____//
 /*************************************************************************\
@@ -368,7 +367,7 @@ void WISPRDFP() {
   TUTxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$DFP*\n");
   TUTxWaitCompletion(PAMPort);
-  RTCDelayMicroSeconds(250000L);
+  Delayms(250);
 
 } //_____ WISPRDFP() _____//
 /*************************************************************************\
@@ -381,7 +380,7 @@ void WISPRTFP() {
   TUTxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$TFP*\n");
   TUTxWaitCompletion(PAMPort);
-  RTCDelayMicroSeconds(250000L);
+  Delayms(250);
 
 } //_____ WISPRDFP() _____//
 /*************************************************************************\
@@ -395,7 +394,7 @@ bool WISPRExit() {
   TURxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$EXI*\n");
   TUTxWaitCompletion(PAMPort);
-  RTCDelayMicroSeconds(200000L);
+  Delay_AD_Log(150);  Delayms(200);
 
   WISPR_Data();
 
@@ -447,7 +446,7 @@ char *GetWISPRInput(float *numchars) {
   r[1] = TURxGetByteWithTimeout(PAMPort, 100);
   if (r[1] == -1) {
     DBG(flogf("\nThe first input character is negative one");
-        RTCDelayMicroSeconds(20000L);)
+        Delayms(20);)
     return NULL;
   }
   for (i = 2; i < 64; i++) { // Up to 59 characters
@@ -510,7 +509,7 @@ void ChangeWISPR(short wnum) {
   }
 
   OpenTUPort_WISPR(false);
-  RTCDelayMicroSeconds(100000);
+  Delayms(100);
   WISP.NUM = wnum;
   OpenTUPort_WISPR(true);
   WISPRPower(true);
@@ -684,7 +683,7 @@ void create_dtx_file(long fnum) {
 
   sprintf(&SourceFileName[2], "%08ld.dtx", fnum);
   filehandle = creat(SourceFileName, 0);
-  RTCDelayMicroSeconds(500000L);
+  Delayms(500);
   if (filehandle < 0) {
     flogf("\nERROR  |Create_DTX_File() errno: %d", errno);
   }
@@ -695,7 +694,7 @@ void create_dtx_file(long fnum) {
           errno);
   DBG(else flogf("\n\t|create_dtx_file(): %s closed", SourceFileName);)
 
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
 }
 /***********************************************************************************************\
 ** GatherWISPRFreeSpace()
@@ -712,7 +711,7 @@ void GatherWISPRFreeSpace() {
 
   if (WISPR_On) {
     WISPRExit();
-    RTCDelayMicroSeconds(2500000L);
+    Delayms(2500);
   }
   WISPRPower(true);
 
@@ -742,7 +741,7 @@ void GatherWISPRFreeSpace() {
         if (gain || count == 2) {
           DBG(flogf("\n\t|GWFS: DFP2");)
           WISPRDFP();
-          RTCDelayMicroSeconds(150000);
+          Delayms(150);
           if (WISPR_Data() == 2)
             dfp = true;
         }
@@ -751,14 +750,14 @@ void GatherWISPRFreeSpace() {
       if (tgetq(PAMPort)) {
         wret = WISPR_Data();
         if (wret == 1) {
-          RTCDelayMicroSeconds(150000);
+          Delayms(150);
           wret = WISPR_Data();
           if (wret == 5) {
             gain = true;
-            RTCDelayMicroSeconds(150000);
+            Delayms(150);
             DBG(flogf("\n\t|GWFS: DFP1");)
             WISPRDFP();
-            RTCDelayMicroSeconds(150000);
+            Delayms(150);
             if (WISPR_Data() == 2)
               dfp = true;
           }
@@ -792,7 +791,7 @@ void GatherWISPRFreeSpace() {
   }
 
   OpenTUPort_WISPR(false);
-  RTCDelayMicroSeconds(100000);
+  Delayms(100);
   WISP.NUM = wnum;
   VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
 
@@ -816,9 +815,9 @@ void UpdateWISPRFRS() {
   WisprString = (char *)calloc(64, sizeof(char));
 
   flogf("\n%s|Update %s ", Time(NULL), wisprfile);
-  RTCDelayMicroSeconds(10000L);
+  Delayms(10);
   // sprintf(&wisprfile[2], "WISPRFRS.DAT");
-  RTCDelayMicroSeconds(20000L);
+  Delayms(20);
   if (stat(wisprfile, &fileinfo) != 0) {
     flogf("%s file does not exist. making file...", wisprfile);
     GatherWISPRFreeSpace();
@@ -829,7 +828,7 @@ void UpdateWISPRFRS() {
   DBG(flogf("\n\t|File size: %ld", filesize);)
 
   wisprfilehandle = open(wisprfile, O_RDWR);
-  RTCDelayMicroSeconds(25000L);
+  Delayms(25);
   if (wisprfilehandle <= 0)
     flogf("\nERROR  |UpdateWISPRFRS(): file open errno: %d", errno);
   DBG(else flogf("\n\t|UpdateWISPRFRS() %s opened", wisprfile);)
@@ -886,7 +885,7 @@ void OpenTUPort_WISPR(bool on) {
     TUTxFlush(PAMPort);
     TURxFlush(PAMPort);
     TUClose(PAMPort);
-    RTCDelayMicroSeconds(1000000L);
+    Delayms(1000);
   }
 
   PIOClear(WISPR_PWR_ON);
@@ -942,7 +941,7 @@ void OpenTUPort_WISPR(bool on) {
     flogf("\n\t|Wrong PAM Port...");
     TUClose(PAMPort);
   }
-  RTCDelayMicroSeconds(100000L);
+  Delayms(100);
 }
 /*
 ** bool WISPRExpectedReturn(short)

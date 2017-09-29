@@ -15,7 +15,7 @@ import time
 
 name = 'sbe39'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS4'
+port = '/dev/ttyS3'
 baudrate = 9600
 CTD_DELAY = 1
 
@@ -26,11 +26,11 @@ def info():
 
 def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode
+    global ser, go, sleepMode, syncMode, timeOff
     ser = None
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     sleepMode = syncMode = False
-    timeoff = 0
+    timeOff = 0
     go = Event()
 
 def start():
@@ -87,7 +87,7 @@ def serThread():
                             sleepMode = True
                             ser.log("ctd sleepMode")
                         if sleepMode != True: 
-                            ser.put('S>')
+                            ser.put('<Executed/>')
         # while go:
     except IOError, e:
         print "IOError on serial, calling buoy.stop() ..."
@@ -107,7 +107,7 @@ def setDateTime(dt):
 def ctdDateTime():
     "use global timeOff set by setDateTime() to make a date"
     global timeOff
-    f='%d %b %Y %H:%M:%S'
+    f='%d %b %Y, %H:%M:%S'
     return time.strftime(f,time.localtime(time.time()-timeOff))
 
 def ctdDelay():
@@ -119,7 +119,7 @@ def ctdDelay():
 # 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
 def ctdOut():
     "instrument sample"
-    # "\r\n# t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss\r\n"
+    # "\r\n  t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy, hh:mm:ss\r\n"
 
     # ctd delay to process, nominal 3.5 sec. Add variance?
     sleep(ctdDelay())
@@ -127,7 +127,13 @@ def ctdOut():
     # note: modify temp for ice
     #ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
     #    (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
-    ser.put("\r\n# %f, %f, %s\r\n" % (temper(), depth(), ctdDateTime() ))
+    ser.put("\r\n %f, %f, %s\r\n" % (temper(), antdepth(), ctdDateTime() ))
+
+def antdepth():
+    "buoy depth - 17, unless there is current"
+    dep=depth()-17
+    if dep<0: return 0
+    else: return dep
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"
