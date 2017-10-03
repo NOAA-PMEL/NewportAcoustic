@@ -93,7 +93,7 @@
 #include <WISPR.h>
 #include <Winch.h>
 
-#define STRING_SIZE 1024
+#define BUFSZ 1024
 #define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 // WDT Watch Dog Timer definition
 // Not sure if this watchdog is even working You have to define
@@ -165,9 +165,9 @@ void main() {
 
   // Allocation of Space for the Global buffer. Mostly used to write to the
   // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(STRING_SIZE, 1);
+  WriteBuffer = (char *)calloc(BUFSZ, 1);
   // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(STRING_SIZE, 1);
+  returnstr = (char *)calloc(BUFSZ, 1);
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -1319,7 +1319,7 @@ static void IRQ5_ISR(void) {
 \******************************************************************************/
 ulong WriteFile(ulong TotalSeconds) {
 
-  long BlkLength = STRING_SIZE;
+  long BlkLength = BUFSZ;
   int filehandle;
   struct stat info;
   char detfname[] = "c:00000000.dtx";
@@ -1355,7 +1355,7 @@ ulong WriteFile(ulong TotalSeconds) {
     //*** Winch Info   ***//
     Winch_Monitor(filehandle);
     Delayms(50);
-    memset(WriteBuffer, 0, STRING_SIZE);
+    memset(WriteBuffer, 0, BUFSZ);
 
     //*** Winch Status ***//
     sprintf(WriteBuffer, "%s\n\0", PrintSystemStatus());

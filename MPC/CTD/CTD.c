@@ -36,7 +36,7 @@
 #include <time.h>
 #include <unistd.h> // PicoDOS POSIX-like UNIX Function Definitions
 
-#define STRING_SIZE 1024
+#define BUFSZ 1024
 
 time_t CTD_VertVel(time_t);
 int Sea_Ice_Algorithm(); 
@@ -62,8 +62,8 @@ float ascentRate = 0.26;
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
-  stringin = (char *)calloc(STRING_SIZE, 1);
-  stringout = (char *)calloc(STRING_SIZE, 1);
+  stringin = (char *)calloc(BUFSZ, 1);
+  stringout = (char *)calloc(BUFSZ, 1);
   return 0;
 }
 
@@ -159,7 +159,7 @@ bool CTD_GetPrompt() {
   char ch;
   bool r;
   // global char *stringin;
-  memset(stringin, 0, STRING_SIZE);
+  memset(stringin, 0, BUFSZ);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
 //ch=TURxGetByteWithTimeout(devicePort, 50); //cr echo
@@ -402,7 +402,7 @@ bool CTD_Data() {
   time_t secs = 0;
 
   DBG2( cprintf("\n. CTD_Data()"); )
-  memset(stringin, 0, STRING_SIZE);
+  memset(stringin, 0, BUFSZ);
 
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
@@ -414,7 +414,7 @@ bool CTD_Data() {
   TURxFlush(devicePort);
   strin=stringin;
 
-  memset(stringout, 0, STRING_SIZE);
+  memset(stringout, 0, BUFSZ);
   // Split data string up into separate values
   if (sbeID==DEVB) { // buoy sbe
     // Example: # 20.6538,  0.01145,    0.217,   0.0622, 01 Aug 2016 12:16:50

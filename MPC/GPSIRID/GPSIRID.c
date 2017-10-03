@@ -56,7 +56,7 @@ of commands
 #define NUMCOM 7 // Number of commmands can be receive per telemetry
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
-#define STRING_SIZE 1024
+#define BUFSZ 1024
 #define RUDICSBLOCK 2000
 // #define RUDICSBLOCK 2000
 
@@ -127,17 +127,14 @@ void DelayTX(int ch);
 
 TUPort *devicePort;
 int deviceID=0; // 0=off, 1=buoy, 2=antenna
-uchar *inputstring, *first, *scratch;
+// uchar *stringin, *first, *scratch;
+char first[BUFSZ], stringin[BUFSZ], scratch[BUFSZ];
 
 /* GPSIRID_Init() initialize file
  * returns 0 success
  */
 int GPSIRID_Init() {
   short deviceRX, deviceTX;
-  // global char *inputstring, *scratch;
-  // never freed
-  inputstring = (char *)calloc(STRING_SIZE, 1);
-  scratch = (char *)calloc(STRING_SIZE, 1);
   deviceRX = TPUChanFromPin(DEVICERX); 
   deviceTX = TPUChanFromPin(DEVICETX);
   devicePort = TUOpen(deviceRX, deviceTX, BUOYBAUD, 0);
@@ -225,8 +222,8 @@ bool GPSstartup() {
   AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
   SendString("AT");
-  GetStringWait(inputstring, (short) 1000);
-  if (!strstr(inputstring, "OK")) {
+  GetStringWait(stringin, (short) 1000);
+  if (!strstr(stringin, "OK")) {
     flogf("\nErr GPSstartup(): not OK");
     return false;
   }
@@ -464,7 +461,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
  ******************************************************************************/
 bool GetGPS_SyncRTC() {
   static bool firstGPS = true;
-  char *Latitude, *Longitude, *Coordinates;
+  char *Latitude, *Longitude, Coordinates[32];
   short sat_num = 0;
   short count = 0;
   ulong total_seconds = 0;
@@ -494,11 +491,6 @@ bool GetGPS_SyncRTC() {
     Delay_AD_Log(8);
   }
   // sat number is acceptable
-
-  // freed?
-  // Latitude = (char *)calloc(16, 1);
-  // Longitude = (char *)calloc(16, 1);
-  Coordinates = (char *)calloc(33, 1);
 
   // Synchronize the RTC time with GPS
   if (GetUTCSeconds())
@@ -555,9 +547,6 @@ bool GetGPS_SyncRTC() {
     } // open(upload)
   } // GetGPSInput
   cdrain();
-  // free(Latitude);
-  // free(Longitude);
-  free(Coordinates);
   DBG1(flogf("\n\t|GetGPS_SyncRTC free buffers");)
 
   return returnvalue;
@@ -572,11 +561,10 @@ bool GetUTCSeconds() {
   struct tm t;
   time_t time_seconds;
   char *hours, *minutes, *seconds;
-  char *time;
+  char time[24];
   long difference = 0;
   ulong time_now = 0;
 
-  time = (char *)calloc(24, sizeof(char));
   TURxFlush(devicePort);
   SendString("AT+PD");
   strncpy(time, GetGPSInput("PD", NULL), 10);
@@ -988,7 +976,7 @@ bool Call_Land(void) {
   long lenreturn;
 
   flogf("\n%s|Call_Land()", Time(NULL));
-  memset(inputstring, 0, (size_t) STRING_SIZE);
+  memset(stringin, 0, (size_t) BUFSZ);
   memset(call, 0, 32);
   strcpy(call, "ATD");
   length = strlen(PhoneNum);
@@ -996,17 +984,17 @@ bool Call_Land(void) {
   strncat(call, PhoneNum, length);
 
   SendString(call);
-  lenreturn = GetStringWait(inputstring, wait);
+  lenreturn = GetStringWait(stringin, wait);
 
-  DBG1(printsafe(lenreturn, inputstring);)
+  DBG1(printsafe(lenreturn, stringin);)
 
-  if (strstr(inputstring, "CONNECT")) {
+  if (strstr(stringin, "CONNECT")) {
     flogf("%s\n\t|Call_Land: CONNECT", Time(NULL));
     return true;
   }
-  if (strstr(inputstring, "NO CARRIER")) 
+  if (strstr(stringin, "NO CARRIER")) 
     flogf("%s\n\t|Call_Land: NO CARRIER", Time(NULL));
-  if (strstr(inputstring, "ERROR")) 
+  if (strstr(stringin, "ERROR")) 
     flogf("%s\n\t|Call_Land: ERROR", Time(NULL));
   return false;
 } //____ Call_Land() ____//
@@ -1308,6 +1296,8 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
   long bytesread;
   const short dataheader = 10; 
 
+  buf = (uchar *)calloc((int) (BlockLength+20), 1);
+
   DBG(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
   if (IRIDFileHandle <= 0) {
@@ -1315,8 +1305,6 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     return -6;
   }
   DBG2(else flogf("\n\t|Send_Blocks: open(%s)", IRIDFilename);)
-  //buf = (uchar *)malloc((BlockLength+20) * sizeof(char));
-  buf = (uchar *)calloc((int) (BlockLength+20), 1);
 
   crc_calc = 0x0000;
   for (BlkNum = 1; BlkNum <= NumOfBlks;
@@ -1369,9 +1357,9 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
       // while ((scratch[blklen++]=TURxGetByteWithTimeout(devicePort, 1)) >= 0) {}
       // printsafe( (long) blklen, scratch);
         
-      memset( scratch, 0, STRING_SIZE );
+      memset( scratch, 0, BUFSZ );
       printsafe( (long) TURxGetBlock(devicePort, scratch, 
-                          (long) STRING_SIZE, (short) 1),
+                          (long) BUFSZ, (short) 1),
         scratch);
     }
 #else
@@ -1381,9 +1369,9 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     Delayms(2000);
   }
 
-  free(buf);
   if (close(IRIDFileHandle) != 0)
     flogf("\nERROR  |Send_Blocks: File Close error: %d", errno);
+  free(buf);
   return 0;
 
 } //____Send_Blocks____//
@@ -1496,7 +1484,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   int k = 1;
 
   DBG(flogf("\n%s|Waiting for Land", Time(NULL)); cdrain();)
-  memset(inputstring, 0, (size_t) STRING_SIZE);
+  memset(stringin, 0, (size_t) BUFSZ);
   CLK(start_clock = clock();)
 
   AD_Check();
@@ -1504,14 +1492,14 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   // recode ?? getblock with longer timeout
   // how long are we waiting here?
   Delay_AD_Log(1);
-  inputstring[0] = TURxGetByteWithTimeout(devicePort, 15000);
+  stringin[0] = TURxGetByteWithTimeout(devicePort, 15000);
   Delay_AD_Log(1);
   qsize = (long)tgetq(devicePort);
 
   DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
   Delayms(10);
   if (qsize < 7) {
-    inputstring[1] = TURxGetByteWithTimeout(devicePort, 3000);
+    stringin[1] = TURxGetByteWithTimeout(devicePort, 3000);
     k = 2;
     qsize = (long)tgetq(devicePort);
     DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
@@ -1522,14 +1510,14 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       cdrain();)
   AD_Check();
 
-  leninput = TURxGetBlock(devicePort, inputstring + k, qsize,
+  leninput = TURxGetBlock(devicePort, stringin + k, qsize,
                            TUBlockDuration(devicePort, qsize)) + k;
-  DBG1(printsafe((long) leninput, inputstring);) 
-  len = strspn(inputstring, "\r\ncmdsoneNO C");
+  DBG1(printsafe((long) leninput, stringin);) 
+  len = strspn(stringin, "\r\ncmdsoneNO C");
   DBG(flogf("\n\t|Len of command characters: %d of %ld", len, leninput);)
 
   if (len > 1) {
-    strncpy(hbuf, inputstring, len);
+    strncpy(hbuf, stringin, len);
 
     if (StringSearch(hbuf, "cmds", NULL) == 1) {
       cmds = Receive_Command((int) leninput);
@@ -1539,7 +1527,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
     else if (StringSearch(hbuf, "NO C", NULL) == 1)
       LostConnect = true;
   } else {
-    len = strspn(inputstring, "\r\n@ ");
+    len = strspn(stringin, "\r\n@ ");
     DBG(flogf("\n\t|Len of possible resendString: %d", len);)
     if (StringSearch(hbuf, "@@@", NULL) == 1)
       resent = 1;
@@ -1626,22 +1614,20 @@ RUDICS
  *          0 if no command received
  ******************************************************************************/
 int Receive_Command(int len) {
+  // global stringin, deviceport
   int cmds = 1;
-  uchar *commands;
+  char *commands; 
   int crc_chk, crc_irid;
   int cmdLength;
   int queue = 0;
   int count = 0;
   int offset = 10;
 
-  commands = (uchar *)calloc(75, 1);
-
   AD_Check();
   while (queue == 0 && count < 3) {
     queue = tgetq(devicePort);
     if (queue > 0) {
-      DBG(flogf("\n\t|strlen of inputstring: %d", len);)
-      TURxGetBlock(devicePort, inputstring + len, (long) queue,
+      TURxGetBlock(devicePort, stringin + len, (long) queue,
                    TUBlockDuration(devicePort, queue));
       break;
     }
@@ -1651,14 +1637,14 @@ int Receive_Command(int len) {
 
   flogf("\n%s|Receive_Command()", Time(NULL));
 
-  if ((commands = strstr(inputstring, "@@@")) != NULL) {
+  if ((commands = strstr(stringin, "@@@")) != NULL) {
     DBG(flogf("\n\t|%s", commands + 10);)
     crc_irid = commands[3] << 8 | commands[4];  // Save the received CRC
     cmdLength = commands[5] << 8 | commands[6]; // Get command length;
     DBG(flogf("\n\t|Given CRC: %#4x, CmdLength: %d", crc_irid, cmdLength);)
 
     offset = 10;
-  } else if ((commands = strstr(inputstring, "@@")) != NULL) {
+  } else if ((commands = strstr(stringin, "@@")) != NULL) {
     DBG(flogf("\n\t|%s", commands + 9);)
     crc_irid = commands[2] << 8 | commands[3];
     cmdLength = commands[4] << 8 | commands[5];
@@ -1776,24 +1762,24 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
 
-  memset(inputstring, 0, (size_t) STRING_SIZE);
-  memset(first, 0, (size_t) STRING_SIZE);
+  memset(stringin, 0, (size_t) BUFSZ);
+  memset(first, 0, (size_t) BUFSZ);
 
   CLK(start_clock = clock();)
 
   // Wait up to wait milliseconds to grab next byte from iridium/gps
   // 3.25.14 up to possibly 20 seconds...
-  lenreturn = GetStringWait(inputstring, wait);
+  lenreturn = GetStringWait(stringin, wait);
   if (lenreturn == 0) return 0;
 
-  DBG1(printsafe(lenreturn, inputstring);)
+  DBG1(printsafe(lenreturn, stringin);)
   // Delayms(25);
 
   // If we are looking for the string Template
   if (Template != NULL) {
     // if we did not find Template
-    // first!! ptr into inputstring
-    if ((first = strstr(inputstring, Template)) == NULL) {
+    // first!! ptr into stringin
+    if ((first = strstr(stringin, Template)) == NULL) {
       Delayms(50);
       Match = 0;
     }
@@ -1807,9 +1793,9 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
       if (numchars != NULL) {
         // overwrite begin of inpstr with match .. num_char
         // ouput numchars = int found after end of match
-        strncpy(inputstring, first, num_char_to_reads);
-        // inputstring[num_char_to_reads+1] = 0; // zero terminate?
-        *numchars = atoi(inputstring + strlen(Template));
+        strncpy(stringin, first, num_char_to_reads);
+        // stringin[num_char_to_reads+1] = 0; // zero terminate?
+        *numchars = atoi(stringin + strlen(Template));
       }
     }
   } // template
@@ -1822,14 +1808,14 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     // test strstr first, may be null
     if (!Template)
       // no template, so first = scratch
-      strncpy(first, strstr(inputstring, compstring), stringlength);
+      strncpy(first, strstr(stringin, compstring), stringlength);
     else
-      // first points into inputstring at match Template
-      // cat onto end of inputstring
-      strncat(first, strstr(inputstring, compstring), stringlength);
+      // first points into stringin at match Template
+      // cat onto end of stringin
+      strncat(first, strstr(stringin, compstring), stringlength);
 
-    // If compstring was successfully added to inputstring
-    // i.e. if strstr(inputstring, compstring) 
+    // If compstring was successfully added to stringin
+    // i.e. if strstr(stringin, compstring) 
     if (strstr(first, compstring) != NULL)
       Match = 1;
     else {
@@ -1841,25 +1827,25 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   if (Match > 0)
     return Match;
 
-  if (strstr(inputstring, "NO CARRIER") != NULL) {
+  if (strstr(stringin, "NO CARRIER") != NULL) {
     LostConnect = true;
     flogf("\n%s|No Carrier!", Time(NULL));
     putflush();
     CIOdrain();
     Match = -1;
-  } else if (strstr(inputstring, "UUUUUU") != NULL) {
+  } else if (strstr(stringin, "UUUUUU") != NULL) {
     LostConnect = true;
     flogf("\n%s|No Carrier!", Time(NULL));
     putflush();
     CIOdrain();
     Match = -1;
-  } else if (strstr(inputstring, "ERROR") != NULL) {
+  } else if (strstr(stringin, "ERROR") != NULL) {
     flogf("\nERROR  |GetIRIDInput();");
     Match = -1;
   }
   if (Match == 0) {
-    DBG(flogf("\n\t|GetIRID() Buf: %s", inputstring);)
-    Match = StringSearch(inputstring, Template, compstring);
+    DBG(flogf("\n\t|GetIRID() Buf: %s", stringin);)
+    Match = StringSearch(stringin, Template, compstring);
   }
 
   Delayms(20);
@@ -1913,28 +1899,29 @@ SigQual, and returns
  * 3: Compares that string str1 to input char* compstring and returns "true"
  *******************************************************************************/
 char *GetGPSInput(char *chars, int *numsats) {
-  // global inputstring first 
+  // global stringin scratch
   bool good = false;
   int count = 0;
   long len, lenreturn;
+  char *first;
 
   DBG1(flogf(" .GetGPSInput. ");)
 
   first = scratch; 
 
-  memset(inputstring, 0, (size_t) STRING_SIZE);
-  memset(first, 0, (size_t) STRING_SIZE);
+  memset(stringin, 0, (size_t) BUFSZ);
+  memset(first, 0, (size_t) BUFSZ);
 
   // Wait for first character to come in.
-  inputstring[0] = TURxGetByteWithTimeout(devicePort, 5000); 
+  stringin[0] = TURxGetByteWithTimeout(devicePort, 5000); 
   // wait long enough for 100 chars @ 9600
   Delayms(100);
-  len = (long) STRING_SIZE - 1L;
-  lenreturn = TURxGetBlock(devicePort, inputstring+1, len, (short) len);
-  DBG1(flogf("\nGPS<< %ld '%s'", lenreturn, inputstring);)
+  len = (long) BUFSZ - 1L;
+  lenreturn = TURxGetBlock(devicePort, stringin+1, len, (short) len);
+  DBG1(flogf("\nGPS<< %ld '%s'", lenreturn, stringin);)
 
   if (chars != NULL) {
-    strtok(inputstring, "=");
+    strtok(stringin, "=");
 
     if (chars == "PL") {
       // concatenates long by tokenizing next '='
@@ -1951,8 +1938,8 @@ char *GetGPSInput(char *chars, int *numsats) {
       first = NULL;
   } // chars
 
-  else if (strstr(inputstring, "Used=") != NULL) {
-    *numsats = atoi(strrchr(inputstring, '=') + 1);
+  else if (strstr(stringin, "Used=") != NULL) {
+    *numsats = atoi(strrchr(stringin, '=') + 1);
     Delayms(20);
     cdrain();
   }
@@ -2043,7 +2030,7 @@ void ConsoleIrid() {
 void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
 
 /*
- * GetStringWait(inputstring, 1000) reads devicePort, up to 1000ms wait
+ * GetStringWait(stringin, 1000) reads devicePort, up to 1000ms wait
  *  1 char long wait, block short wait
  * up to STRINGSIZE
  */
@@ -2062,6 +2049,6 @@ long GetStringWait(char *str, short wait) {
   // short wait
   // 1ms chars @ 9600, use timeoutMS=chars
   len = TURxGetBlock(devicePort, str + 1, 
-    STRING_SIZE-1L, (short) 200);
+    BUFSZ-1L, (short) 200);
   return len+1L;
 }
