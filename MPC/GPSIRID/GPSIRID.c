@@ -127,8 +127,9 @@ void DelayTX(int ch);
 
 TUPort *devicePort;
 int deviceID=0; // 0=off, 1=buoy, 2=antenna
-// uchar *stringin, *first, *scratch;
-char first[BUFSZ], stringin[BUFSZ], scratch[BUFSZ];
+static char first[BUFSZ], stringin[BUFSZ], scratch[BUFSZ];
+
+/* */
 
 /* GPSIRID_Init() initialize file
  * returns 0 success

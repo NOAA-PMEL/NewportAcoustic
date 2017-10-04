@@ -50,8 +50,7 @@ int sbeID=DEVB;  // DEVA:antenna DEVB:buoy
 float SummedVelocity;
 short CTDSamples;
 char CTDLogFile[] = "c:00000000.ctd";
-static char *stringin;
-static char *stringout;
+static char stringin[BUFSZ], stringout[BUFSZ];
 
 // simulation variables: #ifdef LARASIM
 float descentRate = 0.1923; // m/s
@@ -62,8 +61,6 @@ float ascentRate = 0.26;
  */
 int CTD_Init() {
   // global char *stringin, *stringout;  // used by CTD.c
-  stringin = (char *)calloc(BUFSZ, 1);
-  stringout = (char *)calloc(BUFSZ, 1);
   return 0;
 }
 

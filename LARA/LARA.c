@@ -93,7 +93,6 @@
 #include <WISPR.h>
 #include <Winch.h>
 
-#define BUFSZ 1024
 #define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 // WDT Watch Dog Timer definition
 // Not sure if this watchdog is even working You have to define
@@ -150,10 +149,11 @@ bool CurrentWarning();
 
 bool GlobalRestart;
 bool PutInSleepMode = false;
-static char *returnstr;
 static char uploadfile[] =
     "c:00000000.dat"; // 12.9.2015 Can this be a static char?
-// static char *WriteBuffer;
+static char returnstr[BUFSZ];
+// extern WriteBuffer[]; in MPC_Global.h
+char WriteBuffer[BUFSZ];
 
 /******************************************************************************\
 **	Main
@@ -163,11 +163,6 @@ void main() {
   // Two unsigned longs to keep track of system timing.
   ulong PwrOn, PwrOff;
 
-  // Allocation of Space for the Global buffer. Mostly used to write to the
-  // uploadfile. Never released.
-  WriteBuffer = (char *)calloc(BUFSZ, 1);
-  // str for anyone to use, i.e. printSystemStatus
-  returnstr = (char *)calloc(BUFSZ, 1);
 
   // Platform Specific Initialization Function. PwrOn is the start time of
   // PowerLogging
@@ -226,8 +221,6 @@ void main() {
   } // while lara.on
 
   flogf("\nLARA.ON == false\n");
-  free(WriteBuffer);
-  free(returnstr);
   shutdown();
 } //____ Main() ____/
 

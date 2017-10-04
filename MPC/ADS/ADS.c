@@ -95,8 +95,9 @@ bool ADSOn;
 
 PowerParameters ADS;
 
-long TotalPower[2] = {0, 0};
+// ADSample is ptr returned by CFxADQueueToArray(), alloc'd by magic
 short *ADSample;
+long TotalPower[2] = {0, 0};
 
 // Time duration of AD Sampling interval in Deciseconds
 ushort ADSTIME = 0;
@@ -180,6 +181,7 @@ void Open_Avg_File(long counter) {
 ** Setup Acquisition
 \************************************************/
 void Setup_Acquisition(ushort BitShift) {
+  // global ADSample
   double vref = VREF;
   bool uni = true; // true for unipolar, false for bipolar
   bool sgl = true; // true for single-ended, false for differential
@@ -190,8 +192,6 @@ void Setup_Acquisition(ushort BitShift) {
 
   Delayms(20);
 
-  ADSample = (short *)malloc(2 * sizeof(short));
-  // TotalPower= (long*) malloc(2*sizeof(long));
   TotalPower[0] = 0L;
   TotalPower[1] = 0L;
 
@@ -245,7 +245,6 @@ void AD_Log(void) {
 
   ADCounter++;
 
-  //   AveragedEnergy = (ushort *) calloc(3, sizeof(short));
   Delayms(5);
 
   if (data == true) {
