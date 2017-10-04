@@ -3,15 +3,16 @@
 #include <cfxpico.h>
 #include <time.h>
 #define Delayms(X) RTCDelayMicroSeconds((long) 1000 * (long) X)
+#define BUFSZ 1024
 
 extern volatile clock_t start_clock;
 extern volatile clock_t stop_clock;
 extern bool SystemOn;
 extern int DataTimer;
 extern long SystemFreeSpace;
+extern char WriteBuffer[];
 // static global - seen only in file where declared
 // static local - retains value between func calls
-static char *WriteBuffer;
 
 /*********************************************************
 ** SYSTEM PARAMETER STRUCTURES

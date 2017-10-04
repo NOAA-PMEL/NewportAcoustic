@@ -59,7 +59,7 @@ char *GetWISPRInput(float *);
 void AppendDetections(char *, int);
 
 static char wisprfile[] = "c:WISPRFRS.DAT";
-static char *WisprString;
+static char WisprString[64];
 
 bool WISPR_Status() { return WISPR_On; }
 /*************************************************************************\
@@ -417,7 +417,7 @@ loop to get each detection in this same function
 
 \*******************************************************************************/
 char *GetWISPRInput(float *numchars) {
-
+  // global WisprString;
   const char *asterisk;
   int stringlength;
   bool good = false;
@@ -426,9 +426,7 @@ char *GetWISPRInput(float *numchars) {
   char r[65];
   char inchar;
   short count = 0;
-  // char* WisprString;
 
-  // WisprString = (char*) malloc(64);
   memset(WisprString, 0, 64 * sizeof(char));
 
   inchar = TURxGetByteWithTimeout(PAMPort, 250);
@@ -604,10 +602,7 @@ void WISPRSafeShutdown() {
 void WISPRWriteFile(int uploadfilehandle) {
   char detfname[] = "c:00000000.dtx";
   int byteswritten;
-  // char *stringadd="\0";
-  // char* buf;
 
-  //   buf = (char*) calloc(256, sizeof(char));
   memset(WriteBuffer, 0, 256 * sizeof(char));
 
   flogf("\n\t|WISPRWriteFile()");
@@ -655,7 +650,6 @@ void WISPRWriteFile(int uploadfilehandle) {
 #endif
   }
 
-  //  free(buf);
   TotalDetections = 0;
 
 } //____ WISPRWriteFile() ____//
@@ -706,7 +700,7 @@ void GatherWISPRFreeSpace() {
   int writenum = 0;
   bool gain = false, dfp = false;
   int wisprfilehandle;
-  char *wisprbuff;
+  char wisprbuff[16];
   static char *filename = "C:WISPRFRS.DAT";
 
   if (WISPR_On) {
@@ -715,8 +709,6 @@ void GatherWISPRFreeSpace() {
   }
   WISPRPower(true);
 
-  wisprbuff = (char *)malloc(12);
-
   wisprfilehandle = open(filename, O_CREAT | O_TRUNC | O_RDWR);
   if (wisprfilehandle <= 0) {
     flogf("file handle: %d", wisprfilehandle);
@@ -724,7 +716,7 @@ void GatherWISPRFreeSpace() {
     return;
   }
   for (i = 1; i <= WISPRNUMBER; i++) {
-    sprintf(wisprbuff, "W%d:00.00%,", i);
+    sprintf(wisprbuff, "W%d:00.00%,", i); // sprintf adds trailing \0
     byteswritten =
         write(wisprfilehandle, wisprbuff, strlen(wisprbuff) * sizeof(char));
     flogf("\n\t|Bytes written: %d", byteswritten);
@@ -802,17 +794,14 @@ void GatherWISPRFreeSpace() {
 **    Write to file: WISPRFRS.DAT with the current wispr's free space
 \***********************************************************************************************/
 void UpdateWISPRFRS() {
+  // global *WisprString;
   int wisprfilehandle;
-
   struct stat fileinfo;
   char *wispnum = "W0:";
   char *p;
   int length;
   int bytes;
   long filesize;
-  char *WisprString;
-
-  WisprString = (char *)calloc(64, sizeof(char));
 
   flogf("\n%s|Update %s ", Time(NULL), wisprfile);
   Delayms(10);
@@ -864,14 +853,12 @@ void UpdateWISPRFRS() {
 
   close(wisprfilehandle);
 
-  //   free(WisprString);
-
 } //____ UpdateWISPRFRS() ____//
 /****************************************************************************************************************\
 ** void OpenTUPort_WISPR()
 \****************************************************************************************************************/
 void OpenTUPort_WISPR(bool on) {
-
+  // global WisprStr
   int WisprNum;
 
   WisprNum = WISP.NUM;
@@ -880,7 +867,6 @@ void OpenTUPort_WISPR(bool on) {
     PAM_RX = TPUChanFromPin(28);
     PAM_TX = TPUChanFromPin(27);
     PAMPort = TUOpen(PAM_RX, PAM_TX, BAUD, 0);
-    WisprString = (char *)calloc(64, sizeof(char));
   } else if (!on) {
     TUTxFlush(PAMPort);
     TURxFlush(PAMPort);

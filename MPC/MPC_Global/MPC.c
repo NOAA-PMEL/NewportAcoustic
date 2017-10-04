@@ -601,13 +601,12 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 
   int Source;
   int i;
-  // char    *buf;
   struct stat fileinfo;
   long BlockLength = 256;
   long NumBlks, LastBlkLength;
   char extension[] = "XXX";
-  // char filename[]="c:00000000.xxx";
   int byteswritten;
+  // char filename[]="c:00000000.xxx";
 
   Delayms(50);
 
@@ -639,7 +638,6 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
 
     if (i == NumBlks)
       BlockLength = LastBlkLength;
-    //   	buf = (char *) calloc(BlockLength, sizeof(char));
     memset(WriteBuffer, 0, 256 * sizeof(char));
 
     byteswritten = read(Source, WriteBuffer, BlockLength * sizeof(char));
@@ -650,7 +648,6 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
     }
     byteswritten = write(Dest, WriteBuffer, BlockLength * sizeof(char));
     DBG(flogf("\n\t|AppendFiles: bytes written: %d", byteswritten);)
-    // free(buf);
   }
 
   if (erase) {
@@ -849,17 +846,17 @@ void ParseStartupParams(bool DefaultSettings) {
   int value, i, j;
   float floatvalue;
   int paramfilehandle;
-  char *delimiters2;
   int strlength;
   char SettingsFile[] = "c:SYSTEM.CFG";
   char DefaultSettingsFile[] = "c:DEFAULT.CFG";
   char *token;
-  char *param;
-  char *paramstring;
   struct stat fileinfo;
   int filelength = 0;
   size_t paramlength, bytesread;
   char *delimiters;
+  char *delimiters2;
+  char *param;
+  char *paramstring;
   float floater;
   bool returnval;
 
