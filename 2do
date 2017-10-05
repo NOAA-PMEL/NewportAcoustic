@@ -1,3 +1,68 @@
 . reduce use of alloc, prefer char[]
 . MPC.c:  PZCacheSetup('C' - 'A', calloc, free);
  is this wise?
+. grok MPC.c:ParseStartupParams
+
+. wait getprompt
+CTD_DateTime(): 10052017095959
+DATETIME=10052017095959
+<Executed/>
+	|GetStringWait() timeout fail start getprompt
+	|GetStringWait() timeout fail start1 getprompt
+	|GetStringWait() timeout fail start2 getprompt
+CTD_DateTime(): 10052017100125
+. default.cfg
+	|PHASE THREE
+	|Close WISPR1 TUPort
+	|ParseStartupParams():DEFAULT.CFG
+ERROR  |ParseStartupParams() open errno: 17
+10:03:31|Warmup iridium for 27 Sec
+
+. sbe39 month incorrect
+ctd->0.0000,0.000
+ERROR|CTD_Data(): month  incorrect. 
+	|''ecuted/>S''
+. 	|PHASE THREE
+	|Close WISPR1 TUPort
+	|ParseStartupParams():DEFAULT.CFG
+ERROR  |ParseStartupParams() open errno: 17
+. 	|no PhonePin on this sim card
+	|GetGPS_SyncRTC()
+	|Sat num: 8
+	|Failed gathering GPS Time
+	|Coords: 44:37.2556 North 124:02.6518 West
+Lat: 44:37.2556 North, MPC.LAT: 44:33.2743
+	|44:37.26 - 44:33.27
+	|Lat diff: 0:3.98
+Long: 124:02.6518 West, MPC.LONG: 124:02.1111
+	|124:2.65 - 124:2.11
+	|Long diff: 0:0.54
+	|GPS Change greater than max: 1.000000
+	|Coords: 44:37.2556 North|124:02.6519 West
+Lat: 44:37.2556 North, MPC.LAT: 44
+	|44:37.26 - 44:0.00
+	|Lat diff: 0:37.26
+Long: 124:02.6519 West, MPC.LONG: 124
+	|124:2.65 - 124:0.00
+	|Long diff: 0:2.65
+. 	|IRIDGPS(): upload success 1
+10:06:06|PowerDownCloseComDEVICE() 
+	|Successful IRID Call: 1
+	|create_dtx_file() c:00000044.dtx opened
+	|create_dtx_file(): c:00000044.dtx closed
+	|PHASE ONE
+10:06:11|Check_Timers()
+MPC.DETINT: 15
+MPC.DATAXINT: 30
+	|PLI: 1044
+	|Recording Interval: 15.66 minutes
+	|Detection Int: 9
+	|RECOVERY MODE
+	|Data Interval 31.32 minutes
+	|DataInterval: 2
+	|WISPR Duty Cycle: 0%
+	|DutyCycleTicks: 0
+	|POWER: 0.731A, 13.32V
+
+<<<< CRASH >>>>  (saved @ 0xB000)  <<<< CRASH >>>>
+
