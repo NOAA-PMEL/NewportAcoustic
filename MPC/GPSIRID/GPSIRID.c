@@ -107,7 +107,7 @@ int Calc_Crc(uchar *buf, int cnt);
 void Convert_BitMap_To_CharBuf(ulong val0, ulong val1, char *bin_str);
 short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1);
 bool HangUp(void);
-short GetIRIDInput(char *, short, uchar *, int *, short wait);
+short GetIRIDInput(char *, short, uchar *, int *);
 char *GetGPSInput(char *, int *);
 void SendString(const char *);
 bool GetGPS_SyncRTC();
@@ -116,8 +116,7 @@ void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
-// G.h
-// long GetStringWait(char *str, short wait);
+int GetStringWait(char *str, int wait);
 // bool GPSstartup();
 // int DevSelect(int);
 // int AntMode(char);
@@ -222,8 +221,9 @@ short UploadFiles() {
 bool GPSstartup() {
   AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
+  TURxFlush(devicePort);
   SendString("AT");
-  GetStringWait(stringin, (short) 1000);
+  GetStringWait(stringin, 5);
   if (!strstr(stringin, "OK")) {
     flogf("\nErr GPSstartup(): not OK");
     return false;
@@ -793,14 +793,13 @@ bool RudicsConnect(int status) {
 short CallStatus() {
 
   int status = -1;
-  short wait = 6000;
 
   flogf("\n\t|CallStatus()");
   putflush();
   CIOdrain();
   SendString("AT+CLCC");
   // Delayms(150);
-  if (GetIRIDInput(":00", 4, "OK", &status, wait) == 1) {
+  if (GetIRIDInput(":00", 4, "OK", &status) == 1) {
     switch (status) {
     case 0:
       flogf(": Active");
@@ -823,7 +822,7 @@ short CallStatus() {
       break;
     }
     return status;
-  } else if (GetIRIDInput(":00", 4, "OK", &status, wait) != 1) {
+  } else if (GetIRIDInput(":00", 4, "OK", &status) != 1) {
     flogf(": not ready: %d", status);
     cdrain();
   }
@@ -849,13 +848,12 @@ short CallStatus() {
  ******************************************************************************/
 int PhoneStatus() {
   int status=-1;
-  short wait = 10000;
 
   flogf("\n\t|PhoneStatus()");
   putflush();
   CIOdrain();
   SendString("AT+CPAS");
-  if (GetIRIDInput(":00", 4, "OK", &status, wait) == 1) {
+  if (GetIRIDInput(":00", 4, "OK", &status) == 1) {
     switch (status) {
     case 0:
       flogf(": Ready");
@@ -909,15 +907,14 @@ int PhoneStatus() {
  * Oregon State University, 2/17/2015
  ******************************************************************************/
 short PhonePin(void) {
-  short wait = 10000;
   flogf("\n\t|no PhonePin on this sim card");
   return 0;
   // ?? sim card setup - add into params
   flogf("\n\t|PhonePin()");
   SendString("AT+CPIN=\"1111\"");
   Delay_AD_Log(2);
-  GetIRIDInput("CPIN=", 5, NULL, NULL, 5000);
-  if (GetIRIDInput("OK", 2, NULL, NULL, wait) == 1) {
+  GetIRIDInput("CPIN=", 5, NULL, NULL);
+  if (GetIRIDInput("OK", 2, NULL, NULL) == 1) {
     flogf("SIM PIN Set");
     Delay_AD_Log(3);
     return 0;
@@ -942,7 +939,7 @@ short SignalQuality(short *signal_quality) {
 
   TURxFlush(devicePort);
   SendString("AT+CSQ");
-  GetIRIDInput("CSQ:", 5, NULL, &sig, 20000);
+  GetIRIDInput("CSQ:", 5, NULL, &sig);
 
   *signal_quality = (short)sig;
   if (*signal_quality < 1)
@@ -972,9 +969,8 @@ void SendString(const char *StringIn) {
 bool Call_Land(void) {
   // global char *PhoneNum;
   char call[32];
-  short wait = 12000;
-  int length;
-  long lenreturn;
+  int wait = 20;
+  int length, lenreturn;
 
   flogf("\n%s|Call_Land()", Time(NULL));
   memset(stringin, 0, (size_t) BUFSZ);
@@ -1002,7 +998,7 @@ bool Call_Land(void) {
 
   /* pulled out of Call_land
   // Looks for ATD followed by phonenum
-  if (GetIRIDInput("ATD", 3, PhoneNum, NULL, 5000) != 1) {
+  if (GetIRIDInput("ATD", 3, PhoneNum, NULL) != 1) {
     CallOK = false;
     DBG2(flogf("\n\t|Call did not make it"); cdrain();)
     // StatusCheck();
@@ -1010,7 +1006,7 @@ bool Call_Land(void) {
       if (CallStatus() == 6) {
         flogf("\n\t|Call_Land Try call again.");
         SendString(call);
-        if (GetIRIDInput("ATD", 3, PhoneNum, NULL, 5000) == 1)
+        if (GetIRIDInput("ATD", 3, PhoneNum, NULL) == 1)
           CallOK = true;
       }
     } else if (status == 8192) // still connected
@@ -1018,19 +1014,19 @@ bool Call_Land(void) {
   } else
     CallOK = true;
   if (CallOK) {
-    num = GetIRIDInput("CONNECT", 7, "192", NULL, wait);
+    num = GetIRIDInput("CONNECT", 7, "192", NULL);
     if (num == 1)
       flogf("\n\t|Connected!");
     else if (num == 0) {
       CallOK = false;
-      if (GetIRIDInput("CONNECT", 7, "192", NULL, wait) != 1) {
+      if (GetIRIDInput("CONNECT", 7, "192", NULL) != 1) {
         flogf("\nERROR  |No Connect...");
         SendString(call);
-        if (GetIRIDInput("ATD", 3, "0881600", NULL, 12000) != 1) {
+        if (GetIRIDInput("ATD", 3, "0881600", NULL) != 1) {
           CallOK = false;
           DBG2(flogf("\n\t|Call did not make it, again");)
         }
-        num = GetIRIDInput("CONNEC", 6, "192", NULL, wait);
+        num = GetIRIDInput("CONNEC", 6, "192", NULL);
         if (num == 1) {
           DBG2(flogf("\n\t|Connected!");)
           CallOK = true;
@@ -1057,7 +1053,6 @@ bool SendProjHdr() {
   bool Ack = false;
   short Num_ACK = 0;
   short AckMax = 20;
-  short wait = 15000; // in millisec //was 1500 8.29.2016
   short Status = 0;
   int crc, crc1, crc2;
   // need an extra char for null terminated
@@ -1089,7 +1084,7 @@ bool SendProjHdr() {
     Delayms(500);
     TickleSWSR(); // another reprieve
 
-    Status = GetIRIDInput("ACK", 3, NULL, NULL, wait);
+    Status = GetIRIDInput("ACK", 3, NULL, NULL);
     if (Status == 1) {
       flogf("\n\t|ACK Received");
       LostConnect = false;
@@ -1119,7 +1114,7 @@ bool SendProjHdr() {
       TUTxPrintf(devicePort, "+++");  // ??
       TUTxWaitCompletion(devicePort);
       Delayms(25);
-      if (GetIRIDInput("OK", 2, NULL, NULL, 3500) == 1) {
+      if (GetIRIDInput("OK", 2, NULL, NULL) == 1) {
         StatusCheck();
         HangUp();
         // StatusCheck(); //deal with phone status
@@ -1700,7 +1695,6 @@ int Receive_Command(int len) {
  *  power off.
  ******************************************************************************/
 bool HangUp(void) {
-  short wait = 5000;
   short count = 0;
   short status = 0;
   flogf("\n%s|HangUp() TX_Success=%d. Making sure it hangs up properly",
@@ -1712,7 +1706,7 @@ bool HangUp(void) {
   SendString("ATH");
   while (status != 1 && count < 2) {
     AD_Check();
-    status = GetIRIDInput("OK", 2, NULL, NULL, wait);
+    status = GetIRIDInput("OK", 2, NULL, NULL);
     if (status == 1) {
       flogf("\n\t|Hang up", Time(NULL));
       putflush();
@@ -1728,7 +1722,7 @@ bool HangUp(void) {
       TUTxWaitCompletion(devicePort);
       Delayms(25);
 
-      GetIRIDInput("OK", 2, NULL, NULL, wait);
+      GetIRIDInput("OK", 2, NULL, NULL);
       SendString("ATH");
     }
     count++;
@@ -1752,11 +1746,11 @@ bool HangUp(void) {
  * 2/27/2015
  */
 short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
-                   int *numchars, short wait) {
+                   int *numchars) {
   short Match = 0;
   int i = 0;
   short stringlength;
-  long lenreturn;
+  int lenreturn;
   char *first;
 
   first = scratch; // blk - first is a problem
@@ -1768,9 +1762,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   CLK(start_clock = clock();)
 
-  // Wait up to wait milliseconds to grab next byte from iridium/gps
-  // 3.25.14 up to possibly 20 seconds...
-  lenreturn = GetStringWait(stringin, wait);
+  lenreturn = GetStringWait(stringin, 20);
   if (lenreturn == 0) return 0;
 
   DBG1(printsafe(lenreturn, stringin);)
@@ -2031,25 +2023,28 @@ void ConsoleIrid() {
 void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
 
 /*
- * GetStringWait(stringin, 1000) reads devicePort, up to 1000ms wait
- *  1 char long wait, block short wait
- * up to STRINGSIZE
+ * GetStringWait(stringin, 5) reads devicePort, up to BUFSZ
+ *  delay up to wait seconds for first char, finished after charDelay ms
  */
-long GetStringWait(char *str, short wait) {
-  long len;
+int GetStringWait(char *str, int wait) {
+  // global devicePort
+  int len;
   char ch;
+  short charDelay=500; // up to half second between chars
   TickleSWSR(); // another reprieve
   // long wait
-  ch = TURxGetByteWithTimeout(devicePort, wait);
+  ch = TURxGetByteWithTimeout(devicePort, (short) wait*1000);
   if (ch<0) {
     DBG(flogf("\n\t|GetStringWait() timeout");)
-    return 0L;
+    str[0]=0;
+    return 0;
   }
   str[0] = ch;
   TickleSWSR(); // another reprieve
-  // short wait
-  // 1ms chars @ 9600, use timeoutMS=chars
-  len = TURxGetBlock(devicePort, str + 1, 
-    BUFSZ-1L, (short) 200);
-  return len+1L;
+  for (len=1; len<BUFSZ; len++) {
+    str[len] = TURxGetByteWithTimeout(devicePort, charDelay);
+    if (str[len]<0) break;
+  }
+  str[len]=0;
+  return len;
 }
