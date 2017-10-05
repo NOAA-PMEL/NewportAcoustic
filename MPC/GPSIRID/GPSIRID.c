@@ -116,8 +116,7 @@ void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
-// G.h
-// long GetStringWait(char *str, short wait);
+int GetStringWait(char *str, int wait);
 // bool GPSstartup();
 // int DevSelect(int);
 // int AntMode(char);
@@ -222,8 +221,9 @@ short UploadFiles() {
 bool GPSstartup() {
   AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
+  TURxFlush(devicePort);
   SendString("AT");
-  GetStringWait(stringin, (short) 1000);
+  GetStringWait(stringin, 5);
   if (!strstr(stringin, "OK")) {
     flogf("\nErr GPSstartup(): not OK");
     return false;
@@ -972,9 +972,8 @@ void SendString(const char *StringIn) {
 bool Call_Land(void) {
   // global char *PhoneNum;
   char call[32];
-  short wait = 12000;
-  int length;
-  long lenreturn;
+  int wait = 20;
+  int length, lenreturn;
 
   flogf("\n%s|Call_Land()", Time(NULL));
   memset(stringin, 0, (size_t) BUFSZ);
@@ -1756,7 +1755,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
   short Match = 0;
   int i = 0;
   short stringlength;
-  long lenreturn;
+  int lenreturn;
   char *first;
 
   first = scratch; // blk - first is a problem
@@ -1768,9 +1767,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   CLK(start_clock = clock();)
 
-  // Wait up to wait milliseconds to grab next byte from iridium/gps
-  // 3.25.14 up to possibly 20 seconds...
-  lenreturn = GetStringWait(stringin, wait);
+  lenreturn = GetStringWait(stringin, 20);
   if (lenreturn == 0) return 0;
 
   DBG1(printsafe(lenreturn, stringin);)
@@ -2031,25 +2028,28 @@ void ConsoleIrid() {
 void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
 
 /*
- * GetStringWait(stringin, 1000) reads devicePort, up to 1000ms wait
- *  1 char long wait, block short wait
- * up to STRINGSIZE
+ * GetStringWait(stringin, 5) reads devicePort, up to BUFSZ
+ *  delay up to wait seconds for first char, finished after charDelay ms
  */
-long GetStringWait(char *str, short wait) {
-  long len;
+int GetStringWait(char *str, int wait) {
+  // global devicePort
+  int len;
   char ch;
+  short charDelay=500; // up to half second between chars
   TickleSWSR(); // another reprieve
   // long wait
-  ch = TURxGetByteWithTimeout(devicePort, wait);
+  ch = TURxGetByteWithTimeout(devicePort, (short) wait*1000);
   if (ch<0) {
     DBG(flogf("\n\t|GetStringWait() timeout");)
-    return 0L;
+    str[0]=0;
+    return 0;
   }
   str[0] = ch;
   TickleSWSR(); // another reprieve
-  // short wait
-  // 1ms chars @ 9600, use timeoutMS=chars
-  len = TURxGetBlock(devicePort, str + 1, 
-    BUFSZ-1L, (short) 200);
-  return len+1L;
+  for (len=1; len<BUFSZ; len++) {
+    str[len] = TURxGetByteWithTimeout(devicePort, charDelay);
+    if (str[len]<0) break;
+  }
+  str[len]=0;
+  return len;
 }
