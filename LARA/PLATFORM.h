@@ -1,6 +1,11 @@
-
 // DEFINE THE TYPE OF PLATFORM
 #define PLATFORM LARA
+// #define DEBUG
+// #define DEBUG0
+// #define DEBUG1
+#define DEBUG2
+// #define DEBUG3
+// #define DEBUG4  // turn off irid
 
 // pins on MPC board
 /*
@@ -79,12 +84,6 @@ void LARA_Recovery();
 #define PROG_VERSION 3.40 // Keep this up to date!!!
 
 #define POWERLOGGING
-// two levels of debug
-#define DEBUG
-// #define DEBUG1
-// #define DEBUG2
-// #define DEBUG3
-// #define DEBUG4  // turn off irid
 #define SYSTEMDIAGNOSTICS
 #define WISPR
 #define IRIDIUM
@@ -138,6 +137,12 @@ void LARA_Recovery();
 #define DBG(X) X
 #else
 #define DBG(X)
+#endif
+// DEBUG0
+#ifdef DEBUG0
+#define DBG0(X) X
+#else
+#define DBG0(X)
 #endif
 // DEBUG1
 #ifdef DEBUG1

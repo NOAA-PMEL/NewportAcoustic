@@ -3,6 +3,10 @@
  is this wise?
 . grok MPC.c:ParseStartupParams
 
+LONGITUDE=124:02.1111 (vee)
+LATITUDE=44:33.2743 (vee)
+
+
 . wait getprompt
 CTD_DateTime(): 10052017095959
 DATETIME=10052017095959

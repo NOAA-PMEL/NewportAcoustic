@@ -71,7 +71,8 @@ int CTD_Init() {
 bool CTD_Start_Up(int sbe, bool settime) {
   // global int sbeID;
   bool returnval = false;
-  DBG2( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
+  DBG0( cprintf("\n\t|. CTD_Start_Up "); )
+  DBG1( cprintf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
 
   CTD_Select(sbe);
 
@@ -105,7 +106,6 @@ void CTD_Select(int sbe) {
   DevSelect(sbe);
   if (sbe==DEVA) AntMode('S');
   sbeID=sbe;
-  CTD_GetPrompt();
 } // CTD_Select
 
 /******************************************************************************\
@@ -132,7 +132,7 @@ void CTD_DateTime() {
   time_t rawtime;
   struct tm *info;
   char buffer[15];
-  DBG2(flogf("\n\t|CTD_DateTime()");)
+  DBG0(flogf("\n\t|CTD_DateTime()");)
   time(&rawtime);
 
   info = gmtime(&rawtime);
@@ -153,25 +153,16 @@ void CTD_DateTime() {
 ** CTD_GetPrompt()
 \********************************************************************************/
 bool CTD_GetPrompt() {
-  char ch;
   bool r;
   // global char *stringin;
-  memset(stringin, 0, BUFSZ);
   TURxFlush(devicePort);
   TUTxPutByte(devicePort, '\r', true);
-//ch=TURxGetByteWithTimeout(devicePort, 50); //cr echo
-  //ch=TURxGetByteWithTimeout(devicePort, 50); //lf echo
-  //GetStringWait(stringin, (short) 2000);
-  //TURxFlush(devicePort);
-  TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 50);
-  ch=TURxGetByteWithTimeout(devicePort, 50);
-  Delayms(1000);
-  GetStringWait(stringin, (short) 5000);
+  GetStringWait(stringin, 10);
   if (strstr(stringin, ">") != NULL) r=true;
-  else r=false;
-  DBG2(cprintf("\n\t|CTD_GetPrompt()->%d", r);)
-  TURxFlush(devicePort);
+  else {
+    r=false;
+    DBG2(cprintf("\n\t|CTD_GetPrompt()->%s", stringin);)
+  }
   return r;
 }
 
@@ -180,7 +171,7 @@ bool CTD_GetPrompt() {
 \********************************************************************************/
 void CTD_Sample() {
   char ch;
-  DBG2( flogf("\n . CTD_Sample"); )
+  DBG0( flogf("\n . CTD_Sample"); )
   //if (SyncMode) {
     //TUTxPrintf(devicePort, "+\r");
     //Delayms(20);
@@ -398,7 +389,7 @@ bool CTD_Data() {
   struct tm info;
   time_t secs = 0;
 
-  DBG2( cprintf("\n. CTD_Data()"); )
+  DBG0( cprintf("\n. CTD_Data()"); )
   memset(stringin, 0, BUFSZ);
 
   // waits up to 8 seconds - best called after tgetq()
@@ -571,7 +562,7 @@ float CTD_AverageDepth(int i, float *velocity) {
   float first, last, diff, vel;
   ulong dur, starttime = 0, stoptime = 0;
 
-  DBG1( flogf("\n . CTD_AverageDepth"); )
+  DBG0( flogf("\n . CTD_AverageDepth"); )
   CTD_Select(DEVA);
   TURxFlush(devicePort);
 
