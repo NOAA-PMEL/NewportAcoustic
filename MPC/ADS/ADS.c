@@ -96,7 +96,7 @@ bool ADSOn;
 PowerParameters ADS;
 
 long TotalPower[2] = {0, 0};
-short ADSample[2];
+short *ADSample;
 
 // Time duration of AD Sampling interval in Deciseconds
 ushort ADSTIME = 0;
