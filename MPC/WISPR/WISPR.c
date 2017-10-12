@@ -603,7 +603,7 @@ void WISPRWriteFile(int uploadfilehandle) {
   char detfname[] = "c:00000000.dtx";
   int byteswritten;
 
-  memset(WriteBuffer, 0, 256 * sizeof(char));
+  memset(WriteBuffer, 0, BUFSZ);
 
   flogf("\n\t|WISPRWriteFile()");
 

@@ -121,9 +121,10 @@ extern WinchCalls WINCH;
 extern CTDParameters CTD;
 #endif
 
-SystemStatus LARA;
-
 IEV_C_PROTO(ExtFinishPulseRuptHandler);
+
+SystemStatus LARA;
+ulong PwrOff, PwrOn;
 
 // Define unused pins here
 uchar mirrorpins[] = {15, 16, 17, 18, 19, 26, 36, 0};
@@ -160,15 +161,12 @@ char WriteBuffer[BUFSZ];
 \******************************************************************************/
 void main() {
 
-  // Two unsigned longs to keep track of system timing.
-  ulong PwrOn, PwrOff;
-
-
-  // Platform Specific Initialization Function. PwrOn is the start time of
-  // PowerLogging
+  // Platform Specific Initialization Function. 
+  // PwrOn is the start time of PowerLogging
   InitializeLARA(&PwrOn);
 
   // Running WISPR Always! //Rebooting TUPort post-Iridium
+  // ?? why is this not InitializeLARA()?
 #ifndef DEBUG3
   OpenTUPort_WISPR(true);
   if (WISP.DUTYCYCL == 100)
@@ -191,29 +189,17 @@ void main() {
       PhaseOne();
       break;
 
-    // PHASE 2: Ascend ICE Housing
+    // PHASE 2: Ascend buoy
     case 2:
       PhaseTwo();
       break;
 
     // PHASE 3: Call into Satellite
     case 3:
-      Time(&PwrOff);
-      PwrOff -= PwrOn;
-      // global: static char uploadfile[] = "c:00000000.dat
-      // VEEPROM: SystemParameters MPC;
-      sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
-      cprintf("\n\t|File Number: %08ld", MPC.FILENUM);
-      // writefile 1) MPC 2) Winch Info 3) Winch Status
-      // v
-      WriteFile(PwrOff);
-      // Init New LogFile, set PwrOn which is start of dataxint cycle
-      Time(&PwrOn);
-
       PhaseThree();
       break;
 
-    // PHASE 4:  Descend ICE Housing
+    // PHASE 4:  Descend buoy
     case 4:
       PhaseFour();
       break;
@@ -242,6 +228,8 @@ void shutdown() {
 ** InitializeAUH
 \*********************************************************************************/
 void InitializeLARA(ulong *PwrOn) {
+  // global LARA{}, WINCH{}, MPC{}
+  //
   float velocity, depth;
   ulong time = NULL;
   short prevMode;
@@ -259,9 +247,11 @@ void InitializeLARA(ulong *PwrOn) {
   PreRun();
   // Get all Platform Settings
   GetSettings();
+  // ?? who sets MPC.* values?
 
   // First Safety Catch. If woken. Reboot
   if (MPC.STARTUPS >= MPC.STARTMAX) {
+    flogf("\nInit(): startups>startmax");
     SleepUntilWoken();
     BIOSReset(); // Full hardware reset
   }
@@ -304,7 +294,7 @@ void InitializeLARA(ulong *PwrOn) {
   // must init GPSIRID first
   GPSIRID_Init();
   CTD_Init();
-  // startup sets sync mode
+  // open ports, power on ?? should these be powered on now?
   CTD_Start_Up(DEVA, true);
   CTD_Start_Up(DEVB, true);
   DevSelect(DEVX); // turn antmod off // ??
@@ -643,6 +633,8 @@ void PhaseTwo() {
 ** repeat to minimum CTD depth.
 \****************************************************************************/
 void PhaseThree() {
+  // global: static char uploadfile[] = "c:00000000.dat
+  // global ulong PwrOff PwrOn
   short result = 0;
   int gpsFails = 0;
   short count = 0;
@@ -660,15 +652,23 @@ void PhaseThree() {
     ParseStartupParams(true); 
   } 
 
+  // ?? why?
+  Time(&PwrOff); 
+  PwrOff -= PwrOn;
+  // VEEPROM: SystemParameters MPC;
+  sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
+  cprintf("\n\t|File Number: %08ld", MPC.FILENUM);
+  // writefile 1) MPC 2) Winch Info 3) Winch Status
+  // v
+  WriteFile(PwrOff);
+  // Init New LogFile, set PwrOn which is start of dataxint cycle
+  Time(&PwrOn);
+
 
   while (result <= 0) { 
     // -1=false gps, -2=false irid, 1=success 2=fake cmds 3=real cmds
     // DBG( Incoming_Data();)
-#ifdef DEBUG4
-result=1;
-#else
     result = IRIDGPS(); 
-#endif
 
     if (result >= 1 || gpsFails > 4) {
       // IRIDIUM Successful success/fake/real/5th, next phase
@@ -1311,7 +1311,7 @@ static void IRQ5_ISR(void) {
 3) Winch Status
 \******************************************************************************/
 ulong WriteFile(ulong TotalSeconds) {
-
+  // global uploadfile, WriteBuffer
   long BlkLength = BUFSZ;
   int filehandle;
   struct stat info;
@@ -1322,7 +1322,7 @@ ulong WriteFile(ulong TotalSeconds) {
   long maxupload;
   ulong LoggingTime;
 
-  flogf("\n\t|WriteFile(%s)", uploadfile);
+  DBG1(flogf("\n\t|WriteFile(%s)", uploadfile);)
   filehandle = open(uploadfile, O_WRONLY | O_CREAT | O_TRUNC);
 
   if (filehandle <= 0) {
@@ -1332,6 +1332,7 @@ ulong WriteFile(ulong TotalSeconds) {
   DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
 
   //*** LARA Write ***//
+  // ?? should this have geo loc?
   sprintf(WriteBuffer, "LARA Program Ver:%.1f\naa:bb.cccc North ddd:ee.ffff "
                        "West\nFileNumber: %ld\nStarts:%d of "
                        "%d\nWriteTime:%s\nSeconds:%lu\nDetection "
@@ -1346,6 +1347,7 @@ ulong WriteFile(ulong TotalSeconds) {
   // Only comes here if not rebooted.
   if (TotalSeconds != 0) {
     //*** Winch Info   ***//
+    // blk 
     Winch_Monitor(filehandle);
     Delayms(50);
     memset(WriteBuffer, 0, BUFSZ);
@@ -1377,7 +1379,7 @@ ulong WriteFile(ulong TotalSeconds) {
   if (CTD.UPLOAD || TotalSeconds == 0) {
     sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);
     Delayms(50);
-    DBG(cprintf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
+    DBG(flogf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
     stat(detfname, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 1000))
       maxupload = IRID.MAXUPL - 1000;
@@ -1392,7 +1394,7 @@ ulong WriteFile(ulong TotalSeconds) {
   //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
   if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
     sprintf(logfile, "%08ld.log", MPC.FILENUM);
-    DBG(cprintf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
+    DBG(flogf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
     stat(logfile, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 2000))
       maxupload = IRID.MAXUPL - 2000;

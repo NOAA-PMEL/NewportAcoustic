@@ -364,7 +364,7 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
   flogf("\n\t|POWERMonitor(%s)", ADAvgFileName);
 
   // Reset Global Write Buffer
-  memset(WriteBuffer, 0, 256 * sizeof(char));
+  memset(WriteBuffer, 0, BUFSZ);
 
   // Get file status
   stat(ADAvgFileName, &fileinfo);

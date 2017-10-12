@@ -286,10 +286,10 @@ void DOS_Com(char *command, long filenum, char *ext, char *extt) {
 
 /******************************************************************************\
 **	Time String
-** Get the RTC time seconds since 1970 and convert it 
+** push the RTC seconds into (*seconds) and return HH:MM:SS global *time_chr
 \******************************************************************************/
 char *Time(ulong *seconds) {
-
+  // global time_chr
   RTCtm *rtc_time;
   ulong secs = NULL;
 
@@ -298,7 +298,7 @@ char *Time(ulong *seconds) {
   RTCGetTime(&secs, &ticks);
   rtc_time = RTClocaltime(&secs);
   *seconds = secs;
-  sprintf(time_chr, "%.2d:%.2d:%.2d", 
+  sprintf(time_chr, "%02d:%02d:%02d", 
           rtc_time->tm_hour, rtc_time->tm_min, rtc_time->tm_sec);
   return time_chr;
 
@@ -317,7 +317,7 @@ char *TimeDate(ulong *seconds) {
   RTCGetTime(&secs, &ticks);
   rtc_time = RTClocaltime(&secs);
   *seconds = secs;
-  sprintf(time_chr, "%.2d/%.2d/%.4d %.2d:%.2d:%.2d", rtc_time->tm_mon + 1,
+  sprintf(time_chr, "%02d/%02d/%04d %02d:%02d:%02d", rtc_time->tm_mon + 1,
           rtc_time->tm_mday, rtc_time->tm_year + 1900, rtc_time->tm_hour,
           rtc_time->tm_min, rtc_time->tm_sec);
   return time_chr;
@@ -1250,7 +1250,6 @@ void VEEStoreShort(char *veename, short value) {
 available
 \*********************************************************************************/
 void GetSettings(void) {
-
   char *p;
 
   p = VEEFetchData(PROG_NAME).str;

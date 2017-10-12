@@ -1,0 +1,716 @@
+.ADS.BATCAP
+ADS.c:423:    flogf("\n\t|Current Bat Cap: %s", ADS.BATCAP);
+ADS.c:424:    floater = atof(ADS.BATCAP);
+ADS.c:426:    sprintf(ADS.BATCAP, "%7.2f", floater);
+ADS.c:427:    VEEStoreStr(BATTERYCAPACITY_NAME, ADS.BATCAP);
+ADS.c:428:    flogf(", New Bat Cap: %s", ADS.BATCAP);
+ADS.c:517:  strncpy(ADS.BATCAP, p ? p : BATTERYCAPACITY_DEFAULT, sizeof(ADS.BATCAP));
+ADS.c:518:  DBG(uprintf("BATCAP=%s (%s)\n", ADS.BATCAP, p ? "vee" : "def"); cdrain();)
+.ADS.BATLOG
+ADS.c:422:  if (ADS.BATLOG) {
+ADS.c:522:  ADS.BATLOG = atoi(p ? p : BATTERYLOGGER_DEFAULT);
+ADS.c:523:  DBG(uprintf("BATLOG=%u (%s)\n", ADS.BATLOG, p ? "vee" : "def"); cdrain();)
+MPC.c:1182:        if (value != ADS.BATLOG) {
+MPC.c:1184:          ADS.BATLOG = value;
+.ADS.MINVOLT
+ADS.c:508:  strncpy(ADS.MINVOLT, p ? p : MINSYSVOLT_DEFAULT, sizeof(ADS.MINVOLT));
+ADS.c:510:  DBG(uprintf("MINVOLT=%s (%s)\n", ADS.MINVOLT, p ? "vee" : "def"); cdrain();)
+ADS.c:511:  if (MIN_BATTERY_VOLTAGE > atof(ADS.MINVOLT)) {
+ADS.c:512:    sprintf(ADS.MINVOLT, "%5.2f", MIN_BATTERY_VOLTAGE);
+ADS.c:513:    VEEStoreStr(MINSYSVOLT_NAME, ADS.MINVOLT);
+LARA.c:326:  else if (volts < atof(ADS.MINVOLT)) {
+MPC.c:556:  minvolt = atof(ADS.MINVOLT); // Grab User defined minimum voltage.
+MPC.c:574:    else if (currentvoltage <= atof(ADS.MINVOLT)) {
+MPC.c:1167:      floater = atof(ADS.MINVOLT);
+MPC.c:1174:        sprintf(ADS.MINVOLT, "%4.2f", floatvalue);
+MPC.c:1175:        VEEStoreStr(MINSYSVOLT_NAME, ADS.MINVOLT);
+.AMDM.MAXUPL
+MPC.c:1220:      if (value != AMDM.MAXUPL) {
+MPC.c:1221:        AMDM.MAXUPL = value;
+.AVG.VEL
+LARA.c:1427:                        "2f\nTOPDEPTH:%5.2f\nTARGETDPETH:%d\nAVG.VEL:%5."
+.BIOSGVT.BIOSVersion
+MPC.c:199:        BIOSGVT.BIOSVersion, BIOSGVT.BIOSRelease);
+antmain.c:351:         BIOSGVT.CFxSerNum, BIOSGVT.BIOSVersion, BIOSGVT.BIOSRelease,
+.BIOSGVT.CF1SerNum
+MPC.c:198:        BIOSGVT.CF1SerNum, BIOSGVT.PICOVersion, BIOSGVT.PICORelease,
+Settings.c:535:  sprintf(CFXNum, "%05ld", BIOSGVT.CF1SerNum);
+.BIOSGVT.CFxSerNum
+antmain.c:351:         BIOSGVT.CFxSerNum, BIOSGVT.BIOSVersion, BIOSGVT.BIOSRelease,
+.BIOSGVT.PICOVersion
+MPC.c:198:        BIOSGVT.CF1SerNum, BIOSGVT.PICOVersion, BIOSGVT.PICORelease,
+antmain.c:352:         BIOSGVT.PICOVersion, BIOSGVT.PICORelease);
+.BT.ON
+MPC.c:1097:      } else if (value != BT.ON) {
+MPC.c:1098:        BT.ON = value;
+.CTD.UPLOAD
+CTD.c:548:  CTD.UPLOAD = atoi(p ? p : CTDUPLOADFILE_DEFAULT);
+CTD.c:549:  DBG2(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
+LARA.c:1379:  if (CTD.UPLOAD || TotalSeconds == 0) {
+MPC.c:1003:        if (value != CTD.UPLOAD) {
+MPC.c:1004:          CTD.UPLOAD = value;
+MPC.c:1005:          flogf("\n\t|CTD UPLOAD %s", CTD.UPLOAD ? "ON" : "OFF");
+.IRID.ANTSW
+GPSIRID.c:1957:  IRID.ANTSW = atoi(p ? p : ANTSW_DEFAULT);
+.IRID.CALLHOUR
+GPSIRID.c:1986:  IRID.CALLHOUR = atoi(p ? p : CALLHOUR_DEFAULT);
+LARA.c:386:      hour = IRID.CALLHOUR;
+LARA.c:1526:    IRID.CALLHOUR = hours;
+LARA.c:1527:    if (IRID.CALLHOUR > 23)
+LARA.c:1528:      IRID.CALLHOUR = 23;
+LARA.c:1529:    else if (IRID.CALLHOUR < 0)
+LARA.c:1530:      IRID.CALLHOUR = 0;
+LARA.c:1531:    VEEStoreShort(CALLHOUR_NAME, IRID.CALLHOUR);
+LARA.c:1532:    flogf("\n\t|New Call Hour: %d", IRID.CALLHOUR);
+MPC.c:438:    // DBG(flogf("\n\t|CallTime: %d, Hour Now; %d", IRID.CALLHOUR,
+MPC.c:440:    if (info->tm_hour == IRID.CALLHOUR) {
+MPC.c:444:        flogf("\n\t|IRID CALLMODE=1, Call Now!\n\t|IRID CALLHOUR: %d",
+MPC.c:445:              IRID.CALLHOUR);
+MPC.c:494:    flogf("\n\t|CallTime: %d, Hour Now; %d", IRID.CALLHOUR, info->tm_hour);
+MPC.c:495:    if ((int)IRID.CALLHOUR <= info->tm_hour) {
+MPC.c:496:      hour = IRID.CALLHOUR + 23;
+MPC.c:500:      hours = IRID.CALLHOUR - hour - 1;
+MPC.c:1110:      if (value != IRID.CALLHOUR) {
+MPC.c:1112:        IRID.CALLHOUR = value;
+.IRID.CALLMODE
+GPSIRID.c:1990:  IRID.CALLMODE = atoi(p ? p : CALLMODE_DEFAULT);
+LARA.c:380:    prevMode = IRID.CALLMODE;
+LARA.c:389:    // Force IRID.CALLMODE to one even if default.cfg parses a 0
+LARA.c:390:    IRID.CALLMODE = 1;
+MPC.c:424:  if (IRID.CALLMODE == 0 || NIGK.RECOVERY) {
+MPC.c:429:      flogf("\n\t|IRID CALLMODE=0, call now!");
+MPC.c:435:  else if (IRID.CALLMODE == 1) {
+MPC.c:444:        flogf("\n\t|IRID CALLMODE=1, Call Now!\n\t|IRID CALLHOUR: %d",
+MPC.c:484:  if (IRID.CALLMODE == 0 || NIGK.RECOVERY) {
+MPC.c:491:  } else if (IRID.CALLMODE == 1) {
+MPC.c:1121:        if (value != IRID.CALLMODE) {
+MPC.c:1124:          IRID.CALLMODE = value;
+.IRID.LOWFIRST
+GPSIRID.c:400:        filename = GetFileName(IRID.LOWFIRST, false, NULL, "DAT");
+.IRID.MAXCALLS
+GPSIRID.c:362:  while (icall++ <= IRID.MAXCALLS && FileExist) {
+GPSIRID.c:428:    else if (TX_Success <= -1 || LostConnect || icall == IRID.MAXCALLS) {
+GPSIRID.c:439:      if (icall == IRID.MAXCALLS) {
+GPSIRID.c:442:      } else if (icall < IRID.MAXCALLS) {
+GPSIRID.c:1974:  IRID.MAXCALLS = atoi(p ? p : MAXCALLS_DEFAULT);
+.IRID.MAXUPL
+GPSIRID.c:1162:    if (filelength > (long)IRID.MAXUPL + 500) {
+GPSIRID.c:1164:      filelength = (long)IRID.MAXUPL + 500;
+GPSIRID.c:1953:  IRID.MAXUPL = atoi(p ? p : MAXUPLOAD_DEFAULT);
+GPSIRID.c:1954:  DBG(uprintf("MAXUPL=%d (%s)\n", IRID.MAXUPL, p ? "vee" : "def"); cdrain();)
+LARA.c:1384:    if (info.st_size > (long)(IRID.MAXUPL - 1000))
+LARA.c:1385:      maxupload = IRID.MAXUPL - 1000;
+LARA.c:1399:    if (info.st_size > (long)(IRID.MAXUPL - 2000))
+LARA.c:1400:      maxupload = IRID.MAXUPL - 2000;
+MPC.c:1213:      if (value != IRID.MAXUPL) {
+MPC.c:1215:        IRID.MAXUPL = value;
+.IRID.MINSIGQ
+GPSIRID.c:199:  MinSQ = IRID.MINSIGQ; // Min signal quality
+GPSIRID.c:1966:  IRID.MINSIGQ = atoi(p ? p : MINSIGQ_DEFAULT);
+.IRID.OFFSET
+GPSIRID.c:232:  if (GetGPS_SyncRTC(IRID.OFFSET)) // false if no GPS sat
+GPSIRID.c:602:    // time_seconds=time_seconds+(ulong)IRID.OFFSET;
+GPSIRID.c:603:    difference = time_now - (time_seconds + (ulong)IRID.OFFSET);
+GPSIRID.c:610:      RTCSetTime(time_seconds + (ulong)IRID.OFFSET, NULL);
+GPSIRID.c:1978:  IRID.OFFSET = atoi(p ? p : OFFSET_DEFAULT);
+.IRID.PHONE
+GPSIRID.c:204:  strcpy(PhoneNum, IRID.PHONE);
+GPSIRID.c:1962:  strncpy(IRID.PHONE, p ? p : IRIDPHONE_DEFAULT, sizeof(IRID.PHONE));
+.IRID.REST
+GPSIRID.c:1982:  IRID.REST = atoi(p ? p : IRIDREST_DEFAULT);
+.IRID.WARMUP
+GPSIRID.c:713:    DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
+GPSIRID.c:714:    Delay_AD_Log(IRID.WARMUP);
+GPSIRID.c:1970:  IRID.WARMUP = atoi(p ? p : WARMUP_DEFAULT);
+.LARA.ASCENTTIME
+LARA.c:345:  LARA.ASCENTTIME = -1;
+LARA.c:616:  LARA.PAYOUT = ((float)LARA.ASCENTTIME / 60.0) * NIGK.RRATE;
+.LARA.AVGVEL
+LARA.c:288:  LARA.AVGVEL = 0;
+LARA.c:605:      LARA.AVGVEL = CTD_CalculateVelocity();
+LARA.c:606:      if (LARA.AVGVEL == 0.0)
+LARA.c:607:        LARA.AVGVEL = ((float)NIGK.RRATE / 60.0);
+LARA.c:1430:          LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
+.LARA.BUOYMODE
+CTD.c:509:  if (LARA.BUOYMODE != 0) CTD_VertVel(secs); // ??
+CTD.c:591:      LARA.BUOYMODE=0;
+CTD.c:594:      if (vel>0) LARA.BUOYMODE=1;
+CTD.c:595:      else LARA.BUOYMODE=2;
+LARA.c:282:  LARA.BUOYMODE = 0;     // Also Decided Below
+LARA.c:355:    LARA.BUOYMODE = 0;
+LARA.c:402:        LARA.BUOYMODE = 1;
+LARA.c:407:        LARA.BUOYMODE = 2;
+LARA.c:413:        LARA.BUOYMODE = 0;
+LARA.c:423:      //   		LARA.BUOYMODE=1; //Removed after first Lake W. Deployment.
+LARA.c:567:  if (LARA.BUOYMODE != 1) {
+LARA.c:580:  while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
+LARA.c:756:  if (LARA.BUOYMODE != 0) {
+LARA.c:768:  if (LARA.BUOYMODE != 2) {
+LARA.c:785:  while (LARA.BUOYMODE == 2) {
+LARA.c:790:    if (LARA.BUOYMODE == 0)
+LARA.c:813:  if (LARA.BUOYMODE == 0)
+LARA.c:916:        if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
+LARA.c:969:            LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
+LARA.c:1429:          LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
+LARA.c:1451:      if (expectedBuoyMode == LARA.BUOYMODE) {
+LARA.c:1467:  if (LARA.BUOYMODE == expectedBuoyMode) // success
+Winch.c:109:    if (LARA.BUOYMODE == 0)
+Winch.c:111:    LARA.BUOYMODE = 1;
+Winch.c:117:    if (LARA.BUOYMODE == 0)
+Winch.c:119:    LARA.BUOYMODE = 2;
+Winch.c:128:      if (LARA.BUOYMODE == 1) { // Winch Stops buoy from Ascending... Lack of
+Winch.c:148:    LARA.BUOYMODE = 0;
+Winch.c:213:  if (LARA.BUOYMODE != 0) // If CTDPort is Active and the Buoy is in motion
+Winch.c:216:  else if (LARA.BUOYMODE == 0) // If the Buoy is inactive and the CTDPort is off
+.LARA.CTDSAMPLES
+CTD.c:508:  LARA.CTDSAMPLES++;
+LARA.c:349:  LARA.CTDSAMPLES = 0;
+LARA.c:1431:          LARA.CTDSAMPLES);
+.LARA.DATA
+LARA.c:26:*    case '2': LARA.DATA = LARA.DATA ? false : true;
+LARA.c:31:*    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+LARA.c:280:  LARA.DATA = false;
+LARA.c:507:  while (!LARA.DATA && LARA.PHASE == 1) {
+LARA.c:512:      LARA.DATA = true;
+LARA.c:525:  if (LARA.DATA)
+LARA.c:551:  if (LARA.DATA) {
+LARA.c:553:    LARA.DATA = false;
+LARA.c:733:  LARA.DATA = false;
+LARA.c:834:  LARA.DATA = false;
+LARA.c:1063:      // LARA.DATA = LARA.DATA ? false : true;
+LARA.c:1067:      LARA.DATA = LARA.DATA ? false : true;
+LARA.c:1092:      // LARA.DATA = LARA.DATA ? false : true;
+LARA.c:1429:          LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
+.LARA.DEPTH
+CTD.c:436:  LARA.DEPTH = pres;
+CTD.c:525:    pastDepth = LARA.DEPTH;
+CTD.c:530:    vel = (float)((LARA.DEPTH - pastDepth) / (float)timechange);
+CTD.c:535:    pastDepth = LARA.DEPTH;
+CTD.c:574:      first = LARA.DEPTH;
+CTD.c:578:  last = LARA.DEPTH;
+LARA.c:284:  LARA.DEPTH = 0;        // Received from first CTD
+LARA.c:414:        LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:522:  // if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
+LARA.c:523:  if (NIGK.RECOVERY && LARA.DEPTH < LARA.TDEPTH)
+LARA.c:548:  LARA.DEPTH = CTD_AverageDepth(9, &velocity);
+LARA.c:552:    LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:559:  if (LARA.DEPTH < NIGK.TDEPTH) {
+LARA.c:561:    LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:578:  halfway = ((LARA.DEPTH - NIGK.TDEPTH) / 2) + NIGK.TDEPTH + 2;
+LARA.c:583:    if (LARA.DEPTH <= halfway) {
+LARA.c:596:    if (LARA.DEPTH <= NIGK.TDEPTH) {
+LARA.c:600:      LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:769:    LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:783:  prevDepth = LARA.DEPTH;
+LARA.c:799:      prevDepth -= LARA.DEPTH;
+LARA.c:808:      prevDepth = LARA.DEPTH;
+LARA.c:814:    LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:858:  LARA.DEPTH=0.0;
+LARA.c:860:  while (LARA.DEPTH<10.0) {
+LARA.c:865:    flogf("\nP5 %5.2f", LARA.DEPTH);
+LARA.c:873:    thenD=LARA.DEPTH;
+LARA.c:876:    if (CTD_Data()) nowD=LARA.DEPTH;
+LARA.c:1430:          LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
+LARA.c:1563:  b=LARA.DEPTH;
+LARA.c:1568:  a=LARA.DEPTH;
+Winch.c:130:        depth = LARA.DEPTH - NIGK.TDEPTH;
+.LARA.DESCENTTIME
+LARA.c:346:  LARA.DESCENTTIME = -1;
+LARA.c:823:  LARA.DESCENTTIME = (short)(DescentStop - DescentStart);
+LARA.c:825:        (depthChange / ((float)LARA.DESCENTTIME / 60.0)));
+LARA.c:827:        ((float)LARA.DESCENTTIME / 60.0) * NIGK.FRATE);
+LARA.c:828:  flogf("\n\t|Time for Descent: %d", LARA.DESCENTTIME);
+.LARA.LOWPOWER
+LARA.c:337:    LARA.LOWPOWER = true;
+LARA.c:339:    LARA.LOWPOWER = false;
+.LARA.MOORDEPTH
+LARA.c:285:  LARA.MOORDEPTH = 0;    // Eventually init
+LARA.c:414:        LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:552:    LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:614:  depthChange = LARA.TOPDEPTH - LARA.MOORDEPTH;
+LARA.c:814:    LARA.MOORDEPTH = LARA.DEPTH;
+LARA.c:822:  depthChange = LARA.MOORDEPTH - LARA.TOPDEPTH;
+LARA.c:1430:          LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
+.LARA.ON
+LARA.c:25:*    case 'x': LARA.ON = false;
+LARA.c:31:*    case 'x': LARA.ON = false; LARA.DATA = LARA.DATA ? false : true;
+LARA.c:35:*    case 'x': LARA.ON = false; // exit from GPSIRID
+LARA.c:183:  while (LARA.ON) {
+LARA.c:209:  flogf("\nLARA.ON == false\n");
+LARA.c:281:  LARA.ON = true;
+LARA.c:458:  LARA.ON = true;
+LARA.c:514:    if (!LARA.ON)
+LARA.c:610:    if (!LARA.ON) break;
+LARA.c:1062:      // LARA.ON = false;
+LARA.c:1091:      // LARA.ON = false;
+LARA.c:1109:      // LARA.ON = false; // exit from GPSIRID
+.LARA.PAYOUT
+LARA.c:344:  LARA.PAYOUT = -1;
+LARA.c:616:  LARA.PAYOUT = ((float)LARA.ASCENTTIME / 60.0) * NIGK.RRATE;
+LARA.c:619:  flogf("\n\t|Calculated Cable Payout: %5.1fMeters", LARA.PAYOUT);
+.LARA.PHASE
+LARA.c:18:*  LARA.PHASE case 1:
+LARA.c:24:*    case 'p': LARA.PHASE = c;
+LARA.c:27:*  LARA.PHASE case 2: case 4:
+LARA.c:29:*    case 'p': LARA.PHASE = c;
+LARA.c:34:*  LARA.PHASE case 3:
+LARA.c:36:*    case 'p': LARA.PHASE = c;
+LARA.c:177:  if (LARA.PHASE==5) {
+LARA.c:185:    switch (LARA.PHASE) {
+LARA.c:279:  LARA.PHASE = 0; // Decided Below
+LARA.c:356:    LARA.PHASE = 5; // deploy phase
+LARA.c:377:    LARA.PHASE = 0; // Phase 0 when finding the winch status and ctd position as
+LARA.c:403:        LARA.PHASE = 2;
+LARA.c:406:        LARA.PHASE = 4;
+LARA.c:412:        LARA.PHASE = 1;
+LARA.c:427:          LARA.PHASE = 3;
+LARA.c:429:          LARA.PHASE = 4;
+LARA.c:431:        LARA.PHASE = 4;
+LARA.c:436:    if (LARA.PHASE == 0)
+LARA.c:437:      LARA.PHASE = 1;
+LARA.c:507:  while (!LARA.DATA && LARA.PHASE == 1) {
+LARA.c:524:    LARA.PHASE = 3;
+LARA.c:526:    LARA.PHASE = 2;
+LARA.c:563:    LARA.PHASE = 3;
+LARA.c:580:  while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
+LARA.c:624:    LARA.PHASE = 3;
+LARA.c:675:      LARA.PHASE = 4;
+LARA.c:700:      LARA.PHASE = 4;
+LARA.c:717:  if (NIGK.RECOVERY) LARA.PHASE = 1; 
+LARA.c:833:  LARA.PHASE = 1;
+LARA.c:893:  LARA.PHASE=2;
+LARA.c:905:  switch (LARA.PHASE) {
+LARA.c:916:        if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
+LARA.c:917:            LARA.PHASE == 0) // if not surfaced (target depth not reached.) and
+LARA.c:968:        if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
+LARA.c:1021:  switch (LARA.PHASE) {
+LARA.c:1058:      LARA.PHASE = c;
+LARA.c:1083:      LARA.PHASE = c;
+LARA.c:1116:      LARA.PHASE = c;
+LARA.c:1429:          LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
+Winch.c:142:          LARA.PHASE++;
+.LARA.STATUS
+LARA.c:347:  LARA.STATUS = -1;
+.LARA.SURFACED
+LARA.c:33:*    case 's': LARA.SURFACED = true;
+LARA.c:283:  LARA.SURFACED = false; // Decided Below
+LARA.c:357:    LARA.SURFACED = false;
+LARA.c:398:      LARA.SURFACED = false;
+LARA.c:422:      LARA.SURFACED = true;
+LARA.c:562:    LARA.SURFACED = true;
+LARA.c:580:  while ((!LARA.SURFACED || LARA.BUOYMODE == 1) && LARA.PHASE == 2) {
+LARA.c:603:        LARA.SURFACED = true;
+LARA.c:623:  if (LARA.SURFACED)
+LARA.c:751:  LARA.SURFACED = false;
+LARA.c:916:        if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
+LARA.c:968:        if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
+LARA.c:1101:      LARA.SURFACED = true;
+LARA.c:1429:          LARA.DATA ? 1 : 0, LARA.SURFACED ? 1 : 0, LARA.PHASE, LARA.BUOYMODE,
+Winch.c:143:          LARA.SURFACED = true;
+.LARA.SWITCH
+LARA.c:348:  // LARA.SWITCH;
+.LARA.TDEPTH
+LARA.c:287:  LARA.TDEPTH = 0;       // Decided from Param file
+LARA.c:440:  LARA.TDEPTH = NIGK.TDEPTH;
+LARA.c:523:  if (NIGK.RECOVERY && LARA.DEPTH < LARA.TDEPTH)
+LARA.c:726:  LARA.TDEPTH = NIGK.TDEPTH;
+LARA.c:1430:          LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
+.LARA.TEMP
+CTD.c:437:  // LARA.TEMP = temp; //??
+.LARA.TOPDEPTH
+LARA.c:286:  LARA.TOPDEPTH = 0; // depth at start of descent // Eventually Init
+LARA.c:561:    LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:600:      LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:602:      if (LARA.TOPDEPTH <= NIGK.TDEPTH)
+LARA.c:614:  depthChange = LARA.TOPDEPTH - LARA.MOORDEPTH;
+LARA.c:769:    LARA.TOPDEPTH = LARA.DEPTH;
+LARA.c:822:  depthChange = LARA.MOORDEPTH - LARA.TOPDEPTH;
+LARA.c:1430:          LARA.MOORDEPTH, LARA.DEPTH, LARA.TOPDEPTH, LARA.TDEPTH, LARA.AVGVEL,
+.MPC.DATAXINT
+LARA.c:384:      hour = MPC.DATAXINT;
+LARA.c:454:    MPC.DATAXINT = 30;
+LARA.c:455:    VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
+LARA.c:1341:          TotalSeconds, MPC.DETINT, MPC.DATAXINT);
+LARA.c:1495:    // variable hour here is really minutes in system variable: MPC.DATAXINT
+MPC.c:408:        if (MPC.DATAXINT != 30) { 
+MPC.c:409:          MPC.DATAXINT = 30;
+MPC.c:410:          VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT); 
+MPC.c:470:  MPC.DATAXINT += MPC.DETINT;
+MPC.c:474:  DBG(flogf("\nMPC.DETINT: %d\nMPC.DATAXINT: %d", MPC.DETINT, MPC.DATAXINT);)
+MPC.c:485:    DataInterval = (MPC.DATAXINT + (MPC.DETINT - 1)) / MPC.DETINT;
+MPC.c:511:  MPC.DATAXINT -= MPC.DETINT;
+MPC.c:1139:      if (MPC.DATAXINT != value) {
+MPC.c:1141:        MPC.DATAXINT = value;
+MPC.c:1312:  MPC.DATAXINT = atoi(p ? p : DATAXINTERVAL_DEFAULT);
+MPC.c:1313:  DBG(uprintf("DATAXINT=%u (%s)\n", MPC.DATAXINT, p ? "vee" : "def"); cdrain();)
+MPC.c:1314:  if (MPC.DATAXINT < MIN_DATAX_INTERVAL) {
+MPC.c:1315:    MPC.DATAXINT = MIN_DATAX_INTERVAL;
+MPC.c:1316:    VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
+MPC.c:1317:  } else if (MPC.DATAXINT > MAX_DATAX_INTERVAL) {
+MPC.c:1318:    MPC.DATAXINT = MAX_DATAX_INTERVAL;
+MPC.c:1319:    VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
+.MPC.DETINT
+LARA.c:1341:          TotalSeconds, MPC.DETINT, MPC.DATAXINT);
+MPC.c:469:  MPC.DETINT += 5;
+MPC.c:470:  MPC.DATAXINT += MPC.DETINT;
+MPC.c:474:  DBG(flogf("\nMPC.DETINT: %d\nMPC.DATAXINT: %d", MPC.DETINT, MPC.DATAXINT);)
+MPC.c:477:  DetectionInt = (((long)(MPC.DETINT * 600L) + (int)(PLI - 1)) / PLI);
+MPC.c:485:    DataInterval = (MPC.DATAXINT + (MPC.DETINT - 1)) / MPC.DETINT;
+MPC.c:511:  MPC.DATAXINT -= MPC.DETINT;
+MPC.c:512:  MPC.DETINT -= 5;
+MPC.c:1156:      if (MPC.DETINT != value) {
+MPC.c:1159:        MPC.DETINT = value;
+MPC.c:1300:  MPC.DETINT = atoi(p ? p : DETECTIONINT_DEFAULT);
+MPC.c:1301:  DBG(uprintf("DETINT=%u (%s)\n", MPC.DETINT, p ? "vee" : "def"); cdrain();)
+MPC.c:1302:  if (MPC.DETINT < MIN_DETECTION_INTERVAL) {
+MPC.c:1303:    MPC.DETINT = MIN_DETECTION_INTERVAL;
+MPC.c:1304:    VEEStoreShort(DETECTIONINT_NAME, MPC.DETINT);
+MPC.c:1305:  } else if (MPC.DETINT > MAX_DETECTION_INTERVAL) {
+MPC.c:1306:    MPC.DETINT = MAX_DETECTION_INTERVAL;
+MPC.c:1307:    VEEStoreShort(DETECTIONINT_NAME, MPC.DETINT);
+.MPC.FILENUM
+CTD.c:79:  // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
+GPSIRID.c:210:  sprintf(&fname[2], "%08ld.dat", MPC.FILENUM);
+GPSIRID.c:530:    sprintf(&uploadfname[0], "c:%08ld.dat", MPC.FILENUM);
+LARA.c:304:    MPC.FILENUM--;
+LARA.c:305:    sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
+LARA.c:312:    MPC.FILENUM++;
+LARA.c:314:    Setup_ADS(true, MPC.FILENUM, BITSHIFT); // not done > 0 ??
+LARA.c:341:  CTD_CreateFile(MPC.FILENUM); // for science, descent
+LARA.c:463:  create_dtx_file(MPC.FILENUM);
+LARA.c:659:  sprintf(&uploadfile[2], "%08ld.dat", MPC.FILENUM);
+LARA.c:660:  cprintf("\n\t|File Number: %08ld", MPC.FILENUM);
+LARA.c:721:  MPC.FILENUM++;
+LARA.c:722:  sprintf(filenum, "%08ld", MPC.FILENUM);
+LARA.c:724:  create_dtx_file(MPC.FILENUM);
+LARA.c:725:  CTD_CreateFile(MPC.FILENUM); 
+LARA.c:1340:          PROG_VERSION, MPC.FILENUM, MPC.STARTUPS, MPC.STARTMAX, Time(NULL),
+LARA.c:1362:    ADSFileName(MPC.FILENUM);
+LARA.c:1369:  Setup_ADS(true, MPC.FILENUM + 1, BITSHIFT);
+LARA.c:1370:  DOS_Com("del", MPC.FILENUM, "PWR", NULL);
+LARA.c:1380:    sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);
+LARA.c:1382:    DBG(flogf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
+LARA.c:1391:  DOS_Com("move", MPC.FILENUM, "CTD", "CTD");
+LARA.c:1396:    sprintf(logfile, "%08ld.log", MPC.FILENUM);
+LARA.c:1397:    DBG(flogf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
+LARA.c:1407:  DOS_Com("move", MPC.FILENUM, "LOG", "LOG");
+MPC.c:175:  MPC.FILENUM = counter + 1;
+MPC.c:176:  sprintf(filenum, "%08ld", MPC.FILENUM);
+MPC.c:177:  sprintf(logfile, "%08ld.log", MPC.FILENUM);
+MPC.c:209:  RTS(flogf("\n\t|Starting FileNumber: %ld", MPC.FILENUM);)
+MPC.c:658:      DOS_Com("del", MPC.FILENUM, extension, NULL);
+WISPR.c:198:    sprintf(&DTXFilename[2], "%08ld.dtx", MPC.FILENUM);
+WISPR.c:641:    sprintf(&detfname[2], "%08ld.dtx", MPC.FILENUM);
+WISPR.c:649:    DOS_Com("del", MPC.FILENUM, "dtx", NULL);
+.MPC.HIBERNATE
+MPC.c:1323:MPC.HIBERNATE = atoi( p ? p : HIBERNATE_DEFAULT);
+MPC.c:1324:DBG(uprintf("HIBERNATE=%u (%s)\n", MPC.HIBERNATE, p ? "vee" : "def"); cdrain();)
+.MPC.LAT
+GPSIRID.c:523:    strncpy(MPC.LAT, Coordinates, 16);
+GPSIRID.c:528:    flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
+GPSIRID.c:634:  strcpy(Lat, MPC.LAT);
+GPSIRID.c:636:  flogf("\nLat: %s, MPC.LAT: %s", LAT, Lat);
+GPSIRID.c:639:  Degrees = atoi(strtok(MPC.LAT, ":"));
+MPC.c:1272:  strncpy(MPC.LAT, p ? p : LATITUDE_DEFAULT, sizeof(MPC.LAT));
+MPC.c:1273:  DBG(uprintf("LATITUDE=%s (%s)\n", MPC.LAT, p ? "vee" : "def"); cdrain();)
+WISPR.c:320:  strcpy(LATITUDE, MPC.LAT);
+.MPC.LOCATION
+MPC.c:1276:          strncpy(MPC.LOCATION, p ? p : LOCATION_DEFAULT, sizeof(MPC.LOCATION));
+MPC.c:1277:          DBG( uprintf("LOCATION=%s (%s)\n", MPC.LOCATION, p ? "vee" : "def");
+.MPC.LOGFILE
+LARA.c:1394:  //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
+MPC.c:181:  strncpy(MPC.LOGFILE, p ? p : LOGFILE_DEFAULT, sizeof(MPC.LOGFILE));
+MPC.c:182:  sprintf(logfile, "%s", MPC.LOGFILE);
+MPC.c:210:  // flogf("\n\t|%s logfile created", MPC.LOGFILE);
+.MPC.LONG
+GPSIRID.c:525:    strncpy(MPC.LONG, &Coordinates[17], 16);
+GPSIRID.c:528:    flogf("\n\t|LAT: %s, LONG: %s", MPC.LAT, MPC.LONG);
+GPSIRID.c:635:  strcpy(Long, MPC.LONG);
+GPSIRID.c:648:  flogf("\nLong: %s, MPC.LONG: %s", LONG, Long);
+GPSIRID.c:651:  Degrees = atoi(strtok(MPC.LONG, ":"));
+MPC.c:1268:  strncpy(MPC.LONG, p ? p : LONGITUDE_DEFAULT, sizeof(MPC.LONG));
+MPC.c:1269:  DBG(uprintf("LONGITUDE=%s (%s)\n", MPC.LONG, p ? "vee" : "def"); cdrain();)
+WISPR.c:321:  strcpy(LONGITUDE, MPC.LONG);
+.MPC.MINVOLT
+ADS.c:509:  //	MPC.MINVOLT =p;
+.MPC.PLTFRMID
+GPSIRID.c:203:  strcpy(PltfrmID, MPC.PLTFRMID);
+GPSIRID.c:1065:  sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
+LARA.c:261:        MPC.PROGNAME, MPC.PROJID, MPC.PLTFRMID, MPC.STARTUPS);
+MPC.c:1264:  strncpy(MPC.PLTFRMID, p ? p : PLTFRMID_DEFAULT, sizeof(MPC.PLTFRMID));
+MPC.c:1265:  DBG(uprintf("PLTFRMID=%s (%s)\n", MPC.PLTFRMID, p ? "vee" : "def"); cdrain();)
+.MPC.PROGNAME
+LARA.c:261:        MPC.PROGNAME, MPC.PROJID, MPC.PLTFRMID, MPC.STARTUPS);
+MPC.c:1256:  strncpy(MPC.PROGNAME, p ? p : PROG_DEFAULT, sizeof(MPC.PROGNAME));
+MPC.c:1257:  DBG(uprintf("PROGNAME=%s (%s)\n", MPC.PROGNAME, p ? "vee" : "def"); cdrain();)
+.MPC.PROJID
+GPSIRID.c:202:  strcpy(ProjID, MPC.PROJID);
+GPSIRID.c:1065:  sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
+LARA.c:261:        MPC.PROGNAME, MPC.PROJID, MPC.PLTFRMID, MPC.STARTUPS);
+MPC.c:1260:  strncpy(MPC.PROJID, p ? p : PROJID_DEFAULT, sizeof(MPC.PROJID));
+MPC.c:1261:  DBG(uprintf("PROJID=%s (%s)\n", MPC.PROJID, p ? "vee" : "def"); cdrain();)
+.MPC.STARTMAX
+LARA.c:253:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+LARA.c:445:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+LARA.c:1340:          PROG_VERSION, MPC.FILENUM, MPC.STARTUPS, MPC.STARTMAX, Time(NULL),
+MPC.c:587:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+MPC.c:1198:      if (value != MPC.STARTMAX) {
+MPC.c:1200:        MPC.STARTMAX = value;
+MPC.c:1286:  MPC.STARTMAX = atoi(p ? p : STARTMAX_DEFAULT);
+MPC.c:1287:  DBG(uprintf("STARTMAX=%d (%s)\n", MPC.STARTMAX, p ? "vee" : "def"); cdrain();)
+MPC.c:1288:  if (MPC.STARTMAX > MAX_STARTUPS) {
+MPC.c:1289:    uprintf("STARTMAX changed from %d to %d\n", MPC.STARTMAX, MAX_STARTUPS);
+MPC.c:1290:    MPC.STARTMAX = MAX_STARTUPS;
+MPC.c:1291:    VEEStoreShort(STARTMAX_NAME, MPC.STARTMAX);
+MPC.c:1294:if(MPC.STARTUPS>MPC.STARTMAX){
+.MPC.STARTUPS
+GPSIRID.c:480:  if (MPC.STARTUPS == 0 && firstGPS) // ??
+LARA.c:253:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+LARA.c:261:        MPC.PROGNAME, MPC.PROJID, MPC.PLTFRMID, MPC.STARTUPS);
+LARA.c:303:  if (MPC.STARTUPS > 0) {
+LARA.c:313:  } else // MPC.STARTUPS == 0
+LARA.c:352:  if (MPC.STARTUPS == 0) {
+LARA.c:443:  MPC.STARTUPS++;
+LARA.c:444:  VEEStoreShort(STARTUPS_NAME, MPC.STARTUPS);
+LARA.c:445:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+LARA.c:906:  // Case 0: Only at startup when MPC.STARTUPS>0
+LARA.c:1340:          PROG_VERSION, MPC.FILENUM, MPC.STARTUPS, MPC.STARTMAX, Time(NULL),
+LARA.c:1473:** Only comes here after reboot when MPC.STARTUPS>0
+MPC.c:587:  if (MPC.STARTUPS >= MPC.STARTMAX) {
+MPC.c:589:    flogf("\n\t|Startups surpassed maximum: %d", MPC.STARTUPS);
+MPC.c:1193:      /*if(value<MPC.STARTUPS){
+MPC.c:1194:              value=MPC.STARTUPS+1;
+MPC.c:1281:  MPC.STARTUPS = atoi(p ? p : STARTUPS_DEFAULT);
+MPC.c:1282:  DBG(uprintf("STARTUPS=%d (%s)\n", MPC.STARTUPS, p ? "vee" : "def"); cdrain();)
+MPC.c:1294:if(MPC.STARTUPS>MPC.STARTMAX){
+WISPR.c:695:** Only should come here upon MPC.STARTUPS==0 && WISPRNUMBER>1
+.MPC.UPLOAD
+LARA.c:1395:  if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
+.NIGK.ANTLEN
+MPC.c:1017:      else if (value > (3 * NIGK.ANTLEN))
+MPC.c:1018:        value = (3 * NIGK.ANTLEN);
+Winch.c:276:  NIGK.ANTLEN = atoi(p ? p : NIGKANTENNALENGTH_DEFAULT);
+Winch.c:277:  DBG(uprintf("NIGK.ANTLEN=%u (%s)\n", NIGK.ANTLEN, p ? "vee" : "def");
+.NIGK.DELAY
+LARA.c:791:      DescentStop = (time(NULL) - (ulong)(NIGK.DELAY));
+Winch.c:171:  return (time(NULL) + (ulong)NIGK.DELAY);
+Winch.c:183:  return (time(NULL) + (ulong)NIGK.DELAY);
+Winch.c:200:  return (time(NULL) + (ulong)NIGK.DELAY);
+Winch.c:272:  NIGK.DELAY = atoi(p ? p : NIGKDELAY_DEFAULT);
+Winch.c:273:  DBG(uprintf("NIGK.DELAY=%u (%s)\n", NIGK.DELAY, p ? "vee" : "def"); cdrain();)
+Winch.c:315:      NIGK.RECOVERY ? "RECOVERY" : "ON", NIGK.PROFILES, NIGK.DELAY, NIGK.TDEPTH,
+.NIGK.FRATE
+LARA.c:827:        ((float)LARA.DESCENTTIME / 60.0) * NIGK.FRATE);
+MPC.c:1046:      if (value != NIGK.FRATE) {
+MPC.c:1047:        NIGK.FRATE = value;
+MPC.c:1048:        flogf("\n\t|New User defined Fall Rate: %d", NIGK.FRATE);
+Winch.c:290:  NIGK.FRATE = atoi(p ? p : NIGKFALLRATE_DEFAULT);
+Winch.c:291:  DBG(uprintf("NIGK.FRATE=%u (%s)\n", NIGK.FRATE, p ? "vee" : "def"); cdrain();)
+Winch.c:316:      NIGK.RRATE, NIGK.FRATE, WINCH.ASCENTCALLS, WINCH.ASCENTRCV,
+.NIGK.PROFILES
+LARA.c:574:  NIGK.PROFILES++;
+LARA.c:575:  VEEStoreShort(NIGKPROFILES_NAME, NIGK.PROFILES);
+Winch.c:294:  NIGK.PROFILES = atoi(p ? p : NIGKPROFILES_DEFAULT);
+Winch.c:295:  DBG(uprintf("NIGK.PROFILES=%u (%s)\n", NIGK.PROFILES, p ? "vee" : "def");
+Winch.c:315:      NIGK.RECOVERY ? "RECOVERY" : "ON", NIGK.PROFILES, NIGK.DELAY, NIGK.TDEPTH,
+.NIGK.RECOVERY
+LARA.c:453:  if (NIGK.RECOVERY) {
+LARA.c:522:  // if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
+LARA.c:523:  if (NIGK.RECOVERY && LARA.DEPTH < LARA.TDEPTH)
+LARA.c:717:  if (NIGK.RECOVERY) LARA.PHASE = 1; 
+LARA.c:718:  // NIGK.RECOVERY may be cleared by Params load 
+MPC.c:405:        NIGK.RECOVERY = 1;
+MPC.c:406:        VEEStoreShort(NIGKRECOVERY_NAME, NIGK.RECOVERY);
+MPC.c:424:  if (IRID.CALLMODE == 0 || NIGK.RECOVERY) {
+MPC.c:484:  if (IRID.CALLMODE == 0 || NIGK.RECOVERY) {
+MPC.c:487:    if (NIGK.RECOVERY)
+MPC.c:1056:        if (value != NIGK.RECOVERY) {
+MPC.c:1057:          NIGK.RECOVERY = value;
+MPC.c:1058:          flogf("\n\t|NIGK RECOVERY %s", NIGK.RECOVERY ? "ON" : "OFF");
+Winch.c:299:  NIGK.RECOVERY = atoi(p ? p : NIGKRECOVERY_DEFAULT);
+Winch.c:300:  DBG(uprintf("NIGK.RECOVERY=%u (%s)\n", NIGK.RECOVERY, p ? "vee" : "def");
+Winch.c:315:      NIGK.RECOVERY ? "RECOVERY" : "ON", NIGK.PROFILES, NIGK.DELAY, NIGK.TDEPTH,
+.NIGK.RRATE
+LARA.c:607:        LARA.AVGVEL = ((float)NIGK.RRATE / 60.0);
+LARA.c:616:  LARA.PAYOUT = ((float)LARA.ASCENTTIME / 60.0) * NIGK.RRATE;
+MPC.c:1033:      if (value != NIGK.RRATE) {
+MPC.c:1034:        NIGK.RRATE = value;
+MPC.c:1035:        flogf("\n\t|New User defined Rise Rate: %d", NIGK.RRATE);
+Winch.c:286:  NIGK.RRATE = atoi(p ? p : NIGKRISERATE_DEFAULT);
+Winch.c:287:  DBG(uprintf("NIGK.RRATE=%u (%s)\n", NIGK.RRATE, p ? "vee" : "def"); cdrain();)
+Winch.c:316:      NIGK.RRATE, NIGK.FRATE, WINCH.ASCENTCALLS, WINCH.ASCENTRCV,
+.NIGK.TDEPTH
+LARA.c:397:    if (depth > NIGK.TDEPTH) {
+LARA.c:418:    else if (depth <= NIGK.TDEPTH) { 
+LARA.c:440:  LARA.TDEPTH = NIGK.TDEPTH;
+LARA.c:522:  // if (NIGK.RECOVERY && LARA.DEPTH < NIGK.TDEPTH)
+LARA.c:539:  flogf("\n\t|PHASE TWO: Target Depth:%d", NIGK.TDEPTH);
+LARA.c:559:  if (LARA.DEPTH < NIGK.TDEPTH) {
+LARA.c:578:  halfway = ((LARA.DEPTH - NIGK.TDEPTH) / 2) + NIGK.TDEPTH + 2;
+LARA.c:596:    if (LARA.DEPTH <= NIGK.TDEPTH) {
+LARA.c:602:      if (LARA.TOPDEPTH <= NIGK.TDEPTH)
+LARA.c:726:  LARA.TDEPTH = NIGK.TDEPTH;
+MPC.c:388:    if (depth <= NIGK.TDEPTH) {
+MPC.c:393:      if (depth < NIGK.TDEPTH) {
+MPC.c:1020:      if (value != NIGK.TDEPTH) {
+MPC.c:1021:        NIGK.TDEPTH = value;
+MPC.c:1022:        flogf("\n\t|New Winch Target Depth: %d", NIGK.TDEPTH);
+Winch.c:130:        depth = LARA.DEPTH - NIGK.TDEPTH;
+Winch.c:281:  NIGK.TDEPTH = atoi(p ? p : NIGKTARGETDEPTH_DEFAULT);
+Winch.c:282:  DBG(uprintf("NIGK.TDEPTH=%u (%s)\n", NIGK.TDEPTH, p ? "vee" : "def");
+Winch.c:315:      NIGK.RECOVERY ? "RECOVERY" : "ON", NIGK.PROFILES, NIGK.DELAY, NIGK.TDEPTH,
+.SEAG.DIVENUM
+WISPR.c:196:    sprintf(&DTXFilename[2], "%08d.dtx", SEAG.DIVENUM);
+WISPR.c:639:    sprintf(&detfname[2], "%08d.dtx", SEAG.DIVENUM);
+WISPR.c:647:    DOS_Com("del", (long)SEAG.DIVENUM, "dtx", NULL);
+.SEAG.OFFDEPTH
+MPC.c:1070:      if (value != SEAG.OFFDEPTH) {
+MPC.c:1071:        SEAG.OFFDEPTH = value;
+MPC.c:1072:        flogf("\n\t|New SEAGLIDER PAM Off Depth: %d", SEAG.OFFDEPTH);
+.SEAG.ONDEPTH
+MPC.c:1082:      if (value != SEAG.ONDEPTH) {
+MPC.c:1083:        SEAG.ONDEPTH = value;
+MPC.c:1084:        flogf("\n\t|New SEAGLIDER PAM On Depth: %d", SEAG.ONDEPTH);
+.WINCH.ASCENTCALLS
+LARA.c:270:  WINCH.ASCENTCALLS = 0;
+Winch.c:170:  WINCH.ASCENTCALLS++;
+Winch.c:316:      NIGK.RRATE, NIGK.FRATE, WINCH.ASCENTCALLS, WINCH.ASCENTRCV,
+Winch.c:327:  WINCH.ASCENTCALLS = 0;
+.WINCH.ASCENTRCV
+LARA.c:271:  WINCH.ASCENTRCV = 0;
+Winch.c:112:    WINCH.ASCENTRCV++;
+Winch.c:316:      NIGK.RRATE, NIGK.FRATE, WINCH.ASCENTCALLS, WINCH.ASCENTRCV,
+Winch.c:328:  WINCH.ASCENTRCV = 0;
+.WINCH.BUOYRCV
+LARA.c:276:  WINCH.BUOYRCV = 0;
+Winch.c:225:  WINCH.BUOYRCV++;
+Winch.c:333:  WINCH.BUOYRCV = 0;
+.WINCH.DESCENTCALLS
+LARA.c:272:  WINCH.DESCENTCALLS = 0;
+Winch.c:182:  WINCH.DESCENTCALLS++;
+Winch.c:317:      WINCH.DESCENTCALLS, WINCH.DESCENTRCV, WINCH.STOPCALLS, WINCH.STOPRCV);
+Winch.c:329:  WINCH.DESCENTCALLS = 0;
+.WINCH.DESCENTRCV
+LARA.c:273:  WINCH.DESCENTRCV = 0;
+Winch.c:120:    WINCH.DESCENTRCV++;
+Winch.c:317:      WINCH.DESCENTCALLS, WINCH.DESCENTRCV, WINCH.STOPCALLS, WINCH.STOPRCV);
+Winch.c:330:  WINCH.DESCENTRCV = 0;
+.WINCH.STOPCALLS
+LARA.c:274:  WINCH.STOPCALLS = 0;
+Winch.c:199:  WINCH.STOPCALLS++;
+Winch.c:317:      WINCH.DESCENTCALLS, WINCH.DESCENTRCV, WINCH.STOPCALLS, WINCH.STOPRCV);
+Winch.c:331:  WINCH.STOPCALLS = 0;
+.WINCH.STOPRCV
+LARA.c:275:  WINCH.STOPRCV = 0;
+Winch.c:125:      WINCH.STOPRCV++;
+Winch.c:317:      WINCH.DESCENTCALLS, WINCH.DESCENTRCV, WINCH.STOPCALLS, WINCH.STOPRCV);
+Winch.c:332:  WINCH.STOPRCV = 0;
+.WINCH.WINCHCALLS
+LARA.c:277:  WINCH.WINCHCALLS = 0;
+Winch.c:334:  WINCH.WINCHCALLS = 0;
+.WISP.DETMAX
+MPC.c:369:      flogf("\n\t|Detection Call: Requesting %d DTX", WISP.DETMAX);
+MPC.c:370:      WISPRDet(WISP.DETMAX);
+MPC.c:958:      if (value != WISP.DETMAX) {
+MPC.c:960:        WISP.DETMAX = value;
+WISPR.c:293:  else if (dtx > WISP.DETMAX) // if received dtx reqeust > Maximum user set.
+WISPR.c:294:    dtx = WISP.DETMAX;
+WISPR.c:522:  WISP.DETMAX = atoi(p ? p : DETECTIONMAX_DEFAULT);
+WISPR.c:523:  DBG(uprintf("DETMAX=%u (%s)\n", WISP.DETMAX, p ? "vee" : "def"); cdrain();)
+WISPR.c:524:  if (WISP.DETMAX > MAX_DETECTIONS) {
+WISPR.c:525:    WISP.DETMAX = MAX_DETECTIONS;
+WISPR.c:526:    VEEStoreShort(DETECTIONMAX_NAME, WISP.DETMAX);
+WISPR.c:615:            WISP.DETMAX, TotalDetections);
+WISPR.c:950:      WISPRDet(WISP.DETMAX);
+.WISP.DETNUM
+MPC.c:968:            else if(WISP.DETNUM!=value){
+MPC.c:970:               WISP.DETNUM=value;
+WISPR.c:241:        if (WISP.DETNUM > 0)
+WISPR.c:242:          if (returndouble >= WISP.DETNUM)
+WISPR.c:543:  WISP.DETNUM = atoi(p ? p : DETECTIONNUM_DEFAULT);
+WISPR.c:544:  DBG(uprintf("DETECTNUM=%u (%s)\n", WISP.DETNUM, p ? "vee" : "def"); cdrain();)
+WISPR.c:620:               if(WISP.DETNUM>0){
+WISPR.c:621:               sprintf(stringadd, "\nCall upon %04d Detections\n", WISP.DETNUM);
+.WISP.DUTYCYCL
+LARA.c:172:  if (WISP.DUTYCYCL == 100)
+LARA.c:327:    WISP.DUTYCYCL = 0; // Booting up with default.cfg will never have a set
+LARA.c:330:    VEEStoreShort(DUTYCYCLE_NAME, WISP.DUTYCYCL);
+LARA.c:728:  if (WISP.DUTYCYCL > 50) {
+MPC.c:373:      if (WISP.DUTYCYCL < 100) {
+MPC.c:517:  DutyCycleTicks = (int)(DetectionInt * ((float)(WISP.DUTYCYCL / 100.0)));
+MPC.c:518:  flogf("\n\t|WISPR Duty Cycle: %d\%", WISP.DUTYCYCL);
+MPC.c:981:      if (value != WISP.DUTYCYCL) {
+MPC.c:983:        WISP.DUTYCYCL = value;
+WISPR.c:163:        WISP.DUTYCYCL = 0;
+WISPR.c:548:  WISP.DUTYCYCL = atoi(p ? p : DUTYCYCLE_DEFAULT);
+WISPR.c:549:  DBG(uprintf("DUTYCYCLE=%d (%s)\n", WISP.DUTYCYCL, p ? "vee" : "def");
+WISPR.c:551:  if (WISP.DUTYCYCL > MAX_DUTYCYCLE) {
+WISPR.c:552:    WISP.DUTYCYCL = MAX_DUTYCYCLE;
+WISPR.c:553:    VEEStoreShort(DUTYCYCLE_NAME, WISP.DUTYCYCL);
+WISPR.c:554:  } else if (WISP.DUTYCYCL < MIN_DUTYCYCLE) {
+WISPR.c:555:    WISP.DUTYCYCL = MIN_DUTYCYCLE;
+WISPR.c:556:    VEEStoreShort(DUTYCYCLE_NAME, WISP.DUTYCYCL);
+WISPR.c:610:  if (WISP.DUTYCYCL > 0) {
+WISPR.c:614:            WISP.NUM, WISPRGPSSends, WISP.GAIN, WISPRFreeSpace, WISP.DUTYCYCL,
+.WISP.GAIN
+MPC.c:945:      if (WISP.GAIN != value) {
+MPC.c:947:        WISP.GAIN = value;
+MPC.c:948:        VEEStoreShort(WISPRGAIN_NAME, value);
+Settings.c:164:                           WISPRGAIN_NAME,
+Settings.c:165:                           WISPRGAIN_DEFAULT,
+Settings.c:166:                           WISPRGAIN_DESC,
+WISPR.c:351:    c = WISP.GAIN;
+WISPR.c:530:  p = VEEFetchData(WISPRGAIN_NAME).str;
+WISPR.c:531:  WISP.GAIN = atoi(p ? p : WISPRGAIN_DEFAULT);
+WISPR.c:532:  DBG(uprintf("WISPRGAIN=%u (%s)\n", WISP.GAIN, p ? "vee" : "def"); cdrain();)
+WISPR.c:533:  if (WISP.GAIN > 3) {
+WISPR.c:534:    WISP.GAIN = 3;
+WISPR.c:535:    VEEStoreShort(WISPRGAIN_NAME, WISP.GAIN);
+WISPR.c:536:  } else if (WISP.GAIN < 0) {
+WISPR.c:537:    WISP.GAIN = 0;
+WISPR.c:538:    VEEStoreShort(WISPRGAIN_NAME, WISP.GAIN);
+WISPR.c:614:            WISP.NUM, WISPRGPSSends, WISP.GAIN, WISPRFreeSpace, WISP.DUTYCYCL,
+.WISP.NUM
+LARA.c:361:    if (WISPRNUMBER > 1) { // total number
+LARA.c:362:      if (WISP.NUM != 1)
+LARA.c:363:        WISP.NUM = 1; // current used board
+LARA.c:368:      // Gather all #WISPRNUMBER freespace and sync time.
+MPC.c:992:      } else if (value != WISP.NUM) {
+MPC.c:993:        WISP.NUM = value;
+MPC.c:994:        flogf("\n\t|WISPR NUMBER: %d", WISP.NUM);
+MPC.c:995:        VEEStoreShort(WISPRNUM_NAME, value);
+Settings.c:151:Settings WISPSettings[] = {WISPRNUM_NAME,
+Settings.c:152:                           WISPRNUM_DEFAULT,
+Settings.c:153:                           WISPRNUM_DESC,
+WISPR.c:125:        flogf("\n\t|WISPR%d: %0.2f%% Total Space", WISP.NUM, returndouble);
+WISPR.c:136:    flogf("\n\t|WISPR%d: %.2f%% Free Space", WISP.NUM, returndouble);
+WISPR.c:152:      flogf("\n\t|WISPR%d FreeSpace below Minimum", WISP.NUM);
+WISPR.c:153:      if (WISP.NUM < WISPRNUMBER) {
+WISPR.c:155:        ChangeWISPR(WISP.NUM + 1);
+WISPR.c:158:        VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
+WISPR.c:319:  flogf("\n%s|WISPRGPS(%d):", Time(NULL), WISP.NUM);
+WISPR.c:365:  DBG(flogf("\n\t|WISPRDFP(%d)", WISP.NUM);)
+WISPR.c:378:  DBG(flogf("\n\t|WISPRTFP(%d)", WISP.NUM);)
+WISPR.c:511:  WISP.NUM = wnum;
+WISPR.c:560:  p = VEEFetchData(WISPRNUM_NAME).str;
+WISPR.c:561:  WISP.NUM = atoi(p ? p : WISPRNUM_DEFAULT);
+WISPR.c:562:  DBG(uprintf("WISPRNUM=%d (%s)\n", WISP.NUM, p ? "vee" : "def"); cdrain();)
+WISPR.c:563:  if (WISP.NUM < 1) {
+WISPR.c:564:    WISP.NUM = 1;
+WISPR.c:565:    VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
+WISPR.c:566:  } else if (WISP.NUM > WISPRNUMBER) {
+WISPR.c:567:    WISP.NUM = WISPRNUMBER;
+WISPR.c:568:    VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
+WISPR.c:614:            WISP.NUM, WISPRGPSSends, WISP.GAIN, WISPRFreeSpace, WISP.DUTYCYCL,
+WISPR.c:635:  if (WISPRNUMBER > 1)
+WISPR.c:695:** Only should come here upon MPC.STARTUPS==0 && WISPRNUMBER>1
+WISPR.c:718:  for (i = 1; i <= WISPRNUMBER; i++) {
+WISPR.c:726:  while (wnum <= WISPRNUMBER) {
+WISPR.c:769:    if (wnum > WISPRNUMBER)
+WISPR.c:774:  DBG(flogf("\n\t|wnum: %d, WISP.NUM: %d", wnum, WISP.NUM);)
+WISPR.c:787:  WISP.NUM = wnum;
+WISPR.c:788:  VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
+WISPR.c:827:  if (WISP.NUM > WISPRNUMBER)
+WISPR.c:828:    WISP.NUM = WISPRNUMBER;
+WISPR.c:829:  sprintf(wispnum, "W%d:", WISP.NUM);
+WISPR.c:864:  WisprNum = WISP.NUM;

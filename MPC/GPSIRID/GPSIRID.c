@@ -397,7 +397,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
         strncpy(currentfile, filename + 2, 8);
         filenumber = atol(currentfile);
         DOS_Com("move", filenumber, "DAT", "SNT");
-        filename = GetFileName(IRID.LOWFIRST, false, NULL, "DAT");
+        filename = GetFileName(false, false, NULL, "DAT");
         if (filename == NULL)
           FileExist = false;
 
