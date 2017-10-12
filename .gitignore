@@ -1,6 +1,7 @@
 # general
 *.exe
 # codewar
+codewar/
 *.AHX
 *.AMP
 *.APP
@@ -13,6 +14,7 @@
 Resource.frk
 bin
 *_Data
+# tmp
 *~
 *.swp
 *.pyc
