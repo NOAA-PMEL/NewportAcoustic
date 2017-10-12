@@ -47,9 +47,9 @@ typedef struct // Used to access runtime settings
 #define STARTPHASE_DEFAULT "0" 
 #define STARTPHASE_DESC "recommended phase to start.\n"
 
-#define STARTMAX_NAME                                                          \
-  "MPC.STARTMAX" //-s to control this valuable through SYSTEM.CFG file
-#define STARTMAX_DEFAULT "9999" //
+#define STARTMAX_NAME "MPC.STARTMAX" 
+//-s to control this valuable through SYSTEM.CFG file
+#define STARTMAX_DEFAULT "9999"
 #define STARTMAX_DESC "Maximum number of startups allowed.\n"
 
 #define DETECTIONINT_NAME "MPC.DETINT" //-i
@@ -244,35 +244,4 @@ typedef struct // Used to access runtime settings
 #define CTDUPLOADFILE_NAME "CTD.UPLOAD"
 #define CTDUPLOADFILE_DEFAULT "1"
 #define CTDUPLOADFILE_DESC                                                     \
-  "\"1\" to upload file via Iridium else \"0\"\n" /*                           \
-                                                  #define                      \
-                                                  CTDSAMPLINGMODE_NAME         \
-                                                  "CTD.POLLED"                 \
-                                                  #define                      \
-                                                  CTDSAMPLINGMODE_DEFAULT "1"  \
-                                                  #define CTDSAMPLINGMODE_DESC                                                          \
-                                                  "1 for Polled, 0 for         \
-                                                  Autonomous\n"                \
-                                                                               \
-                                                  #define                      \
-                                                  CTDSAMPLEDELAY_NAME          \
-                                                  "CTD.DELAY"                  \
-                                                  #define                      \
-                                                  CTDSAMPLEDELAY_DEFAULT  "2"  \
-                                                  #define  CTDSAMPLEDELAY_DESC \
-                                                  "Number of seconds to wait   \
-                                                  before taking another        \
-                                                  sample. Polled Mode only \n" \
-                                                                               \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_NAME       \
-                                                  "CTD.SAMPINT"                \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_DEFAULT    \
-                                                  "6"                          \
-                                                  #define                      \
-                                                  CTDSAMPLEINTERVAL_DESC       \
-                                                  "Number of seconds between   \
-                                                  samples. Autonomous sampling \
-                                                  mode only \n"                \
-                                                  */
+  "1 to upload file via Iridium else 0\n" 
