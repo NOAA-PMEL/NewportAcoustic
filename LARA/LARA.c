@@ -906,9 +906,9 @@ int Incoming_Data() {
   // Case 0: Only at startup when MPC.STARTUPS>0
   case 0:
     while (incoming) {
+      DBG(flogf("\n Incoming\t");)
       AD_Check();
       if (tgetq(NIGKPort)) {
-        // DBG(flogf("NIGK Incoming");)
         AModem_Data();
       } else if (tgetq(devicePort)) { // ?? very messy handling of ctd
         // DBG(flogf("CTD Incoming");)
@@ -929,6 +929,7 @@ int Incoming_Data() {
   case 1:
 
     while (incoming) {
+      DBG(flogf("\n Incoming\t");)
       AD_Check();
       // Data coming from WISPR Board
       if (tgetq(PAMPort)) {
@@ -953,6 +954,7 @@ int Incoming_Data() {
   case 4:
 
     while (incoming) {
+      DBG(flogf("\n Incoming\t");)
       // ?? does adcheck need to run between each incoming? how often?
       AD_Check();
       if (tgetq(PAMPort)) {
@@ -982,6 +984,7 @@ int Incoming_Data() {
   // CASE 3: GPSIRID
   case 3:
     while (incoming) {
+      DBG(flogf("\n Incoming\t");)
       AD_Check();
       if (tgetq(PAMPort)) {
         // DBG(flogf("WISPR Incoming");)

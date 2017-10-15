@@ -31,9 +31,8 @@ extern SystemStatus LARA;
 
 WinchCalls WINCH;
 
-/************************************************************************************\
-** void Console_Data()
-\************************************************************************************/
+/*************************************************************************\
+\*************************************************************************/
 void WinchConsole() {
   char in;
   cprintf("\n\t|WinchConsole():");
@@ -48,7 +47,7 @@ void WinchConsole() {
   // Ascend
   else if (in == 'R')
     Winch_Ascend();
-  // Not sure...Buoy Status?
+  // Buoy Status?
   else if (in == 'B')
     Buoy_Status();
   else
@@ -57,7 +56,6 @@ void WinchConsole() {
 } //_____ Console_Data() _____//
 
 /*************************************************************\
-** void AModem_Data(void)
 \*************************************************************/
 void AModem_Data(void) {
   char *inString; // Array for input command/response
@@ -158,44 +156,35 @@ void AModem_Data(void) {
 
 } //____ AModem_Data() ____//
 /*************************************************************\
-** void Ascend(void)
-** Tells CTDPort to start autonomous data sampling
 \*************************************************************/
 ulong Winch_Ascend(void) {
-  flogf("\n%s|Winch_Ascend():", Time(NULL));
+  DBG(flogf("\n%s|Winch_Ascend():", Time(NULL));)
 
-  TUTxPrintf(NIGKPort, "#R,01,03\n");
   TUTxWaitCompletion(NIGKPort);
+  TUTxPrintf(NIGKPort, "#R,01,03\n");
   Delayms(25);
   WINCH.ASCENTCALLS++;
   return (time(NULL) + (ulong)NIGK.DELAY);
 } //____ Ascend() ____//
 /*************************************************************\
-** void Descend(void)
 \*************************************************************/
 ulong Winch_Descend(void) {
-  flogf("\n%s|Winch_Descend():", Time(NULL));
+  DBG(flogf("\n%s|Winch_Descend():", Time(NULL));)
 
-  TUTxPrintf(NIGKPort, "#F,01,00\n");
   TUTxWaitCompletion(NIGKPort);
+  TUTxPrintf(NIGKPort, "#F,01,00\n");
   Delayms(25);
   WINCH.DESCENTCALLS++;
-  return (time(NULL) + (ulong)NIGK.DELAY);
+  return (time(NULL) + (ulong)NIGK.DELAY); // why return time?
 } //____ Descend() ____//
 /*************************************************************\
-** void Stop(Bool)
-** This function goes about collecting buffered CTDPort data
-** and making sure the CTDPort comes to a complete stop before
-** checking for more CTDPort data
 \*************************************************************/
 ulong Winch_Stop(void) {
+  DBG(flogf("\n%s|Winch_Stop():", Time(NULL));)
 
-  flogf("\n%s|Winch_Stop():", Time(NULL));
-
-  TUTxPrintf(NIGKPort, "#S,01,00\n");
   TUTxWaitCompletion(NIGKPort);
+  TUTxPrintf(NIGKPort, "#S,01,00\n");
   Delayms(25);
-
   WINCH.STOPCALLS++;
   return (time(NULL) + (ulong)NIGK.DELAY);
 }
@@ -207,19 +196,17 @@ ulong Winch_Stop(void) {
 \*************************************************************/
 void Buoy_Status(void) {
   char B_Status[3] = "00"; // Base return call
-
-  flogf("\n%s|Buoy Status:", Time(NULL));
+  DBG(flogf("\n%s|Buoy Status:", Time(NULL));)
 
   if (LARA.BUOYMODE != 0) // If CTDPort is Active and the Buoy is in motion
     B_Status[1] = '1';
-
   else if (LARA.BUOYMODE == 0) // If the Buoy is inactive and the CTDPort is off
     B_Status[0] = '1';
 
+  TUTxWaitCompletion(NIGKPort);
   TUTxPrintf(
       NIGKPort, "%%B,01,%c%c\n", B_Status[0],
       B_Status[1]); // Send rest of status via acoustic remote to deck unit
-  TUTxWaitCompletion(NIGKPort);
   Delayms(5000);        // Make sure all the Buoy Calls have been received....
   TURxFlush(NIGKPort); // Before clearing the NIGKPort Rx
   WINCH.BUOYRCV++;
