@@ -93,8 +93,6 @@ ushort BitShift;
 CFxAD *ad, adbuf;
 bool ADSOn;
 
-PowerParameters ADS;
-
 // ADSample is ptr returned by CFxADQueueToArray(), alloc'd by magic
 short *ADSample;
 long TotalPower[2] = {0, 0};

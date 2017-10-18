@@ -148,7 +148,6 @@ void WaitForWinch(short);
 void SleepUntilWoken();
 bool CurrentWarning();
 
-bool GlobalRestart;
 bool PutInSleepMode = false;
 static char uploadfile[] =
     "c:00000000.dat"; // 12.9.2015 Can this be a static char?
@@ -166,12 +165,11 @@ void main() {
   InitializeLARA(&PwrOn);
 
   // Running WISPR Always! //Rebooting TUPort post-Iridium
-  // ?? why is this not InitializeLARA()?
-#ifndef DEBUG3
-  OpenTUPort_WISPR(true);
+  // ?? why is this not InitializeLARA() or PhaseOne?
+  if (WISP.DUTYCYCL > 0)
+    OpenTUPort_WISPR(true);
   if (WISP.DUTYCYCL == 100)
     WISPRPower(true);
-#endif
 
   // PHASE 5:  Deployment
   if (LARA.PHASE==5) {
@@ -322,21 +320,21 @@ void InitializeLARA(ulong *PwrOn) {
     SleepUntilWoken();
     BIOSReset();
   }
-  // Else lower than user set minimum.
-  else if (volts < atof(ADS.MINVOLT)) {
+  // lower than user set minimum.
+  if (volts >= atof(ADS.MINVOLT)) 
+    LARA.LOWPOWER = false;
+  else {
     WISP.DUTYCYCL = 0; // Booting up with default.cfg will never have a set
                        // value for turning on the WISPR. WISPR can only be
                        // turned on again if
     VEEStoreShort(DUTYCYCLE_NAME, WISP.DUTYCYCL);
     // Possibility of WISPR still being on after reboot. Shut it down.
-#ifndef DEBUG3
+    // ?? check wispr power state first
     OpenTUPort_WISPR(true);
     WISPRSafeShutdown();
     OpenTUPort_WISPR(false);
-#endif
     LARA.LOWPOWER = true;
-  } else
-    LARA.LOWPOWER = false;
+  } 
 
   CTD_CreateFile(MPC.FILENUM); // for science, descent
 
@@ -350,7 +348,7 @@ void InitializeLARA(ulong *PwrOn) {
 
   // If First startup, parse system.cfg file and initialize all WISPR Boards.
   if (MPC.STARTUPS == 0) {
-    GlobalRestart = false;
+    LARA.RESTART = false;
     ParseStartupParams(false);
     LARA.BUOYMODE = 0;
     LARA.PHASE = 5; // deploy phase
@@ -361,19 +359,15 @@ void InitializeLARA(ulong *PwrOn) {
     if (WISPRNUMBER > 1) { // total number
       if (WISP.NUM != 1)
         WISP.NUM = 1; // current used board
-
-#ifndef DEBUG3
       OpenTUPort_WISPR(true);
-
       // Gather all #WISPRNUMBER freespace and sync time.
       GatherWISPRFreeSpace();
-#endif
     }
 
   }
   // Startups>0 Go to default callmode @ callhour.
   else {
-    GlobalRestart = true;
+    LARA.RESTART = true;
     LARA.PHASE = 0; // Phase 0 when finding the winch status and ctd position as
                     // to place the Buoy in the proper phase
     // Get previous call mode
@@ -540,11 +534,7 @@ void PhaseTwo() {
   OpenTUPort_NIGK(true);
   PrintSystemStatus();
 
-#ifdef DEBUG3
-  CTD_Select(DEVB);
-#else
   CTD_Select(DEVA);
-#endif
   LARA.DEPTH = CTD_AverageDepth(9, &velocity);
 
   // Coming here from phase one. Induced by system_timer==2
@@ -648,7 +638,7 @@ void PhaseThree() {
   OpenTUPort_WISPR(false);
 
   // should do this at boot
-  if (GlobalRestart) { 
+  if (LARA.RESTART) { 
     ParseStartupParams(true); 
   } 
 
@@ -717,7 +707,7 @@ void PhaseThree() {
   if (NIGK.RECOVERY) LARA.PHASE = 1; 
   // NIGK.RECOVERY may be cleared by Params load 
   
-  GlobalRestart = false;
+  LARA.RESTART = false;
   MPC.FILENUM++;
   sprintf(filenum, "%08ld", MPC.FILENUM);
   VEEStoreStr(FILENUM_NAME, filenum);
@@ -849,10 +839,8 @@ void PhaseFive() {
   maxT = (ulong) (2*60*60);
   Delayms(5000);
   RTCGetTime(&nowT, NULL);
-#ifdef DEBUG3
-  cprintf("\np5 then: %ld, now: %ld, max %ld", 
-    (long) deployT, (long) nowT, (long) maxT);
-#endif
+  DBG2( cprintf("\np5 then: %ld, now: %ld, max %ld", 
+    (long) deployT, (long) nowT, (long) maxT);)
   CTD_Select(DEVA);
   Delay_AD_Log(9);
   LARA.DEPTH=0.0;
@@ -883,10 +871,8 @@ void PhaseFive() {
     RTCGetTime(&nowT, NULL);
     if ((nowT - deployT) > maxT) break; // too long
   }
-#ifndef DEBUG3
   // do nothing for 30minutes
   Delay_AD_Log(30*60);
-#endif
   // deployed!
   flogf("\n%s\t|P5: deployed", Time(NULL));
   // rise
@@ -896,17 +882,18 @@ void PhaseFive() {
 /****************************************************************************\
 ** int Incoming_Data()
  * ?? very fragile, caution
+ * called by Phase1,2,3,4
 \****************************************************************************/
 int Incoming_Data() {
   bool incoming = true;
   static int count = 0;
   int value = 0; // Need to update this if we ever need to return a legit value.
-                 // -AT 20151215
+
+  DBG(flogf("\n Incoming_Data\t");)
   switch (LARA.PHASE) {
   // Case 0: Only at startup when MPC.STARTUPS>0
   case 0:
     while (incoming) {
-      DBG(flogf("\n Incoming\t");)
       AD_Check();
       if (tgetq(NIGKPort)) {
         AModem_Data();

@@ -5,7 +5,8 @@
 // #define DEBUG1
 #define DEBUG2
 // #define DEBUG3
-// #define DEBUG4  // turn off irid
+// #define DEBUG4
+#define DEBUGWISPR
 
 // pins on MPC board
 /*
@@ -70,6 +71,7 @@ typedef struct {
   short STATUS;
   short CTDSAMPLES;
   bool LOWPOWER;
+  bool RESTART;
 } SystemStatus;
 char *PrintSystemStatus(void);
 int Incoming_Data();
@@ -109,7 +111,11 @@ void LARA_Recovery();
 #define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
 #define SYSCLK 16000 // Clock speed: 2000 works 160-32000 kHz Default: 16000
 
+#ifdef DEBUGWISPR
+#define WISPRNUMBER 0
+#else
 #define WISPRNUMBER 4
+#endif
 #define MAX_DETECTIONS 20
 #define MIN_DUTYCYCLE 0
 #define MAX_DUTYCYCLE 100

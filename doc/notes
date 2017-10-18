@@ -86,3 +86,13 @@ WISPR.c:      if (errno != 0)
 
 
 
+cflow.err:
+cflow:ADS.c:118: ADS redefined
+cflow:ADS.c:96: this is the place of previous definition
+cflow:ADS.c:489: IEV_C_FUNCT/1 redefined
+cflow:ADS.c:455: this is the place of previous definition
+cflow:LARA.c:1133: IEV_C_FUNCT/1 redefined
+cflow:ADS.c:489: this is the place of previous definition
+cflow:antmain.c:120: main/0 redefined
+cflow:LARA.c:162: this is the place of previous definition
+
