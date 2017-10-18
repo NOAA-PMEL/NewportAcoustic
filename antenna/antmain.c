@@ -45,7 +45,7 @@
 #endif              /*  */
 // #define DEBUG1
 #ifdef DEBUG1
-#define DBG1(X) X // template:   DBG( cprintf("\n"); )
+#define DBG1(X) X // template:   DBG0( cprintf("\n"); )
 #pragma message("!!! "__FILE__                                                 \
                 ": Don't ship with DEBUG1 compile flag set!")
 #else               /*  */
@@ -526,7 +526,7 @@ void transBlock(long b) {
   if (count != b) 
     cprintf("Error: putblock %ld != expected %ld \n", count, b);
   DBG(if (echoUp||echoDn) cprintf(" [[%ld]] ", count);)
-  DBG1(
+  DBG(
   len = (int) TURxQueuedCount(devPort); // accumulated
   if (len > 0)
       cprintf("%d bytes accumulated on devPort \n", len);

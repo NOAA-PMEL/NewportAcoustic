@@ -435,10 +435,9 @@ int System_Timer() {
   else if (IRID.CALLMODE == 1) {
     time(&rawtime);
     info = gmtime(&rawtime);
-    // DBG(flogf("\n\t|CallTime: %d, Hour Now; %d", IRID.CALLHOUR,
-    // info->tm_hour);)
+    // DBG1(flogf("\n\t|CallTime: %d, Hour Now %d", IRID.CALLHOUR, info->tm_hour);)
     if (info->tm_hour == IRID.CALLHOUR) {
-      DBG(flogf("\n\t|Current Minutes: %d", info->tm_min);)
+      DBG1(flogf("\n\t|Current Minutes: %d", info->tm_min);)
       if (info->tm_min <= 3) {
         DataTimer = 0;
         flogf("\n\t|IRID CALLMODE=1, Call Now!\n\t|IRID CALLHOUR: %d",
@@ -471,14 +470,14 @@ float Check_Timers(ushort PLI) {
 #endif
 
   flogf("\n%s|Check_Timers()", Time(NULL));
-  DBG(flogf("\nMPC.DETINT: %d\nMPC.DATAXINT: %d", MPC.DETINT, MPC.DATAXINT);)
+  DBG1(flogf("\nMPC.DETINT: %d\nMPC.DATAXINT: %d", MPC.DETINT, MPC.DATAXINT);)
   // Rounding of our Detection Timer with the Power Logging Cycle "SysTimeInt"
-  DBG(flogf("\n\t|PLI: %hu", PLI);)
+  DBG1(flogf("\n\t|PLI: %hu", PLI);)
   DetectionInt = (((long)(MPC.DETINT * 600L) + (int)(PLI - 1)) / PLI);
   callrate = DetectionInt * (PLI / 600.0);
 
   flogf("\n\t|Recording Interval: %4.2f minutes", callrate);
-  DBG(flogf("\n\t|Detection Int: %d", DetectionInt);)
+  DBG1(flogf("\n\t|Detection Int: %d", DetectionInt);)
 
 #ifdef REALTIME
   if (IRID.CALLMODE == 0 || NIGK.RECOVERY) {
@@ -487,7 +486,7 @@ float Check_Timers(ushort PLI) {
     if (NIGK.RECOVERY)
       flogf("\n\t|RECOVERY MODE");
     flogf("\n\t|Data Interval %4.2f minutes", callrate);
-    DBG(flogf("\n\t|DataInterval: %d", DataInterval);)
+    DBG1(flogf("\n\t|DataInterval: %d", DataInterval);)
   } else if (IRID.CALLMODE == 1) {
     time(&rawtime);
     info = gmtime(&rawtime);
@@ -516,7 +515,7 @@ float Check_Timers(ushort PLI) {
   // Calculate Duty Cycle
   DutyCycleTicks = (int)(DetectionInt * ((float)(WISP.DUTYCYCL / 100.0)));
   flogf("\n\t|WISPR Duty Cycle: %d\%", WISP.DUTYCYCL);
-  DBG(flogf("\n\t|DutyCycleTicks: %d", DutyCycleTicks);)
+  DBG1(flogf("\n\t|DutyCycleTicks: %d", DutyCycleTicks);)
 // If some kind of Duty Cycle, keep Wispr Off until duty cycle begins
 
 // Real value...
@@ -641,18 +640,18 @@ bool Append_Files(int Dest, const char *SourceFileName, bool erase,
     memset(WriteBuffer, 0, 256 * sizeof(char));
 
     byteswritten = read(Source, WriteBuffer, BlockLength * sizeof(char));
-    DBG(flogf("\n\t|AppendFiles: bytes read: %d", byteswritten);)
+    DBG1(flogf("\n\t|AppendFiles: bytes read: %d", byteswritten);)
     if (i == NumBlks) {
       strcat(WriteBuffer, "\n");
       BlockLength++;
     }
     byteswritten = write(Dest, WriteBuffer, BlockLength * sizeof(char));
-    DBG(flogf("\n\t|AppendFiles: bytes written: %d", byteswritten);)
+    DBG1(flogf("\n\t|AppendFiles: bytes written: %d", byteswritten);)
   }
 
   if (erase) {
     if (close(Source) == 0) {
-      DBG(flogf("\n\t|Append_Files() %s Closed", SourceFileName);)
+      DBG1(flogf("\n\t|Append_Files() %s Closed", SourceFileName);)
       sprintf(extension, "%c%c%c", SourceFileName[11], SourceFileName[12],
               SourceFileName[13]);
       DOS_Com("del", MPC.FILENUM, extension, NULL);
@@ -738,7 +737,7 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
 
   //
   path[0] = dfname[0] = 'C'; // C: drive
-  DBG(flogf("\n\t|GetFileName(.%3s): %s", FileType,
+  DBG0(flogf("\n\t|GetFileName(.%3s): %s", FileType,
             Lowest ? "Lowest" : "Highest");)
 
   // Do this with *log extension next
@@ -758,10 +757,10 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
             break;
         if (i == 8) { // all digits
           if (Lowest && val < minval) {
-            // DBG(flogf("\nNew lowest value: %ld", val);)
+            // DBG1(flogf("\nNew lowest value: %ld", val);)
             minval = val;
           } else if (val > maxval) {
-            // DBG(flogf("\nNew highest value: %ld", val);)
+            // DBG1(flogf("\nNew highest value: %ld", val);)
             maxval = val;
           }
         }
@@ -770,10 +769,10 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
 
     if (Lowest) {
       if (minval < 0 && counter < 0 || minval == 99999999) {
-        DBG(flogf("\n\t|Did not find any .%3s files", FileType);)
+        DBG1(flogf("\n\t|Did not find any .%3s files", FileType);)
         return NULL;
       } else if (minval > counter) {
-        DBG(flogf("\n\t|New min val: %ld", minval);)
+        DBG1(flogf("\n\t|New min val: %ld", minval);)
         counter = minval;
       }
     } else {
@@ -781,7 +780,7 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
         counter = 0;                 // 2003-08-21
 
       else if (maxval >= counter) { // 2003-08-21
-        DBG(flogf("\n\t|New maxval: %ld", maxval);)
+        DBG1(flogf("\n\t|New maxval: %ld", maxval);)
         counter = maxval;
         if (incIndex)
           counter++;
@@ -796,8 +795,8 @@ char *GetFileName(bool Lowest, bool incIndex, long *fcounter,
   else
     *fcounter = counter;
 
-  DBG(flogf("\n%s|GetFileName(): %s", Time(NULL), dfname);)
-  DBG(flogf("\n\t|filecounter: %ld", filecounter);)
+  DBG1(flogf("\n%s|GetFileName(): %s", Time(NULL), dfname);)
+  DBG1(flogf("\n\t|filecounter: %ld", filecounter);)
 
   return dfname;
 
@@ -824,10 +823,10 @@ bool SaveParams(const char *Command) {
   }
   DBG(else flogf("\n\t|SYSTEM.CFG Opened"); cdrain(); coflush();)
 
-  DBG(flogf("\n\t|string length: %ld", strlen(Command)); cdrain(); coflush();)
+  DBG1(flogf("\n\t|string length: %ld", strlen(Command));)
 
   byteswritten = write(paramfilehandle, params, strlen(Command));
-  DBG(flogf("\n\t|BytesWritten: %d", byteswritten);)
+  DBG1(flogf("\n\t|BytesWritten: %d", byteswritten);)
   Delayms(25);
   if (close(paramfilehandle) < 0)
     flogf("\nERROR  |SYSTEM.CFG close errno: %d", errno);
@@ -884,7 +883,7 @@ void ParseStartupParams(bool DefaultSettings) {
     return;
   } else {
     returnval = false;
-    DBG(flogf("\n\t|ParseStartupParams() opened");)
+    DBG1(flogf("\n\t|ParseStartupParams() opened");)
   }
 
   param = (char *)calloc(filelength, sizeof(char));
@@ -893,18 +892,18 @@ void ParseStartupParams(bool DefaultSettings) {
   strlength = strlen(delimiters);
   delimiters2 = (char *)calloc(strlength * 2, sizeof(char));
   bytesread = read(paramfilehandle, param, (filelength * sizeof(char)));
-  DBG(flogf("\n\t|Bytes Read: %ld", bytesread); cdrain(); coflush();)
+  DBG1(flogf("\n\t|Bytes Read: %ld", bytesread);)
   if (close(paramfilehandle) == 0) {
-    DBG(flogf("\n\t|ParseStartupParams() closed");)
+    DBG1(flogf("\n\t|ParseStartupParams() closed");)
     returnval = true;
   } else {
-    DBG(flogf("\nERROR  |ParseStarupParams() errno: %d", errno);)
+    DBG1(flogf("\nERROR  |ParseStarupParams() errno: %d", errno);)
     returnval = false;
   }
 
   param = strchr(param, '(');
   paramstring = strtok(param + 1, ")");
-  DBG(flogf("\n%s|ParseStartupParam(%s)", Time(NULL), paramstring);)
+  DBG1(flogf("\n%s|ParseStartupParam(%s)", Time(NULL), paramstring);)
 
   for (i = 0, j = 0; i < strlength; i++, j += 2) {
 
@@ -926,11 +925,11 @@ void ParseStartupParams(bool DefaultSettings) {
     if (token[0] == 'v' || token[0] == 'V') {
       strncpy(string, token + 1, paramlength);
       floatvalue = atof(string);
-      DBG(flogf("\nvalue for minvolt: %5.2f", floatvalue);)
+      DBG1(flogf("\nvalue for minvolt: %5.2f", floatvalue);)
     } else {
       strncpy(string, token + 1, paramlength);
       value = atoi(string);
-      DBG(flogf("\nvalue at %c: %d", token[0], value);)
+      DBG1(flogf("\nvalue at %c: %d", token[0], value);)
     }
 
     switch (token[0]) {
@@ -1254,37 +1253,37 @@ void GetSettings(void) {
 
   p = VEEFetchData(PROG_NAME).str;
   strncpy(MPC.PROGNAME, p ? p : PROG_DEFAULT, sizeof(MPC.PROGNAME));
-  DBG(uprintf("PROGNAME=%s (%s)\n", MPC.PROGNAME, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("PROGNAME=%s (%s)\n", MPC.PROGNAME, p ? "vee" : "def");)
 
   p = VEEFetchData(PROJID_NAME).str;
   strncpy(MPC.PROJID, p ? p : PROJID_DEFAULT, sizeof(MPC.PROJID));
-  DBG(uprintf("PROJID=%s (%s)\n", MPC.PROJID, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("PROJID=%s (%s)\n", MPC.PROJID, p ? "vee" : "def");)
 
   p = VEEFetchData(PLTFRMID_NAME).str;
   strncpy(MPC.PLTFRMID, p ? p : PLTFRMID_DEFAULT, sizeof(MPC.PLTFRMID));
-  DBG(uprintf("PLTFRMID=%s (%s)\n", MPC.PLTFRMID, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("PLTFRMID=%s (%s)\n", MPC.PLTFRMID, p ? "vee" : "def");)
 
   p = VEEFetchData(LONGITUDE_NAME).str;
   strncpy(MPC.LONG, p ? p : LONGITUDE_DEFAULT, sizeof(MPC.LONG));
-  DBG(uprintf("LONGITUDE=%s (%s)\n", MPC.LONG, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("LONGITUDE=%s (%s)\n", MPC.LONG, p ? "vee" : "def");)
 
   p = VEEFetchData(LATITUDE_NAME).str;
   strncpy(MPC.LAT, p ? p : LATITUDE_DEFAULT, sizeof(MPC.LAT));
-  DBG(uprintf("LATITUDE=%s (%s)\n", MPC.LAT, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("LATITUDE=%s (%s)\n", MPC.LAT, p ? "vee" : "def");)
   /*
           p = VEEFetchData(LOCATION_NAME).str;
           strncpy(MPC.LOCATION, p ? p : LOCATION_DEFAULT, sizeof(MPC.LOCATION));
-          DBG( uprintf("LOCATION=%s (%s)\n", MPC.LOCATION, p ? "vee" : "def");
+          DBG1( flogf("LOCATION=%s (%s)\n", MPC.LOCATION, p ? "vee" : "def");
      cdrain();)
           */
   p = VEEFetchData(STARTUPS_NAME).str;
   MPC.STARTUPS = atoi(p ? p : STARTUPS_DEFAULT);
-  DBG(uprintf("STARTUPS=%d (%s)\n", MPC.STARTUPS, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("STARTUPS=%d (%s)\n", MPC.STARTUPS, p ? "vee" : "def");)
 
   //"s" 0- 999 Ideally this would be a small number
   p = VEEFetchData(STARTMAX_NAME).str;
   MPC.STARTMAX = atoi(p ? p : STARTMAX_DEFAULT);
-  DBG(uprintf("STARTMAX=%d (%s)\n", MPC.STARTMAX, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("STARTMAX=%d (%s)\n", MPC.STARTMAX, p ? "vee" : "def");)
   if (MPC.STARTMAX > MAX_STARTUPS) {
     uprintf("STARTMAX changed from %d to %d\n", MPC.STARTMAX, MAX_STARTUPS);
     MPC.STARTMAX = MAX_STARTUPS;
@@ -1298,7 +1297,7 @@ if(MPC.STARTUPS>MPC.STARTMAX){
   //"I" 0-360 minutes
   p = VEEFetchData(DETECTIONINT_NAME).str;
   MPC.DETINT = atoi(p ? p : DETECTIONINT_DEFAULT);
-  DBG(uprintf("DETINT=%u (%s)\n", MPC.DETINT, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("DETINT=%u (%s)\n", MPC.DETINT, p ? "vee" : "def");)
   if (MPC.DETINT < MIN_DETECTION_INTERVAL) {
     MPC.DETINT = MIN_DETECTION_INTERVAL;
     VEEStoreShort(DETECTIONINT_NAME, MPC.DETINT);
@@ -1310,7 +1309,7 @@ if(MPC.STARTUPS>MPC.STARTMAX){
   //"A"
   p = VEEFetchData(DATAXINTERVAL_NAME).str;
   MPC.DATAXINT = atoi(p ? p : DATAXINTERVAL_DEFAULT);
-  DBG(uprintf("DATAXINT=%u (%s)\n", MPC.DATAXINT, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("DATAXINT=%u (%s)\n", MPC.DATAXINT, p ? "vee" : "def");)
   if (MPC.DATAXINT < MIN_DATAX_INTERVAL) {
     MPC.DATAXINT = MIN_DATAX_INTERVAL;
     VEEStoreShort(DATAXINTERVAL_NAME, MPC.DATAXINT);
@@ -1321,7 +1320,7 @@ if(MPC.STARTUPS>MPC.STARTMAX){
 /*
 p = VEEFetchData(HIBERNATE_NAME).str;
 MPC.HIBERNATE = atoi( p ? p : HIBERNATE_DEFAULT);
-DBG(uprintf("HIBERNATE=%u (%s)\n", MPC.HIBERNATE, p ? "vee" : "def"); cdrain();)
+DBG1(flogf("HIBERNATE=%u (%s)\n", MPC.HIBERNATE, p ? "vee" : "def");)
 */
 
 #ifdef POWERLOGGING

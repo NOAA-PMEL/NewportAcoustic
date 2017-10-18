@@ -158,7 +158,7 @@ void AModem_Data(void) {
 /*************************************************************\
 \*************************************************************/
 ulong Winch_Ascend(void) {
-  DBG(flogf("\n%s|Winch_Ascend():", Time(NULL));)
+  DBG0(flogf("\n%s|Winch_Ascend():", Time(NULL));)
 
   TUTxWaitCompletion(NIGKPort);
   TUTxPrintf(NIGKPort, "#R,01,03\n");
@@ -169,7 +169,7 @@ ulong Winch_Ascend(void) {
 /*************************************************************\
 \*************************************************************/
 ulong Winch_Descend(void) {
-  DBG(flogf("\n%s|Winch_Descend():", Time(NULL));)
+  DBG0(flogf("\n%s|Winch_Descend():", Time(NULL));)
 
   TUTxWaitCompletion(NIGKPort);
   TUTxPrintf(NIGKPort, "#F,01,00\n");
@@ -180,7 +180,7 @@ ulong Winch_Descend(void) {
 /*************************************************************\
 \*************************************************************/
 ulong Winch_Stop(void) {
-  DBG(flogf("\n%s|Winch_Stop():", Time(NULL));)
+  DBG0(flogf("\n%s|Winch_Stop():", Time(NULL));)
 
   TUTxWaitCompletion(NIGKPort);
   TUTxPrintf(NIGKPort, "#S,01,00\n");
@@ -196,7 +196,7 @@ ulong Winch_Stop(void) {
 \*************************************************************/
 void Buoy_Status(void) {
   char B_Status[3] = "00"; // Base return call
-  DBG(flogf("\n%s|Buoy Status:", Time(NULL));)
+  DBG0(flogf("\n%s|Buoy Status:", Time(NULL));)
 
   if (LARA.BUOYMODE != 0) // If CTDPort is Active and the Buoy is in motion
     B_Status[1] = '1';
@@ -257,34 +257,34 @@ void GetWinchSettings() {
 
   p = VEEFetchData(NIGKDELAY_NAME).str;
   NIGK.DELAY = atoi(p ? p : NIGKDELAY_DEFAULT);
-  DBG(uprintf("NIGK.DELAY=%u (%s)\n", NIGK.DELAY, p ? "vee" : "def"); cdrain();)
+  DBG1(uprintf("NIGK.DELAY=%u (%s)\n", NIGK.DELAY, p ? "vee" : "def");)
 
   p = VEEFetchData(NIGKANTENNALENGTH_NAME).str;
   NIGK.ANTLEN = atoi(p ? p : NIGKANTENNALENGTH_DEFAULT);
-  DBG(uprintf("NIGK.ANTLEN=%u (%s)\n", NIGK.ANTLEN, p ? "vee" : "def");
+  DBG1(uprintf("NIGK.ANTLEN=%u (%s)\n", NIGK.ANTLEN, p ? "vee" : "def");
       cdrain();)
 
   p = VEEFetchData(NIGKTARGETDEPTH_NAME).str;
   NIGK.TDEPTH = atoi(p ? p : NIGKTARGETDEPTH_DEFAULT);
-  DBG(uprintf("NIGK.TDEPTH=%u (%s)\n", NIGK.TDEPTH, p ? "vee" : "def");
+  DBG1(uprintf("NIGK.TDEPTH=%u (%s)\n", NIGK.TDEPTH, p ? "vee" : "def");
       cdrain();)
 
   p = VEEFetchData(NIGKRISERATE_NAME).str;
   NIGK.RRATE = atoi(p ? p : NIGKRISERATE_DEFAULT);
-  DBG(uprintf("NIGK.RRATE=%u (%s)\n", NIGK.RRATE, p ? "vee" : "def"); cdrain();)
+  DBG1(uprintf("NIGK.RRATE=%u (%s)\n", NIGK.RRATE, p ? "vee" : "def");)
 
   p = VEEFetchData(NIGKFALLRATE_NAME).str;
   NIGK.FRATE = atoi(p ? p : NIGKFALLRATE_DEFAULT);
-  DBG(uprintf("NIGK.FRATE=%u (%s)\n", NIGK.FRATE, p ? "vee" : "def"); cdrain();)
+  DBG1(uprintf("NIGK.FRATE=%u (%s)\n", NIGK.FRATE, p ? "vee" : "def");)
 
   p = VEEFetchData(NIGKPROFILES_NAME).str;
   NIGK.PROFILES = atoi(p ? p : NIGKPROFILES_DEFAULT);
-  DBG(uprintf("NIGK.PROFILES=%u (%s)\n", NIGK.PROFILES, p ? "vee" : "def");
+  DBG1(uprintf("NIGK.PROFILES=%u (%s)\n", NIGK.PROFILES, p ? "vee" : "def");
       cdrain();)
 
   p = VEEFetchData(NIGKRECOVERY_NAME).str;
   NIGK.RECOVERY = atoi(p ? p : NIGKRECOVERY_DEFAULT);
-  DBG(uprintf("NIGK.RECOVERY=%u (%s)\n", NIGK.RECOVERY, p ? "vee" : "def");
+  DBG1(uprintf("NIGK.RECOVERY=%u (%s)\n", NIGK.RECOVERY, p ? "vee" : "def");
       cdrain();)
 }
 /****************************************************************************\
@@ -308,7 +308,7 @@ void Winch_Monitor(int filehandle) {
   flogf("\n\t|Winch_Monitor():\n%s", WriteBuffer);
 
   byteswritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
-  DBG(flogf("\nBytesWritten: %d", byteswritten);)
+  DBG1(flogf("\nBytesWritten: %d", byteswritten);)
   // free(writebuffer);
 
   WINCH.ASCENTCALLS = 0;

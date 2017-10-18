@@ -166,7 +166,7 @@ sleep before
  ********************************************************************************/
 short IRIDGPS() {
   short TX_Result;
-  DBG1(flogf("\n\t|iridgps.gpsstartup()"); cdrain();)
+  DBG1(flogf("\n\t|iridgps.gpsstartup()");)
   AntMode('G');
   if (!SatComOpen) OpenSatCom(true);
   if (!GPSstartup()) {
@@ -350,7 +350,7 @@ short Connect_SendFile_RecCmd(const char *filename) {
   int status = 0;
 
   // FileType="DAT";
-  DBG(flogf("\n%s|Connect_SendFile_RecCmd()", Time(NULL)); cdrain();)
+  DBG0(flogf("\n%s|Connect_SendFile_RecCmd()", Time(NULL));)
   TickleSWSR(); // another reprieve
   memset(currentfile, 0, (size_t) 9);
 
@@ -541,10 +541,10 @@ bool GetGPS_SyncRTC() {
       lseek(datafilehandle, 21, SEEK_SET); // 22 is for LARA data file
       Delayms(25); // ??
       byteswritten = write(datafilehandle, Coordinates, strlen(Coordinates));
-      DBG(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
+      DBG1(flogf("\n\t|Coordinate bytes written: %d", byteswritten);)
       if (close(datafilehandle) != 0)
         flogf("\nERROR  |GetGPS_SyncRTC: File Close error: %d", errno);
-      DBG2(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
+      DBG(else flogf("\n\t|GetGPS_SyncRTC: File Closed");)
     } // open(upload)
   } // GetGPSInput
   cdrain();
@@ -710,7 +710,7 @@ void OpenSatCom(bool onoff) {
   
   if (onoff) { // turn on
     // AntMode set before call to OpenSatCom
-    DBG(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP); cdrain();)
+    DBG1(flogf("\n%s|Warmup iridium for %d Sec", Time(NULL), IRID.WARMUP);)
     Delay_AD_Log(IRID.WARMUP);
     DBG(ConsoleIrid();)
     PhonePin();
@@ -954,7 +954,7 @@ short SignalQuality(short *signal_quality) {
 void SendString(const char *StringIn) {
   char *local[16];
   strcpy(local, StringIn);
-  DBG1(flogf("\n\t|SendString(%s)", local); cdrain();)
+  DBG1(flogf("\n\t|SendString(%s)", local);)
   strcat(local, "\r");
   TUTxPutBlock(devicePort, local, (long) strlen(local), (short) 1000);
 } //_____ SendString() _____//
@@ -1000,7 +1000,7 @@ bool Call_Land(void) {
   // Looks for ATD followed by phonenum
   if (GetIRIDInput("ATD", 3, PhoneNum, NULL) != 1) {
     CallOK = false;
-    DBG2(flogf("\n\t|Call did not make it"); cdrain();)
+    DBG2(flogf("\n\t|Call did not make it");)
     // StatusCheck();
     if ((status = PhoneStatus()) == 0) {
       if (CallStatus() == 6) {
@@ -1063,7 +1063,7 @@ bool SendProjHdr() {
 
   // note - sprintf is zero terminated, strncpy is not
   sprintf(proj, "%4s%4s", MPC.PROJID, MPC.PLTFRMID);
-  DBG(flogf("\n%s|SendProjHdr(%s)", Time(NULL), proj);)
+  DBG0(flogf("\n%s|SendProjHdr(%s)", Time(NULL), proj);)
   crc = Calc_Crc(proj, 8);
   crc1 = crc;
   crc2 = crc;
@@ -1194,7 +1194,7 @@ short Send_File(bool FileExist, long filelength) {
     // Send the data IridFile in blocks
     for (i = 0; i < NumOfBlks; i++)
       bitmap[63 - i] = '1'; // Set bitmap all to '1s' to send all blocks
-    // DBG(flogf("\n\t|Check First Bitmap: %s", bitmap); putflush();)
+    // DBG1(flogf("\n\t|Check First Bitmap: %s", bitmap); )
 
     Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
     // note- S_B delays per output size, flushes input
@@ -1228,7 +1228,7 @@ short Send_File(bool FileExist, long filelength) {
       Delayms(10);
       if (Reply == 0) { // Request to resend bad blocks
         Convert_BitMap_To_CharBuf(val0, val1, &bitmap);
-        DBG2(flogf("\n\t|Resend"); cdrain();
+        DBG2(flogf("\n\t|Resend");
             Delayms(20);)
         Send_Blocks(bitmap, NumOfBlks, BlkLength, LastBlkLength);
       }
@@ -1294,13 +1294,13 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
 
   buf = (uchar *)calloc((int) (BlockLength+20), 1);
 
-  DBG(flogf(" .Send_Blocks() ");)
+  DBG0(flogf(" .Send_Blocks() ");)
   IRIDFileHandle = open(IRIDFilename, O_RDONLY);
   if (IRIDFileHandle <= 0) {
     flogf("\nError: Send_Blocks: failed open(%s)", IRIDFilename);
     return -6;
   }
-  DBG2(else flogf("\n\t|Send_Blocks: open(%s)", IRIDFilename);)
+  DBG(else flogf("\n\t|Send_Blocks: open(%s)", IRIDFilename);)
 
   crc_calc = 0x0000;
   for (BlkNum = 1; BlkNum <= NumOfBlks;
@@ -1312,13 +1312,13 @@ int Send_Blocks(char *bitmap, uchar NumOfBlks, ushort BlockLength,
     blklen = BlockLength + 5;
     mlen[0] = (blklen & 0xFF00) >> 8; // Convert an integer to
     mlen[1] = (blklen & 0x00FF);      // 2-byte uchar.
-    DBG1(flogf(", clear %d bytes", blklen + 5); cdrain();)
+    DBG1(flogf(", clear %d bytes", blklen + 5);)
     memset(buf, 0, (size_t) (blklen + 5)); // Flush the buffer
 
     bytesread = read(IRIDFileHandle, buf + dataheader, (size_t) BlockLength);
-    DBG(flogf("\n\t|Bytes Read: %ld", bytesread); cdrain(); )
+    DBG1(flogf("\n\t|Bytes Read: %ld", bytesread); )
     if (bitmap[64 - BlkNum] != '0') { // Send in reverse order
-      DBG(flogf("\n\t|SENDING BLK #%d %ld BYTES", BlkNum, mlength); )
+      DBG1(flogf("\n\t|SENDING BLK #%d %ld BYTES", BlkNum, mlength); )
       AD_Check();
       buf[5] = mlen[0]; // Block length
       buf[6] = mlen[1];
@@ -1479,7 +1479,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   int crc_rec, crc_chk; // crc
   int k = 1;
 
-  DBG(flogf("\n%s|Waiting for Land", Time(NULL)); cdrain();)
+  DBG1(flogf("\n%s|Waiting for Land", Time(NULL));)
   memset(stringin, 0, (size_t) BUFSZ);
   CLK(start_clock = clock();)
 
@@ -1492,13 +1492,13 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
   Delay_AD_Log(1);
   qsize = (long)tgetq(devicePort);
 
-  DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
+  DBG1(flogf("\n\t|Check Queue: %ld", qsize);)
   Delayms(10);
   if (qsize < 7) {
     stringin[1] = TURxGetByteWithTimeout(devicePort, 3000);
     k = 2;
     qsize = (long)tgetq(devicePort);
-    DBG(flogf("\n\t|Check Queue: %ld", qsize); cdrain();)
+    DBG1(flogf("\n\t|Check Queue: %ld", qsize);)
   }
 
   CLK(stop_clock = clock();
@@ -1510,7 +1510,7 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
                            TUBlockDuration(devicePort, qsize)) + k;
   DBG1(printsafe((long) leninput, stringin);) 
   len = strspn(stringin, "\r\ncmdsoneNO C");
-  DBG(flogf("\n\t|Len of command characters: %d of %ld", len, leninput);)
+  DBG1(flogf("\n\t|Len of command characters: %d of %ld", len, leninput);)
 
   if (len > 1) {
     strncpy(hbuf, stringin, len);
@@ -1524,13 +1524,13 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
       LostConnect = true;
   } else {
     len = strspn(stringin, "\r\n@ ");
-    DBG(flogf("\n\t|Len of possible resendString: %d", len);)
+    DBG1(flogf("\n\t|Len of possible resendString: %d", len);)
     if (StringSearch(hbuf, "@@@", NULL) == 1)
       resent = 1;
   }
 
   if (cmds > 0) { //"cmds" string is confirmed get ready to receive a command
-    DBG(flogf("\n\t|Incoming Commands"); putflush(); CIOdrain();)
+    DBG1(flogf("\n\t|Incoming Commands");)
     return cmds + 1;
   } else if (done) //"done" string is confirmed //Moved this else if here
                    //because for some reason we were receiving @@@ in cmds, and
@@ -1547,7 +1547,8 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
     for (i = hbuf_size + 1; i < qsize; i++) { // Get other 11-bytes from header
       hbuf[i] = TURxGetByteWithTimeout(devicePort, 300);
       if (hbuf[i] == '-1') {
-        DBG(flogf("\n\t|resent buffer incomplete: %s", hbuf);) return -3;
+        DBG1(flogf("\n\t|resent buffer incomplete: %s", hbuf);) 
+        return -3;
       } // If any of the 11 are bad, return fail
     }
 
@@ -1571,14 +1572,13 @@ short Check_If_Cmds_Done_Or_Resent(ulong *val0, ulong *val1) {
               ((ulong)bfo[7]) << 24;
       return 0;
     } else {
-      DBG(flogf("\n\t|Resend request garbled: %s", hbuf); putflush();
-          CIOdrain(); Delayms(10);)
+      DBG1(flogf("\n\t|Resend request garbled: %s", hbuf);)
       return -4;
     }
   }
 
   else {
-    DBG(flogf("\n\t|Inaccurate reply from land: %s", hbuf);)
+    DBG1(flogf("\n\t|Inaccurate reply from land: %s", hbuf);)
     return -5;
   }
 
@@ -1634,17 +1634,17 @@ int Receive_Command(int len) {
   flogf("\n%s|Receive_Command()", Time(NULL));
 
   if ((commands = strstr(stringin, "@@@")) != NULL) {
-    DBG(flogf("\n\t|%s", commands + 10);)
+    DBG1(flogf("\n\t|%s", commands + 10);)
     crc_irid = commands[3] << 8 | commands[4];  // Save the received CRC
     cmdLength = commands[5] << 8 | commands[6]; // Get command length;
-    DBG(flogf("\n\t|Given CRC: %#4x, CmdLength: %d", crc_irid, cmdLength);)
+    DBG1(flogf("\n\t|Given CRC: %#4x, CmdLength: %d", crc_irid, cmdLength);)
 
     offset = 10;
   } else if ((commands = strstr(stringin, "@@")) != NULL) {
-    DBG(flogf("\n\t|%s", commands + 9);)
+    DBG1(flogf("\n\t|%s", commands + 9);)
     crc_irid = commands[2] << 8 | commands[3];
     cmdLength = commands[4] << 8 | commands[5];
-    DBG(flogf("\n\t|Given CRC: %#4x, CmdLength: %d", crc_irid, cmdLength);)
+    DBG1(flogf("\n\t|Given CRC: %#4x, CmdLength: %d", crc_irid, cmdLength);)
     offset = 9;
   }
 
@@ -1656,7 +1656,7 @@ int Receive_Command(int len) {
 
   // Calc_CRC needs everything after crc bytes in header + length/#of bytes
   crc_chk = Calc_Crc(commands + (offset - 5), cmdLength);
-  DBG(flogf("\n\t|Calc CRC: %#4x", crc_chk);)
+  DBG1(flogf("\n\t|Calc CRC: %#4x", crc_chk);)
   Delayms(20);
 
   if (crc_chk == crc_irid) { // If our crc values match up...
@@ -1755,7 +1755,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
 
   first = scratch; // blk - first is a problem
 
-  DBG(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
+  DBG1(flogf("\n\t|GetIRIDInput(%s, %s)", Template, compstring); )
 
   memset(stringin, 0, (size_t) BUFSZ);
   memset(first, 0, (size_t) BUFSZ);
@@ -1779,7 +1779,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     // successful Template search
     else {
       Match = 1;
-      DBG(flogf("\n%s|Found %s", Time(NULL), Template);)
+      DBG1(flogf("\n%s|Found %s", Time(NULL), Template);)
       CLK(stop_clock = clock();
           print_clock_cycle_count(start_clock, stop_clock, "GetIRIDInput");
           cdrain();)
@@ -1837,7 +1837,7 @@ short GetIRIDInput(char *Template, short num_char_to_reads, uchar *compstring,
     Match = -1;
   }
   if (Match == 0) {
-    DBG(flogf("\n\t|GetIRID() Buf: %s", stringin);)
+    DBG1(flogf("\n\t|GetIRID() Buf: %s", stringin);)
     Match = StringSearch(stringin, Template, compstring);
   }
 
@@ -1864,7 +1864,7 @@ short StringSearch(char *inString, char *Template, uchar *compstring) {
       if (strchr(inString, Template[i]) != NULL)
         Count++;
     }
-    DBG(flogf("\n\t|StringSearch(Count: %d of %d)", Count, tempLength);)
+    DBG0(flogf("\n\t|StringSearch(Count: %d of %d)", Count, tempLength);)
     if (Count >= (tempLength / 2) + (tempLength % 2))
       Match = 1;
   }
@@ -1874,7 +1874,7 @@ short StringSearch(char *inString, char *Template, uchar *compstring) {
       if (strchr(inString, compstring[i]) != NULL)
         Count++;
     }
-    DBG(flogf("\n\t|StringSearch(Count: %d of %d)", Count, compLength);)
+    DBG0(flogf("\n\t|StringSearch(Count: %d of %d)", Count, compLength);)
     if (Count >= (compLength / 2) + (compLength % 2))
       Match = 1;
   }
@@ -1936,7 +1936,7 @@ char *GetGPSInput(char *chars, int *numsats) {
     Delayms(20);
     cdrain();
   }
-  // DBG(flogf("\n\t|first string: %s", first);)
+  // DBG1(flogf("\n\t|first string: %s", first);)
   TURxFlush(devicePort);
   TUTxFlush(devicePort);
   return first;
@@ -1951,7 +1951,7 @@ void GetIRIDIUMSettings() {
   //"u" maxupload
   p = VEEFetchData(MAXUPLOAD_NAME).str;
   IRID.MAXUPL = atoi(p ? p : MAXUPLOAD_DEFAULT);
-  DBG(uprintf("MAXUPL=%d (%s)\n", IRID.MAXUPL, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("MAXUPL=%d (%s)\n", IRID.MAXUPL, p ? "vee" : "def");)
 
   p = VEEFetchData(ANTSW_NAME).str;
   IRID.ANTSW = atoi(p ? p : ANTSW_DEFAULT);
@@ -2035,7 +2035,7 @@ int GetStringWait(char *str, int wait) {
   // long wait
   ch = TURxGetByteWithTimeout(devicePort, (short) wait*1000);
   if (ch<0) {
-    DBG(flogf("\n\t|GetStringWait() timeout");)
+    DBG1(flogf("\n\t|GetStringWait() timeout");)
     str[0]=0;
     return 0;
   }

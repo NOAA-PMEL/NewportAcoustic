@@ -71,8 +71,8 @@ int CTD_Init() {
 bool CTD_Start_Up(int sbe, bool settime) {
   // global int sbeID;
   bool returnval = false;
-  DBG0( cprintf("\n\t|. CTD_Start_Up "); )
-  DBG1( cprintf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
+  DBG1( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
+  DBG1( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
 
   CTD_Select(sbe);
 
@@ -132,7 +132,7 @@ void CTD_DateTime() {
   time_t rawtime;
   struct tm *info;
   char buffer[15];
-  DBG0(flogf("\n\t|CTD_DateTime()");)
+  DBG1(flogf("\n\t|CTD_DateTime()");)
   time(&rawtime);
 
   info = gmtime(&rawtime);
@@ -161,7 +161,7 @@ bool CTD_GetPrompt() {
   if (strstr(stringin, ">") != NULL) r=true;
   else {
     r=false;
-    DBG2(cprintf("\n\t|CTD_GetPrompt()->%s", stringin);)
+    DBG2(flogf("\n\t|CTD_GetPrompt()->%s", stringin);)
   }
   return r;
 }
@@ -171,7 +171,7 @@ bool CTD_GetPrompt() {
 \********************************************************************************/
 void CTD_Sample() {
   char ch;
-  DBG0( flogf("\n . CTD_Sample"); )
+  DBG1( flogf("\n . CTD_Sample"); )
   //if (SyncMode) {
     //TUTxPrintf(devicePort, "+\r");
     //Delayms(20);
@@ -192,7 +192,7 @@ void CTD_Sample() {
 ** CTD_SampleSleep()
 \********************************************************************************/
 void CTD_SyncMode() {
-  DBG(flogf("\n\t|CTD_SyncMode()");)
+  DBG0(flogf("\n\t|CTD_SyncMode()");)
   // CTD_SampleBreak();
   TUTxPrintf(devicePort, "Syncmode=y\r");
   Delayms(500);
@@ -389,7 +389,7 @@ bool CTD_Data() {
   struct tm info;
   time_t secs = 0;
 
-  DBG0( cprintf("\n. CTD_Data()"); )
+  DBG1( flogf("\n. CTD_Data()"); )
   memset(stringin, 0, BUFSZ);
 
   // waits up to 8 seconds - best called after tgetq()
@@ -435,7 +435,7 @@ bool CTD_Data() {
   }
   LARA.DEPTH = pres;
   // LARA.TEMP = temp; //??
-  DBG(flogf("\nctd->%s", stringout);)
+  DBG1(flogf("\nctd->%s", stringout);)
 
   // buoy sbe vvvvv
   // convert date time to secs
@@ -484,7 +484,7 @@ bool CTD_Data() {
   sprintf(stringin, ",%d/%d/%d,%02d:%02d:%02d", month, info.tm_mday,
           info.tm_year - 100, info.tm_hour, info.tm_min, info.tm_sec);
   strcat( stringout, stringin );
-  DBG(flogf("%s", stringin);)
+  DBG1(flogf("%s", stringin);)
 
   secs = mktime(&info);
 
@@ -499,7 +499,7 @@ bool CTD_Data() {
     return false;
   }
   byteswritten = write(filehandle, stringout, strlen(stringout));
-  DBG2( cprintf("\nBytes Written: %d", byteswritten);)
+  DBG2( flogf("\nBytes Written: %d", byteswritten);)
   if (close(filehandle) != 0) {
     flogf("\nERROR  |CTD_Logger: File Close error: %d", errno);
     return false;
@@ -523,7 +523,7 @@ time_t CTD_VertVel(time_t seconds) {
   if (timechange > 180 || pastTime == 0) {
     pastTime = seconds;
     pastDepth = LARA.DEPTH;
-    DBG(flogf("\n\t|CTD_VertVel: No previous recent measurements, reinitialize");)
+    DBG1(flogf("\n\t|CTD_VertVel: No previous recent measurements, reinitialize");)
     return 0;
   } else {
     pastTime = seconds;
@@ -546,7 +546,7 @@ void CTD_GetSettings() {
 
   p = VEEFetchData(CTDUPLOADFILE_NAME).str;
   CTD.UPLOAD = atoi(p ? p : CTDUPLOADFILE_DEFAULT);
-  DBG2(uprintf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def"); cdrain();)
+  DBG2(flogf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def");)
 
 } //____ CTD_GetSettings() ____//
 
@@ -562,7 +562,7 @@ float CTD_AverageDepth(int i, float *velocity) {
   float first, last, diff, vel;
   ulong dur, starttime = 0, stoptime = 0;
 
-  DBG0( flogf("\n . CTD_AverageDepth"); )
+  DBG1( flogf("\n . CTD_AverageDepth"); )
   CTD_Select(DEVA);
   TURxFlush(devicePort);
 

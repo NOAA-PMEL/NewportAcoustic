@@ -1,11 +1,15 @@
 // DEFINE THE TYPE OF PLATFORM
 #define PLATFORM LARA
-// #define DEBUG
-// #define DEBUG0
+// the DEBUG's each turn on a macro named DBG()
+// blocks of code
+#define DEBUG
+// 0 print func names
+#define DEBUG0
+// 1 print more interesting things
 // #define DEBUG1
+// 2 print details
 #define DEBUG2
-// #define DEBUG3
-// #define DEBUG4
+// debug related to wispr
 #define DEBUGWISPR
 
 // pins on MPC board

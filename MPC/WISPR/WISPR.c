@@ -124,7 +124,7 @@ short WISPR_Data() {
 
         flogf("\n\t|WISPR%d: %0.2f%% Total Space", WISP.NUM, returndouble);
         if(returndouble ==0.0){
-           DBG(flogf("\n\t|Bad TFP return... tryaing again");)
+           DBG1(flogf("\n\t|Bad TFP return... tryaing again");)
            WISPRTFP();
            return -3;
            }
@@ -136,7 +136,7 @@ short WISPR_Data() {
     flogf("\n\t|WISPR%d: %.2f%% Free Space", WISP.NUM, returndouble);
 
     if (returndouble == 0.0) {
-      DBG(flogf("\n\t|Bad DFP return...trying again");)
+      DBG1(flogf("\n\t|Bad DFP return...trying again");)
       WISPRDFP();
       return -2;
     }
@@ -198,7 +198,7 @@ short WISPR_Data() {
     sprintf(&DTXFilename[2], "%08ld.dtx", MPC.FILENUM);
 #endif
 
-    DBG(flogf("\n\t|DTX file: %s", DTXFilename);)
+    DBG1(flogf("\n\t|DTX file: %s", DTXFilename);)
     WISPRFile = open(DTXFilename, O_APPEND | O_RDWR | O_CREAT);
     Delayms(25);
     if (WISPRFile <= 0)
@@ -221,7 +221,7 @@ short WISPR_Data() {
     }
 
     else if (dtxrqst > 0) {
-      DBG(flogf("\n%s", WisprString);)
+      DBG1(flogf("\n%s", WisprString);)
       AppendDetections(WisprString, WISPRFile);
       if (dtxrqst > 0) {
         for (i = 0; i < dtxrqst; i++) {
@@ -250,7 +250,7 @@ short WISPR_Data() {
   }
 
   else if (strncmp(WisprString, "$DTX", 4) == 0) {
-    DBG(flogf("\n%s", WisprString);)
+    DBG1(flogf("\n%s", WisprString);)
     return 4;
   }
 
@@ -362,7 +362,7 @@ void WISPRGain(short c) {
 \*************************************************************************/
 void WISPRDFP() {
 
-  DBG(flogf("\n\t|WISPRDFP(%d)", WISP.NUM);)
+  DBG0(flogf("\n\t|WISPRDFP(%d)", WISP.NUM);)
   TURxFlush(PAMPort);
   TUTxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$DFP*\n");
@@ -375,7 +375,7 @@ void WISPRDFP() {
 \*************************************************************************/
 void WISPRTFP() {
 
-  DBG(flogf("\n\t|WISPRTFP(%d)", WISP.NUM);)
+  DBG0(flogf("\n\t|WISPRTFP(%d)", WISP.NUM);)
   TURxFlush(PAMPort);
   TUTxFlush(PAMPort);
   TUTxPrintf(PAMPort, "$TFP*\n");
@@ -443,7 +443,7 @@ char *GetWISPRInput(float *numchars) {
   r[0] = '$';
   r[1] = TURxGetByteWithTimeout(PAMPort, 100);
   if (r[1] == -1) {
-    DBG(flogf("\nThe first input character is negative one");
+    DBG1(flogf("\nThe first input character is negative one");
         Delayms(20);)
     return NULL;
   }
@@ -520,7 +520,7 @@ void GetWISPRSettings() {
   /*****************WISPR PARAMETERS**************************************/
   p = VEEFetchData(DETECTIONMAX_NAME).str;
   WISP.DETMAX = atoi(p ? p : DETECTIONMAX_DEFAULT);
-  DBG(uprintf("DETMAX=%u (%s)\n", WISP.DETMAX, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("DETMAX=%u (%s)\n", WISP.DETMAX, p ? "vee" : "def");)
   if (WISP.DETMAX > MAX_DETECTIONS) {
     WISP.DETMAX = MAX_DETECTIONS;
     VEEStoreShort(DETECTIONMAX_NAME, WISP.DETMAX);
@@ -529,7 +529,7 @@ void GetWISPRSettings() {
   //"g" 0-3 gain values
   p = VEEFetchData(WISPRGAIN_NAME).str;
   WISP.GAIN = atoi(p ? p : WISPRGAIN_DEFAULT);
-  DBG(uprintf("WISPRGAIN=%u (%s)\n", WISP.GAIN, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("WISPRGAIN=%u (%s)\n", WISP.GAIN, p ? "vee" : "def");)
   if (WISP.GAIN > 3) {
     WISP.GAIN = 3;
     VEEStoreShort(WISPRGAIN_NAME, WISP.GAIN);
@@ -541,12 +541,12 @@ void GetWISPRSettings() {
   // "N" Number of detections per DETINT to trigger AModem
   p = VEEFetchData(DETECTIONNUM_NAME).str;
   WISP.DETNUM = atoi(p ? p : DETECTIONNUM_DEFAULT);
-  DBG(uprintf("DETECTNUM=%u (%s)\n", WISP.DETNUM, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("DETECTNUM=%u (%s)\n", WISP.DETNUM, p ? "vee" : "def");)
 
   //"C" dutycycle
   p = VEEFetchData(DUTYCYCLE_NAME).str;
   WISP.DUTYCYCL = atoi(p ? p : DUTYCYCLE_DEFAULT);
-  DBG(uprintf("DUTYCYCLE=%d (%s)\n", WISP.DUTYCYCL, p ? "vee" : "def");
+  DBG1(flogf("DUTYCYCLE=%d (%s)\n", WISP.DUTYCYCL, p ? "vee" : "def");
       cdrain();)
   if (WISP.DUTYCYCL > MAX_DUTYCYCLE) {
     WISP.DUTYCYCL = MAX_DUTYCYCLE;
@@ -559,7 +559,7 @@ void GetWISPRSettings() {
   // "x" wisprnum
   p = VEEFetchData(WISPRNUM_NAME).str;
   WISP.NUM = atoi(p ? p : WISPRNUM_DEFAULT);
-  DBG(uprintf("WISPRNUM=%d (%s)\n", WISP.NUM, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("WISPRNUM=%d (%s)\n", WISP.NUM, p ? "vee" : "def");)
   if (WISP.NUM < 1) {
     WISP.NUM = 1;
     VEEStoreShort(WISPRNUM_NAME, WISP.NUM);
@@ -614,7 +614,7 @@ void WISPRWriteFile(int uploadfilehandle) {
             WISP.NUM, WISPRGPSSends, WISP.GAIN, WISPRFreeSpace, WISP.DUTYCYCL,
             WISP.DETMAX, TotalDetections);
 
-    DBG(flogf("\n%s", WriteBuffer);)
+    DBG1(flogf("\n%s", WriteBuffer);)
     /*
             #ifdef REALTIME
                if(WISP.DETNUM>0){
@@ -629,7 +629,7 @@ void WISPRWriteFile(int uploadfilehandle) {
   }
 
   byteswritten = write(uploadfilehandle, WriteBuffer, strlen(WriteBuffer));
-  DBG(flogf("\nWISPRWrite File: Number of Bytes written: %d", byteswritten);)
+  DBG1(flogf("\nWISPRWrite File: Number of Bytes written: %d", byteswritten);)
 
   // If more than one wispr, add total free space of all WISPRs to Write File.
   if (WISPRNUMBER > 1)
@@ -640,7 +640,7 @@ void WISPRWriteFile(int uploadfilehandle) {
 #else
     sprintf(&detfname[2], "%08ld.dtx", MPC.FILENUM);
 #endif
-    DBG(flogf("\n\t|Append File: %s", detfname);)
+    DBG1(flogf("\n\t|Append File: %s", detfname);)
     Append_Files(uploadfilehandle, detfname, true, 0);
   } else {
 #ifdef SEAGLIDER
@@ -667,7 +667,7 @@ float GetWISPRFreeSpace() {
 void AppendDetections(char *DTXString, int FileDescriptor) {
   int i;
 
-  DBG(flogf("\nAppendDetections() dtxstring length: %lu", strlen(DTXString));)
+  DBG0(flogf("\nAppendDetections() dtxstring length: %lu", strlen(DTXString));)
   i = write(FileDescriptor, DTXString, strlen(DTXString));
 }
 /*************create dtx file*********************/
@@ -731,7 +731,7 @@ void GatherWISPRFreeSpace() {
       if (AD_Check()) {
         count++;
         if (gain || count == 2) {
-          DBG(flogf("\n\t|GWFS: DFP2");)
+          DBG1(flogf("\n\t|GWFS: DFP2");)
           WISPRDFP();
           Delayms(150);
           if (WISPR_Data() == 2)
@@ -747,7 +747,7 @@ void GatherWISPRFreeSpace() {
           if (wret == 5) {
             gain = true;
             Delayms(150);
-            DBG(flogf("\n\t|GWFS: DFP1");)
+            DBG1(flogf("\n\t|GWFS: DFP1");)
             WISPRDFP();
             Delayms(150);
             if (WISPR_Data() == 2)
@@ -771,7 +771,7 @@ void GatherWISPRFreeSpace() {
     //      if(WISPRFreeSpace>=MIN_FREESPACE)
     ChangeWISPR(wnum);
   }
-  DBG(flogf("\n\t|wnum: %d, WISP.NUM: %d", wnum, WISP.NUM);)
+  DBG1(flogf("\n\t|wnum: %d, WISP.NUM: %d", wnum, WISP.NUM);)
   wnum = 1;
 
   // Shut off WISPR && Close TUPort
@@ -814,7 +814,7 @@ void UpdateWISPRFRS() {
   }
   filesize = fileinfo.st_size;
 
-  DBG(flogf("\n\t|File size: %ld", filesize);)
+  DBG1(flogf("\n\t|File size: %ld", filesize);)
 
   wisprfilehandle = open(wisprfile, O_RDWR);
   Delayms(25);
@@ -840,13 +840,13 @@ void UpdateWISPRFRS() {
 
   p = strtok(p + 3, ",");
 
-  DBG(flogf("\nUpdating WISPRFRS at position %d from %5.2f to %5.2f", length,
+  DBG1(flogf("\nUpdating WISPRFRS at position %d from %5.2f to %5.2f", length,
             atof(p), WISPRFreeSpace);)
 
   sprintf(wispnum, "%5.2f", WISPRFreeSpace);
   lseek(wisprfilehandle, length + 3, SEEK_SET);
   bytes = write(wisprfilehandle, wispnum, 5);
-  DBG(flogf("\nBytes written: %d", bytes);)
+  DBG1(flogf("\nBytes written: %d", bytes);)
   lseek(wisprfilehandle, 0, SEEK_SET);
   read(wisprfilehandle, WisprString, fileinfo.st_size);
   flogf("%s", WisprString);

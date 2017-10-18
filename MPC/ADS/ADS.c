@@ -213,7 +213,7 @@ void Setup_Acquisition(ushort BitShift) {
   SAMPLES = (ushort)pow(2, BitShift);
   ADSTIME = (10 * SAMPLES * (PITRATE * PITPERIOD));
 
-  DBG(flogf("\n\t|Writing every %4.1fSeconds", ADSTIME / 10.0);)
+  DBG1(flogf("\n\t|Writing every %4.1fSeconds", ADSTIME / 10.0);)
   Delayms(1);
 
   // Set the Rate and start the PIT
@@ -433,7 +433,7 @@ float Power_Monitor(ulong totaltime, int filehandle, ulong *LoggingTime) {
                          "Volt:%.2fV\nMin Volt:%.2fV\nMax Current:%.3fA\n",
             TotalTime, kjoules, voltage, MinVoltage, MaxCurrent);
 
-  DBG(flogf("\n%s", WriteBuffer); cdrain(); coflush();)
+  DBG1(flogf("\n%s", WriteBuffer);)
   if (filehandle > 0)
     byteswritten = write(filehandle, WriteBuffer, strlen(WriteBuffer));
 
@@ -505,7 +505,7 @@ void GetPowerSettings() {
   p = VEEFetchData(MINSYSVOLT_NAME).str;
   strncpy(ADS.MINVOLT, p ? p : MINSYSVOLT_DEFAULT, sizeof(ADS.MINVOLT));
   //	MPC.MINVOLT =p;
-  DBG(uprintf("MINVOLT=%s (%s)\n", ADS.MINVOLT, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("MINVOLT=%s (%s)\n", ADS.MINVOLT, p ? "vee" : "def"); )
   if (MIN_BATTERY_VOLTAGE > atof(ADS.MINVOLT)) {
     sprintf(ADS.MINVOLT, "%5.2f", MIN_BATTERY_VOLTAGE);
     VEEStoreStr(MINSYSVOLT_NAME, ADS.MINVOLT);
@@ -513,10 +513,10 @@ void GetPowerSettings() {
 
   p = VEEFetchData(BATTERYCAPACITY_NAME).str;
   strncpy(ADS.BATCAP, p ? p : BATTERYCAPACITY_DEFAULT, sizeof(ADS.BATCAP));
-  DBG(uprintf("BATCAP=%s (%s)\n", ADS.BATCAP, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("BATCAP=%s (%s)\n", ADS.BATCAP, p ? "vee" : "def"); )
 
   //"t" 0 or 1
   p = VEEFetchData(BATTERYLOGGER_NAME).str;
   ADS.BATLOG = atoi(p ? p : BATTERYLOGGER_DEFAULT);
-  DBG(uprintf("BATLOG=%u (%s)\n", ADS.BATLOG, p ? "vee" : "def"); cdrain();)
+  DBG1(flogf("BATLOG=%u (%s)\n", ADS.BATLOG, p ? "vee" : "def"); )
 }

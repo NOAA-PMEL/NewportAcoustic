@@ -457,7 +457,7 @@ void InitializeLARA(ulong *PwrOn) {
   create_dtx_file(MPC.FILENUM);
 
 /*
-  DBG({
+  DBG0({
   TUChParams *tuch; 
   tuch = TUGetDefaultParams();
   flogf("\nTUChParams: baud %ld, rx %d, tx %d, pf %d",
@@ -833,24 +833,21 @@ void PhaseFive() {
   float nowD=0.0, thenD=0.0;
   int changeless=0;
 
-  flogf("\nPhaseFive()");
+  DBG0( flogf("\nPhaseFive()"); )
   RTCGetTime(&deployT, NULL);
   // give up after two hours
   maxT = (ulong) (2*60*60);
-  Delayms(5000);
   RTCGetTime(&nowT, NULL);
-  DBG2( cprintf("\np5 then: %ld, now: %ld, max %ld", 
-    (long) deployT, (long) nowT, (long) maxT);)
+  // ?? DBG2( flogf("\np5 then: %ld, now: %ld, max %ld", (long) deployT, (long) nowT, (long) maxT);)
   CTD_Select(DEVA);
-  Delay_AD_Log(9);
   LARA.DEPTH=0.0;
-  flogf("\n%s\t|P5: wait until >10m", Time(NULL));
+  DBG1( flogf("\n%s\t|P5: wait until >10m", Time(NULL));)
   while (LARA.DEPTH<10.0) {
     CTD_Sample();
     Delay_AD_Log(3);
     if (!  CTD_Data()) 
       flogf("\nERR in P5 - no CTD data");
-    flogf("\nP5 %5.2f", LARA.DEPTH);
+    DBG1(flogf("\nP5 %5.2f", LARA.DEPTH);)
     Delay_AD_Log(30);
     RTCGetTime(&nowT, NULL);
     if ((nowT - deployT) > maxT) break; // too long
@@ -889,7 +886,7 @@ int Incoming_Data() {
   static int count = 0;
   int value = 0; // Need to update this if we ever need to return a legit value.
 
-  DBG(flogf("\n Incoming_Data\t");)
+  DBG0(flogf("\n Incoming_Data\t");)
   switch (LARA.PHASE) {
   // Case 0: Only at startup when MPC.STARTUPS>0
   case 0:
@@ -898,14 +895,14 @@ int Incoming_Data() {
       if (tgetq(NIGKPort)) {
         AModem_Data();
       } else if (tgetq(devicePort)) { // ?? very messy handling of ctd
-        // DBG(flogf("CTD Incoming");)
+        // DBG1(flogf("CTD Incoming");)
         CTD_Data();
         if ((!LARA.SURFACED && LARA.PHASE > 1) || LARA.BUOYMODE > 0 ||
             LARA.PHASE == 0) // if not surfaced (target depth not reached.) and
                              // winch is moving (not stopped)
           CTD_Sample();
       } else if (cgetq()) {
-        // DBG(flogf("Console Incoming");)
+        // DBG1(flogf("Console Incoming");)
         Console(cgetc());
       } else
         incoming = false;
@@ -916,18 +913,18 @@ int Incoming_Data() {
   case 1:
 
     while (incoming) {
-      DBG(flogf("\n Incoming\t");)
+      DBG1(flogf("\n Incoming\t");)
       AD_Check();
       // Data coming from WISPR Board
       if (tgetq(PAMPort)) {
-        // DBG(flogf("WISPR Incoming");)
+        // DBG1(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (tgetq(devicePort)) {
         CTD_Data();
       }
       // Console Wake up.
       else if (cgetq()) {
-        // DBG(flogf("Console Incoming");)
+        // DBG1(flogf("Console Incoming");)
         Console(cgetc());
       }
       // No more incoming data
@@ -941,25 +938,25 @@ int Incoming_Data() {
   case 4:
 
     while (incoming) {
-      DBG(flogf("\n Incoming\t");)
+      DBG1(flogf("\n Incoming\t");)
       // ?? does adcheck need to run between each incoming? how often?
       AD_Check();
       if (tgetq(PAMPort)) {
-        DBG(flogf("WISPR Incoming");)
+        DBG1(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (tgetq(NIGKPort)) {
         // ??? not hearing on bench test
-        DBG(flogf("NIGK Incoming");)
+        DBG1(flogf("NIGK Incoming");)
         AModem_Data();
       } else if (tgetq(devicePort)) {
-        DBG(flogf("CTD Incoming");)
+        DBG1(flogf("CTD Incoming");)
         CTD_Data();
         if ((!LARA.SURFACED && (LARA.PHASE == 2 || LARA.PHASE == 4)) ||
             LARA.BUOYMODE > 0) // if not surfaced (target depth not reached.)
                                // and winch is moving (not stopped)
           CTD_Sample();
       } else if (cgetq()) {
-        DBG(flogf("Console Incoming");)
+        DBG1(flogf("Console Incoming");)
         Console(cgetc());
       }
       // No more incoming data
@@ -971,13 +968,13 @@ int Incoming_Data() {
   // CASE 3: GPSIRID
   case 3:
     while (incoming) {
-      DBG(flogf("\n Incoming\t");)
+      DBG1(flogf("\n Incoming\t");)
       AD_Check();
       if (tgetq(PAMPort)) {
-        // DBG(flogf("WISPR Incoming");)
+        // DBG1(flogf("WISPR Incoming");)
         WISPR_Data();
       } else if (cgetq()) {
-        // DBG(flogf("Console Incoming");)
+        // DBG1(flogf("Console Incoming");)
         Console(cgetc());
       } else
         incoming = false;
@@ -1006,7 +1003,7 @@ void Console(char in) {
   // shutdown from here
   short c;
 
-  DBG(flogf("Incoming Char: %c", in);)
+  DBG1(flogf("Incoming Char: %c", in);)
   Delayms(2);
   switch (LARA.PHASE) {
   case 1:
@@ -1319,7 +1316,7 @@ ulong WriteFile(ulong TotalSeconds) {
     flogf("\nERROR  |WriteFile(): open error: errno: %d", errno);
     return -1;
   }
-  DBG2(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
+  DBG(else flogf("\n\t|WriteFile: %s Opened", uploadfile);)
 
   //*** LARA Write ***//
   // ?? should this have geo loc?
@@ -1369,7 +1366,7 @@ ulong WriteFile(ulong TotalSeconds) {
   if (CTD.UPLOAD || TotalSeconds == 0) {
     sprintf(&detfname[2], "%08ld.ctd", MPC.FILENUM);
     Delayms(50);
-    DBG(flogf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
+    DBG1(flogf("\n\t|WriteFile:%ld ctd file: %s", MPC.FILENUM, detfname);)
     stat(detfname, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 1000))
       maxupload = IRID.MAXUPL - 1000;
@@ -1384,7 +1381,7 @@ ulong WriteFile(ulong TotalSeconds) {
   //*** MPC.LOGFILE upload ***// Note: occurring only after reboot.
   if (TotalSeconds == 0) { //||MPC.UPLOAD==1)
     sprintf(logfile, "%08ld.log", MPC.FILENUM);
-    DBG(flogf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
+    DBG1(flogf("\n\t|WriteFile: %ld log file: %s", MPC.FILENUM, logfile);)
     stat(logfile, &info);
     if (info.st_size > (long)(IRID.MAXUPL - 2000))
       maxupload = IRID.MAXUPL - 2000;
@@ -1546,7 +1543,7 @@ void LARA_Recovery() {} //____ LARA_Recovery() ____//
  */
 bool CurrentWarning() {
   float a, b;
-  DBG(flogf("\n%s\t|CurrentWarning()", Time(NULL));)
+  DBG0(flogf("\n%s\t|CurrentWarning()", Time(NULL));)
   CTD_Select(DEVB);
   CTD_Sample();
   CTD_Data();
