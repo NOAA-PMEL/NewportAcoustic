@@ -10,7 +10,9 @@ import time, sys
 
 port = '/dev/ttyS2'
 baudrate = 9600
-echo = True
+#echo = True
+echo = False
+devEol = '\r\n'
 
 def info():
     "globals which may be externally set"
@@ -48,26 +50,43 @@ def serThread():
             t = time.time()-timer
             buf += [[c,t]]
             sys.stdout.write(c)
+            sys.stdout.flush()
             if echo:
                 ser.write(c)
 
 def stampPrint(buf):
     "print chars and timestamps"
-    a = buf
-    if len(a) == 0:
+    line = ''
+    # 
+    if len(buf) == 0:
         print "buf is empty"
-    for (c,t) in a:
-        print "(",
+        return
+    for (c,t) in buf:
+        out = "("
         d = ord(c)
         if c == '\n':
-            print "\\n",
+            out += "\\n"
         elif c == '\r':
-            print "\\r",
+            out += "\\r"
+        elif c == ' ':
+            out += '_'
         elif d in range(32,127):
-            print "%s" % c,
+            out += "%s" % c
         else:
-            print "%02X" % d,
-        print "%.3f )" % t
+            out += "%02X" % d
+        out += " %.3f) " % t
+        # add to line
+        outl = len(out)
+        linel = len(line)
+        if linel+outl>80:
+            sys.stdout.write(line + '\n')
+            sys.stdout.flush()
+            line = ''
+        line += out
+    sys.stdout.write(line + '\n')
+    sys.stdout.flush()
+
+#
 
 init()
 start()
@@ -81,7 +100,7 @@ while 1:
     else :
         buf = []
         timer = time.time()
-        ser.write(con)
+        ser.write(con + devEol)
 
 stop()
 if ser.is_open: ser.close()
