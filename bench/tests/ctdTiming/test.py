@@ -10,6 +10,7 @@ import time, sys
 
 port = '/dev/ttyS2'
 baudrate = 9600
+echo = True
 
 def info():
     "globals which may be externally set"
@@ -17,7 +18,8 @@ def info():
 
 def init():
     "set up globals"
-    global ser, go, timer
+    global buf, ser, go, timer
+    buf = []
     ser = Serial(port=port,baudrate=baudrate)
     timer = time.time()
     go = Event()
@@ -36,29 +38,36 @@ def stop():
 
 def serThread():
     "thread: loop looks for serial input; to stop set sergo=0"
-    global go, ser, timer
+    global buf, go, ser, timer, echo
     if not ser.is_open: ser.open()
-    ser.buff = []
-    try:
-        while go.isSet():
-            # CTD. syncMode, sample, settings
-            while ser.in_waiting:
-                c = ser.read()
-                t = time.time()-timer
-                ser.buff += [[c,t]]
+    buf = []
+    while go.isSet():
+        # CTD. syncMode, sample, settings
+        if ser.in_waiting:
+            c = ser.read()
+            t = time.time()-timer
+            buf += [[c,t]]
+            sys.stdout.write(c)
+            if echo:
                 ser.write(c)
-    except IOError, e:
-        print "IOError on serial, calling stop() ..."
-        stop()
-    if ser.is_open: ser.close()
 
 def stampPrint(buf):
     "print chars and timestamps"
-    a = ser.buf
+    a = buf
     if len(a) == 0:
-        print "ser.buf is empty"
-    for i in a:
-        print "(%s %s)" % tuple(i)
+        print "buf is empty"
+    for (c,t) in a:
+        print "(",
+        d = ord(c)
+        if c == '\n':
+            print "\\n",
+        elif c == '\r':
+            print "\\r",
+        elif d in range(32,127):
+            print "%s" % c,
+        else:
+            print "%02X" % d,
+        print "%.3f )" % t
 
 init()
 start()
@@ -66,13 +75,13 @@ start()
 while 1:
     con = sys.stdin.readline()
     if 'show' in con:
-        stampPrint(ser.buf)
+        stampPrint(buf)
     elif 'exit' in con:
         break
     else :
-        ser.buf = []
-        ser.write(con)
+        buf = []
         timer = time.time()
+        ser.write(con)
 
 stop()
 if ser.is_open: ser.close()
