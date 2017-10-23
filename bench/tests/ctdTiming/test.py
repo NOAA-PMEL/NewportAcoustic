@@ -13,6 +13,7 @@ baudrate = 9600
 #echo = True
 echo = False
 devEol = '\r\n'
+outputL = 70
 
 def info():
     "globals which may be externally set"
@@ -76,9 +77,9 @@ def stampPrint(buf):
             out += "%02X" % d
         out += " %.3f) " % t
         # add to line
-        outl = len(out)
-        linel = len(line)
-        if linel+outl>80:
+        outL = len(out)
+        lineL = len(line)
+        if lineL+outL>outputL
             sys.stdout.write(line + '\n')
             sys.stdout.flush()
             line = ''
