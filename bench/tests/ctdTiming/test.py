@@ -79,7 +79,7 @@ def stampPrint(buf):
         # add to line
         outL = len(out)
         lineL = len(line)
-        if lineL+outL>outputL
+        if lineL+outL>outputL:
             sys.stdout.write(line + '\n')
             sys.stdout.flush()
             line = ''
