@@ -15,10 +15,6 @@ echo = False
 devEol = '\r\n'
 outputL = 70
 
-def info():
-    "globals which may be externally set"
-    print "(go:%s)   " % (go.isSet())
-
 def init():
     "set up globals"
     global buf, ser, go, timer
@@ -48,7 +44,7 @@ def serThread():
         # CTD. syncMode, sample, settings
         if ser.in_waiting:
             c = ser.read()
-            t = time.time()-timer
+            t = time.time()
             buf += [[c,t]]
             sys.stdout.write(c)
             sys.stdout.flush()
@@ -75,7 +71,7 @@ def stampPrint(buf):
             out += "%s" % c
         else:
             out += "%02X" % d
-        out += " %.3f) " % t
+        out += " %.3f) " % (t-timer)
         # add to line
         outL = len(out)
         lineL = len(line)
@@ -96,10 +92,10 @@ while 1:
     con = sys.stdin.readline()
     if 'show' in con:
         stampPrint(buf)
+        buf = []
     elif 'exit' in con:
         break
     else :
-        buf = []
         timer = time.time()
         ser.write(con + devEol)
 
