@@ -4,13 +4,14 @@ from serial import Serial
 from threading import Thread, Event
 import time, sys
 
-# globals set in init(), start()
-# go = ser = None
-# timer = 0
-
-port = '/dev/ttyS2'
+args = len(sys.argv)
+if args>1 and 'h' in sys.argv[1]:
+    print "usage: %s port" % sys.argv[0]
+    sys.exit(-1)
+#
+if args>1:  port = '/dev/ttyS%s' % sys.argv[1]
+else:       port = '/dev/ttyS2'
 baudrate = 9600
-#echo = True
 echo = False
 devEol = '\r\n'
 outputL = 70

@@ -1,3 +1,5 @@
+python -m serial.tools.list_ports
+
 codewarrior
 install CW9.0 in directory of your choice
 run CW9.2 update. Run buildall as directed, ignore errors. (palmOS?)
