@@ -1,7 +1,7 @@
 # emulate buoy
 
-#from laraSer import Serial
 from laraSer import Serial
+from serial.tools.list_ports import comports
 from shared import *
 from winch import depth
 from threading import Thread, Event
@@ -14,23 +14,28 @@ import time
 # timeOff = 0
 
 name = 'ctd'
-eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS4'
+eol = '\r'          # input is \r, output \r\n
+eol_out = '\r\n'
 baudrate = 9600
-CTD_DELAY = 3.8
+# select port 0-n of multiport serial
+portSelect = 2
+
+CTD_DELAY = 4.3     # delay readings from sbe16
+CTD_WAKE = 0.78
 
 def info():
     "globals which may be externally set"
-    print "(go:%s)   syncMode=%s   sleepMode=%s" % \
-        (go.isSet(), sleepMode, syncMode)
+    print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
+        (go.isSet(), syncMode, syncModePending, sleepMode)
 
 def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode, timeOff
-    ser = None
-    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
-    sleepMode = syncMode = False
+    global ser, go, sleepMode, syncMode, syncModePending, timeOff
+    sleepMode = syncMode = syncModePending = False
     timeOff = 0
+    # select port 0-n of multiport serial
+    port = comports()[portSelect].device
+    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol,eol_out=eol_out)
     go = Event()
 
 def start():
@@ -47,28 +52,46 @@ def stop():
 
 def serThread():
     "thread: loop looks for serial input; to stop set sergo=0"
-    global go, ser, syncMode, sleepMode
+    global ser, go, sleepMode, syncMode, syncModePending
+    stamp = time.time()
+    # goes to sleep if no input for 2:00 or QS
+    # 0.8 sec to wake
     if not ser.is_open: ser.open()
     ser.buff = ''
     try:
         while go.isSet():
+            if not sleepMode and not syncMode:
+                if (time.time()-stamp)>120:
+                    ser.log("ctd sleepMode")
+                    ser.put('time out\r\n')
+                    if syncModePending:
+                        ser.log("ctd syncMode")
+                        syncModePending = False
+                        syncMode = True
+                    sleepMode = True
             # CTD. syncMode, sample, settings
             if ser.in_waiting:
-                # syncMode is special, a trigger not a command, eol not required
-                # consume input while pondering
-                if syncMode and sleepMode:
+                stamp = time.time()
+                # syncMode is pending until sleepMode
+                # syncMode is special, a trigger not a command
+                if syncMode:
                     c = ser.get()
                     if '\x00' in c:
-                        # break
+                        # serial break, python cannot really see it
                         ser.log( "break; syncMode off, flushing %r" % ser.buff )
                         syncMode = False
                         sleepMode = False
-                        ser.buff = ''
-                        ser.reset_input_buffer
                     else:
                         ctdOut()
-                else: # not sync & sleep
-                    # command line. note: we don't do timeout
+                elif sleepMode:
+                    c = ser.get()
+                    if '\r' in c:
+                        # wake
+                        ser.log( "waking, flushing %r" % ser.buff )
+                        sleep(CTD_WAKE)
+                        ser.put('SBE 16plus\r\nS>')
+                        sleepMode = False
+                else: # not sync or sleep. command line
                     # upper case is standard for commands, but optional
                     l = ser.getline(echo=1).upper()
                     if l:
@@ -76,16 +99,21 @@ def serThread():
                         if 'TS' in l: 
                             ctdOut()
                         elif 'DATE' in l:
+                            # trim up to =
                             dt = l[l.find('=')+1:]
                             setDateTime(dt)
                             ser.log( "set date time %s -> %s" % \
                                 (dt, ctdDateTime()))
                         elif 'SYNCMODE=Y' in l:
-                            syncMode = True
+                            syncModePending = True
                             ser.log( "syncMode pending (when ctd sleeps)")
                         elif 'QS' in l:
-                            sleepMode = True
                             ser.log("ctd sleepMode")
+                            if syncModePending:
+                                ser.log("ctd syncMode")
+                                syncModePending = False
+                                syncMode = True
+                            sleepMode = True
                         if sleepMode != True: 
                             ser.put('S>')
         # while go:
@@ -116,16 +144,17 @@ def ctdDelay():
     return CTD_DELAY
 
 # Temp, conductivity, depth, fluromtr, PAR, salinity, time
-# 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
+#'20.7301,''0.00832,''''0.243,'0.0098,'0.0106,'''0.0495,'14'May'2017'23:18:20
+# 20.5476,  0.01495,    0.300, 1.8187, 0.0139,   0.0801, 24 Oct 2017 00:32:38
 def ctdOut():
     "instrument sample"
-    # "\r\n# t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss\r\n"
+    # "\r\n t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss"
 
-    # ctd delay to process, nominal 3.5 sec. Add variance?
+    # ctd delay to process. Add variance?
     sleep(ctdDelay())
     ###
     # note: modify temp for ice
-    ser.put("\r\n# %f, %f, %f, %f, %f, %f, %s\r\n" %
+    ser.put(" %7.4f, %8.5f, %8.3f, %6.4f, %6.4f, %8.4f, %s\r\n" %
         (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
 
 #def modGlobals(**kwargs):
@@ -139,4 +168,3 @@ def ctdOut():
 #            glob[i] = j
 #            logmsg += "%s=%s " % (i, j)
 
-init()

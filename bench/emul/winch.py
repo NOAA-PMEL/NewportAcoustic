@@ -1,21 +1,23 @@
 # emulate LARA winch
 from laraSer import Serial
+from serial.tools.list_ports import comports
 from time import time, sleep
 from shared import *
 from threading import Thread, Event
 
 # globals set in init(), start()
 # motorOn = go = ser = None
-# buffOut = ''
 #motorRunState = off, down, up
-#cable = 0
+cable = 0
 mooring = 30
 
 # amodRate measured about 6.5 sec 
 name = 'winch'
-eol = '\n'
-port = '/dev/ttyS5'
 baudrate = 4800
+eol = '\n'
+# select port 0-n of multiport serial
+portSelect = 3
+
 amodDelay = 5.5
 
 def info():
@@ -32,7 +34,8 @@ def init():
     motorRunState = 'off' 
     go = Event()
     motorOn = Event()
-    ser = None
+    # select port 0-n of multiport serial
+    port = comports()[portSelect].device
     ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
 
 def start():
@@ -209,4 +212,3 @@ def depth():
 #            glob[i] = j
 #            logmsg += "%s=%s " % (i, j)
 
-init()

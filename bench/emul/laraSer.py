@@ -1,5 +1,6 @@
 import serial
 from threading import Lock
+from string import split, join
 import time
 
 class Serial(serial.Serial):
@@ -40,44 +41,43 @@ class Serial(serial.Serial):
         "Log to stdout, thread safe"
         if self.logLevel>1:
             # time seconds sss.sss
-            stamp = "%.3f" % (time.time()%1000)
-            self.logSafe( "%s: %s %s" % (self.name, stamp, s) )
+            stamp = time.time()
+            self.logSafe( "%s: %s %s" % 
+                (self.name, "%.3f" % (stamp%1000), s) )
 
     def get(self):
-        "Get some chars"
-        b = self.buff
+        "Get all available chars"
+        if self.in_waiting:
+            c = self.read(self.in_waiting)
+        b = self.buff + c
         self.buff = ''
-        while 1:
-            c = self.read()
-            if not c: break
-            b += c
         self.logIn(b)
         return b
 
     def getline(self, echo=0):
         "Get full lines from serial, keep eol; partial to self.buff"
-        r = ''
         eol = self.eol
         eol_out = self.eol_out
-
+        # read chars
         if self.in_waiting:
-            # read chars
             c = self.read(self.in_waiting)
             if echo: 
                 # translate if echo & self.eol_out
                 # note - only works if eol is one char (i.e. \r->\r\n)
-                if eol_out and (eol==c): self.write(eol_out)
-                else: self.write(c)
+                if eol_out and (eol in c): 
+                    c = join(split(c, eol), eol_out)
+                self.write(c)
             b = self.buff + c
             if eol in b:
                 i = b.find(eol) + len(eol)
                 r = b[:i]
                 self.buff = b[i:]
                 self.logIn(r)
+                return r
             else: 
                 # partial
                 self.buff = b
-            return r
+                return ''
 
     def putline(self, s):
         "put to serial"

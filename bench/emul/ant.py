@@ -1,7 +1,7 @@
 # emulate antenna sbe39
 
-#from laraSer import Serial
 from laraSer import Serial
+from serial.tools.list_ports import comports
 from shared import *
 from winch import depth
 from threading import Thread, Event
@@ -15,8 +15,10 @@ import time
 
 name = 'sbe39'
 eol = '\r'        # input is \r, output \r\n
-port = '/dev/ttyS3'
 baudrate = 9600
+# select port 0-n of multiport serial
+portSelect = 1
+
 CTD_DELAY = 1
 
 def info():
@@ -26,11 +28,12 @@ def info():
 
 def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode, timeOff
-    ser = None
-    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
-    sleepMode = syncMode = False
+    global ser, go, sleepMode, syncMode, syncModePending, timeOff
+    sleepMode = syncMode = syncModePending = False
     timeOff = 0
+    # select port 0-n of multiport serial
+    port = comports()[portSelect].device
+    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
     go = Event()
 
 def start():
@@ -150,4 +153,3 @@ def temper():
 #            glob[i] = j
 #            logmsg += "%s=%s " % (i, j)
 
-init()

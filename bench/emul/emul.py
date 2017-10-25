@@ -32,8 +32,11 @@ def restart():
     init()
     start()
 
-if __name__=='__main__': start()
-else: print "start() stop() init() buoy.info() winch.mooring=14 winch.cable=15"
+if __name__=='__main__': 
+    init()
+    start()
+else: 
+    print "init() start() stop() buoy.info() winch.mooring=14 winch.cable=15"
 
 
 # Notes:
