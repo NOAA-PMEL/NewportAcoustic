@@ -13,7 +13,7 @@ import time
 # sleepMode = syncMode = False
 # timeOff = 0
 
-name = 'ctd'
+name = 'sbe16'
 eol = '\r'          # input is \r, output \r\n
 eol_out = '\r\n'
 baudrate = 9600
@@ -62,13 +62,8 @@ def serThread():
         while go.isSet():
             if not sleepMode and not syncMode:
                 if (time.time()-stamp)>120:
-                    ser.log("ctd sleepMode")
                     ser.put('time out\r\n')
-                    if syncModePending:
-                        ser.log("ctd syncMode")
-                        syncModePending = False
-                        syncMode = True
-                    sleepMode = True
+                    gotoSleepMode()
             # CTD. syncMode, sample, settings
             if ser.in_waiting:
                 stamp = time.time()
@@ -102,18 +97,13 @@ def serThread():
                             # trim up to =
                             dt = l[l.find('=')+1:]
                             setDateTime(dt)
-                            ser.log( "set date time %s -> %s" % \
-                                (dt, ctdDateTime()))
+                            ser.log( "set date time %s -> %s" % 
+                                (dt, ctdDateTime()) )
                         elif 'SYNCMODE=Y' in l:
                             syncModePending = True
                             ser.log( "syncMode pending (when ctd sleeps)")
                         elif 'QS' in l:
-                            ser.log("ctd sleepMode")
-                            if syncModePending:
-                                ser.log("ctd syncMode")
-                                syncModePending = False
-                                syncMode = True
-                            sleepMode = True
+                            gotoSleepMode()
                         if sleepMode != True: 
                             ser.put('S>')
         # while go:
@@ -121,6 +111,16 @@ def serThread():
         print "IOError on serial, calling buoy.stop() ..."
         stop()
     if ser.is_open: ser.close()
+
+def gotoSleepMode():
+    "CTD enters sleep mode, due to timeout or QS command"
+    global ser, sleepMode, syncMode, syncModePending
+    ser.log(ser.name + " ctd sleepMode")
+    if syncModePending:
+        ser.log(ser.name + " ctd syncMode")
+        syncModePending = False
+        syncMode = True
+    sleepMode = True
 
 def setDateTime(dt):
     "set ctdClock global timeOff from command in seabird format"

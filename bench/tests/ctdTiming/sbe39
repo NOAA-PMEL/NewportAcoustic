@@ -1,4 +1,6 @@
 Note: two \r\n\r\n to wake -> executed
+or was it just slow to wake?
+wakeup time?
 
 $ kahn@gorda 05:18:40 ~/NewportAcoustic/bench/tests/ctdTiming $
  python test.py
