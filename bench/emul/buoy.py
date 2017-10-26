@@ -1,24 +1,16 @@
-# emulate buoy
-
+# emulate buoy v3
+import time
 from laraSer import Serial
 from serial.tools.list_ports import comports
-from shared import *
-from winch import depth
 from threading import Thread, Event
-from time import sleep
-import time
+from design import *
+import winch
 
 # globals set in init(), start()
-# go = ser = None
-# sleepMode = syncMode = False
-# timeOff = 0
 
 name = 'sbe16'
-eol = '\r'          # input is \r, output \r\n
-eol_out = '\r\n'
+portSelect = 2      # select port 0-n of multiport serial
 baudrate = 9600
-# select port 0-n of multiport serial
-portSelect = 2
 
 CTD_DELAY = 4.3     # delay readings from sbe16
 CTD_WAKE = 0.78
@@ -28,15 +20,19 @@ def info():
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
         (go.isSet(), syncMode, syncModePending, sleepMode)
 
-def init():
+def init(portSel=portSelect):
     "set globals to defaults"
     global ser, go, sleepMode, syncMode, syncModePending, timeOff
     sleepMode = syncMode = syncModePending = False
     timeOff = 0
-    # select port 0-n of multiport serial
-    port = comports()[portSelect].device
-    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol,eol_out=eol_out)
     go = Event()
+    try:
+        # select port 0-n of multiport serial
+        port = comports()[portSel].device
+        ser = Serial(port=port,baudrate=baudrate,name=name)
+    except:
+        print "no serial for %s" % name
+        ser = None
 
 def start():
     "start reader thread"
@@ -83,7 +79,7 @@ def serThread():
                     if '\r' in c:
                         # wake
                         ser.log( "waking, flushing %r" % ser.buff )
-                        sleep(CTD_WAKE)
+                        time.sleep(CTD_WAKE)
                         ser.put('SBE 16plus\r\nS>')
                         sleepMode = False
                 else: # not sync or sleep. command line
@@ -98,7 +94,7 @@ def serThread():
                             dt = l[l.find('=')+1:]
                             setDateTime(dt)
                             ser.log( "set date time %s -> %s" % 
-                                (dt, ctdDateTime()) )
+                                (dt, sbe16DateTime()) )
                         elif 'SYNCMODE=Y' in l:
                             syncModePending = True
                             ser.log( "syncMode pending (when ctd sleeps)")
@@ -132,9 +128,10 @@ def setDateTime(dt):
     # offset between emulated ctd and this PC clock
     timeOff = time.time()-utc
 
-def ctdDateTime():
+def sbe16DateTime():
     "use global timeOff set by setDateTime() to make a date"
     global timeOff
+    # sbe16 has no comma, sbe39 has one
     f='%d %b %Y %H:%M:%S'
     return time.strftime(f,time.localtime(time.time()-timeOff))
 
@@ -148,23 +145,17 @@ def ctdDelay():
 # 20.5476,  0.01495,    0.300, 1.8187, 0.0139,   0.0801, 24 Oct 2017 00:32:38
 def ctdOut():
     "instrument sample"
-    # "\r\n t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy hh:mm:ss"
-
     # ctd delay to process. Add variance?
-    sleep(ctdDelay())
-    ###
-    # note: modify temp for ice
+    time.sleep(ctdDelay())
+    # note: modify temp for ice tests
     ser.put(" %7.4f, %8.5f, %8.3f, %6.4f, %6.4f, %8.4f, %s\r\n" %
-        (20.1, 0.01, depth(), 0.01, 0.01, 0.06, ctdDateTime() ))
+        (20.1, 0.1, depth(), 0.1, 0.1, 0.1, sbe16DateTime() ))
 
-#def modGlobals(**kwargs):
-#    "change defaults from command line"
-#    # change any of module globals, most likely mooring or cableLen
-#    if kwargs:
-#        # update module globals
-#        glob = globals()
-#        logmsg = "params: "
-#        for (i, j) in kwargs.iteritems():
-#            glob[i] = j
-#            logmsg += "%s=%s " % (i, j)
+def depth():
+    "mooring - (cable+buoyLine)"
+    # TBD
+    d = mooring-(winch.cable()+buoyLine)
+    if d<0: return 0
+    else: return d
 
+init()

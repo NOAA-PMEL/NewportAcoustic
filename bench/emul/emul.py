@@ -1,6 +1,6 @@
-import sys, time
-import laraSer, winch, buoy, ant
-from shared import *
+# emulator. v3
+import winch, buoy, ant, floats
+from design import mooring
 
 def init():
     "init all"
@@ -33,10 +33,10 @@ def restart():
     start()
 
 if __name__=='__main__': 
-    init()
     start()
 else: 
-    print "init() start() stop() buoy.info() winch.mooring=14 winch.cable=15"
+    print "start() stop() restart() buoy.info() mooring=30 winch.cable(0)"
+    info()
 
 
 # Notes:

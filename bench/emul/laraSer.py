@@ -1,12 +1,12 @@
+import time
 import serial
 from threading import Lock
 from string import split, join
-import time
 
 class Serial(serial.Serial):
     "extra methods to handle our serial ports"
 
-    def __init__(self, eol='\r', eol_out='', name=None, *args, **kwargs):
+    def __init__(self, eol='\r', eol_out='\r\n', name=None, *args, **kwargs):
         # buff is for input not consumed by getline
         super(Serial, self).__init__(*args, **kwargs)
         # getline() buffers partial line input
@@ -61,13 +61,12 @@ class Serial(serial.Serial):
         # read chars
         if self.in_waiting:
             c = self.read(self.in_waiting)
+            b = self.buff + c
             if echo: 
-                # translate if echo & self.eol_out
-                # note - only works if eol is one char (i.e. \r->\r\n)
                 if eol_out and (eol in c): 
+                    # translate eol for echo
                     c = join(split(c, eol), eol_out)
                 self.write(c)
-            b = self.buff + c
             if eol in b:
                 i = b.find(eol) + len(eol)
                 r = b[:i]

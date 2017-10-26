@@ -1,24 +1,16 @@
-# emulate antenna sbe39
-
+# emulate antenna sbe39 v3
+import time
 from laraSer import Serial
 from serial.tools.list_ports import comports
-from shared import *
-from winch import depth
 from threading import Thread, Event
-from time import sleep
-import time
+from design import *
+import winch
 
 # globals set in init(), start()
-# go = ser = None
-# sleepMode = syncMode = False
-# timeOff = 0
 
 name = 'sbe39'
-eol = '\r'        # input is \r, output \r\n
-eol_out = '\r\n'
+portSelect = 1      # select port 0-n of multiport serial
 baudrate = 9600
-# select port 0-n of multiport serial
-portSelect = 1
 
 CTD_DELAY = 0.53
 CTD_WAKE = 0.78
@@ -28,15 +20,19 @@ def info():
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
         (go.isSet(), syncMode, syncModePending, sleepMode)
 
-def init():
+def init(portSel=portSelect):
     "set globals to defaults"
     global ser, go, sleepMode, syncMode, syncModePending, timeOff
     sleepMode = syncMode = syncModePending = False
     timeOff = 0
-    # select port 0-n of multiport serial
-    port = comports()[portSelect].device
-    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol,eol_out=eol_out)
     go = Event()
+    try:
+        # select port 0-n of multiport serial
+        port = comports()[portSel].device
+        ser = Serial(port=port,baudrate=baudrate,name=name)
+    except: 
+        print "no serial for %s" % name
+        ser = None
 
 def start():
     "start reader thread"
@@ -82,7 +78,7 @@ def serThread():
                     if '\r' in c:
                         # wake
                         ser.log( "waking, flushing %r" % ser.buff )
-                        sleep(CTD_WAKE)
+                        time.sleep(CTD_WAKE)
                         ser.put('<Executed/>\r\n')
                         sleepMode = False
                 else: # not sync or sleep. command line
@@ -97,7 +93,7 @@ def serThread():
                             dt = l[l.find('=')+1:]
                             setDateTime(dt)
                             ser.log( "set date time %s -> %s" % 
-                                (dt, ctdDateTime()) )
+                                (dt, sbe39DateTime()) )
                         elif 'SYNCMODE=Y' in l:
                             syncModePending = True
                             ser.log( "syncMode pending (when ctd sleeps)")
@@ -131,9 +127,10 @@ def setDateTime(dt):
     # offset between emulated ctd and this PC clock
     timeOff = time.time()-utc
 
-def ctdDateTime():
+def sbe39DateTime():
     "use global timeOff set by setDateTime() to make a date"
     global timeOff
+    # sbe16 has no comma, sbe39 has one
     f='%d %b %Y, %H:%M:%S'
     return time.strftime(f,time.localtime(time.time()-timeOff))
 
@@ -149,31 +146,21 @@ def ctdOut():
     # "\r\n  t.t, c.c, d.d, f.f, p.p, s.s,  dd Mmm yyyy, hh:mm:ss\r\n"
 
     # ctd delay to process, nominal 3.5 sec. Add variance?
-    sleep(ctdDelay())
+    time.sleep(ctdDelay())
     ###
     # note: modify temp for ice simulation
     #  24.2544,    0.182, 24 Oct 2017, 00:21:43
     #''24.2544,''''0.182,'24'Oct'2017,'00:21:43
-    ser.put("%8.4f, %8.3f, %s\r\n" % (temper(), antdepth(), ctdDateTime() ))
+    ser.put("%8.4f, %8.3f, %s\r\n" % (temper(), depth(), sbe39DateTime() ))
 
-def antdepth():
-    "buoy depth - 17, unless there is current"
-    dep=depth()-17
-    if dep<0: return 0
+def depth():
+    "mooring-(cable+buoyL+floatsL+antL), but always below surface"
+    dep=mooring - (winch.cable()+buoyLine+floatsLine+antLine)
+    if dep<antCTDpos: return antCTDpos
     else: return dep
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"
     return 20.1
 
-#def modGlobals(**kwargs):
-#    "change defaults from command line"
-#    # change any of module globals, most likely mooring or cableLen
-#    if kwargs:
-#        # update module globals
-#        glob = globals()
-#        logmsg = "params: "
-#        for (i, j) in kwargs.iteritems():
-#            glob[i] = j
-#            logmsg += "%s=%s " % (i, j)
-
+init()

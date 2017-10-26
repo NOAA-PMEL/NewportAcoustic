@@ -1,15 +1,12 @@
-# emulate LARA winch
+# emulate winch v3
 from laraSer import Serial
 from serial.tools.list_ports import comports
-from time import time, sleep
-from shared import *
 from threading import Thread, Event
+from time import time, sleep
+from design import *
+import floats
 
 # globals set in init(), start()
-# motorOn = go = ser = None
-#motorRunState = off, down, up
-cable = 0
-mooring = 30
 
 # amodRate measured about 6.5 sec 
 name = 'winch'
@@ -21,29 +18,34 @@ portSelect = 3
 amodDelay = 5.5
 
 def info():
-    global mooring, cable, motorRunState
+    global go, cableLen, motorRunState
     "globals which may be externally set"
-    print "(go:%s)   motor('%s')   cable=%.2f   mooring=%d   (depth():%.2f)" % \
-        (go.isSet(), motorRunState, cable, mooring, depth())
+    print "(go:%s)   motor('%s')   cableLen=%.2f" % \
+        (go.isSet(), motorRunState, cableLen)
 
-def init():
+def init(portSel=portSelect):
     "set global vars to defaults"
-    global ser,cable, mooring, motorRunState, go, motorOn
-    cable = 0
+    global go, ser, cableLen, motorRunState, motorOn
+    cableLen = 0
     # motorRunState off, down, up
     motorRunState = 'off' 
-    go = Event()
     motorOn = Event()
-    # select port 0-n of multiport serial
-    port = comports()[portSelect].device
-    ser = Serial(port=port,baudrate=baudrate,name=name,eol=eol)
+    go = Event()
+    try:
+        # select port 0-n of multiport serial
+        port = comports()[portSel].device
+        ser = Serial(port=port,baudrate=baudrate,name=name)
+    except:
+        print "no serial for %s" % name
+        ser = None
 
 def start():
     "start serial and reader thread"
-    global go, buffOut
+    global go, ser, buffOut
     buffOut = ''
     # threads run while go is set
     go.set()
+    # during test, we may be running with no serial
     Thread(target=serThread).start()
     Thread(target=motorThread).start()
 
@@ -69,7 +71,7 @@ def serThread():
                 amodOutput()
         # while go
     except IOError, e:
-        print "IOError on serial, calling buoy.stop() ..."
+        print "IOError on serial, calling stop() ..."
         stop()
     if ser.is_open: ser.close()
 
@@ -130,8 +132,8 @@ def amodOutput():
 def amodPut(s):
     "Buffer output for slow sending by amodOutput"
     global buffOut
+    # note - should use threading.Timer for this
     buffOut += s
-    
 
 def motor(state):
     "set motorRunState to off, down, up; motorOn event"
@@ -140,13 +142,13 @@ def motor(state):
         return ser.log( "motor(up|off|down), not '%s'" % state )
     #
     motorRunState = state
-    ser.log( "motor %s with cable at %.2f depth %.2f" % (state,cable,depth()) )
+    ser.log( "motor %s with cableLen at %.2f" % (state,cableLen) )
     if motorRunState=='off': motorOn.clear()
     else: motorOn.set()
 
 def motorThread():
-    "when motor is on: update cable, check dock and slack"
-    global ser, go, cable, motorRunState, motorOn
+    "when motor is on: update cableLen, check dock and slack"
+    global ser, go, cableLen, motorRunState, motorOn
     # motor could be on when emulation starts
     while go.isSet(): 
         motorOn.wait()
@@ -154,61 +156,34 @@ def motorThread():
         sleep(.1)
         # up
         if motorRunState=='up':
-            # surfaced?
+            cableLen += (time() - motorLastTime) * .331
             if slack():
+                ser.log( "surfaced" )
                 motor('off')
-                # no amod delay here, sleep(amodDelay) is in serThread
-                ser.log( "buoy surfaced" )
-                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
-            # simple linear
-            cable += (time() - motorLastTime) * .331
-            if slack(): # surfaced?
-                motor('off')
-                ser.log( "line slack, buoy surfaced" )
-                # no amod delay here, sleep(amodDelay) is in serThread
                 amodPut("#S,%s,00%s" % (buoyID, ser.eol))
         # down
         if motorRunState=='down':
+            cableLen -= (time() - motorLastTime) * .2
             if docked():
+                ser.log( "docked" )
+                cableLen=0
                 motor('off')
-                # no amod delay here, sleep(amodDelay) is in serThread
-                ser.log( "buoy docked" )
-                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
-            # simple linear
-            cable -= (time() - motorLastTime) * .2
-            if docked():
-                motor('off')
-                cable=0
-                ser.log( "buoy docked" )
-                # no amod delay here, sleep(amodDelay) is in serThread
                 amodPut("#S,%s,00%s" % (buoyID, ser.eol))
 
 def slack():
-    "determine if the cable is slack"
-    return depth()<17
+    "determine if the cableLen is slack"
+    return floats.depth()<.1
 
 def docked():
     "are we docked?"
-    global cable
-    return cable<.1
+    global cableLen
+    return cableLen<.1
 
-def depth():
-    "mooring - cable, mod by current"
-    global mooring, cable
-    # TBD
-    d = mooring-cable
-    if d<0: return 0
-    else: return d
+def cable(new=None):
+    "set or get cableLen"
+    global cableLen
+    if new is not None:
+        cableLen = new
+    return cableLen
 
-#def modGlobals(**kwargs):
-#    "change defaults from command line"
-#    # change any of module globals, most likely mooring or cable
-#    # ?? globals need defaults to reset on run()
-#    if kwargs: 
-#        # update module globals
-#        glob = globals()
-#        logmsg = "params: "
-#        for (i, j) in kwargs.iteritems(): 
-#            glob[i] = j
-#            logmsg += "%s=%s " % (i, j)
-
+init()
