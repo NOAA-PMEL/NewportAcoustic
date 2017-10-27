@@ -1,6 +1,6 @@
-import sys, time
-import laraSer, winch, buoy, ant
-from shared import *
+# emulator. v3
+import winch, buoy, ant, floats
+from design import mooring
 
 def init():
     "init all"
@@ -32,9 +32,20 @@ def restart():
     init()
     start()
 
-if __name__=='__main__': start()
-else: print "start() stop() init() buoy.info() winch.mooring=14 winch.cable=15"
+#import sys
+#def my_except_hook(exctype, value, traceback):
+#    if exctype == KeyboardInterrupt:
+#        print "stopping..."
+#        stop()
+#    else:
+#        sys.__excepthook__(exctype, value, traceback)
+#sys.excepthook = my_except_hook
 
+import atexit
+atexit.register(stop)
 
-# Notes:
-# add exception ^C stop() before exit
+if __name__=='__main__': 
+    start()
+else: 
+    print "start() stop() restart() buoy.info() mooring=30 winch.cable(0)"
+    info()
