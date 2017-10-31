@@ -1,4 +1,3 @@
-#include <stdio.h>
 // WISPR HEADER FILE
 
 // WISPR Control Structure

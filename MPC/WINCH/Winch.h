@@ -1,5 +1,3 @@
-
-
 // AModemPort and WISPR Transmission
 void AModem_Data();
 

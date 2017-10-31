@@ -1,80 +1,20 @@
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-#include <cfxbios.h> // Persistor BIOS and I/O Definitions
-
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <errno.h>
-#include <fcntl.h> // PicoDOS POSIX-like File Access Definitions
-#include <stat.h>  // PicoDOS POSIX-like File Status Definitions
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h> // PicoDOS POSIX-like Terminal I/O Definitions
-#include <unistd.h>  // PicoDOS POSIX-like UNIX Function Definitions
-
-#include <MPC_Global.h>
-#include <PLATFORM.h>
-#ifdef ACOUSTICMODEM
-#include <AMODEM.h>
-#endif
-
-#ifdef BLUETOOTH
-#include <BT.h>
-#endif
-
-#ifdef IRIDIUM
-#include <GPSIRID.h>
-#endif
-#include <Settings.h>
-#ifdef WISPR
-#include <WISPR.h>
-#endif
-#ifdef POWERLOGGING
-#include <ADS.h>
-#endif
-#ifdef CTDSENSOR
-#include <CTD.h>
-#endif
-
-extern SystemParameters MPC;
-extern SystemStatus LARA;
-
-#ifdef BLUETOOTH
-extern BluetoothParameters BT;
-#endif
+// MPC.c - pre-run and hardware
+#include <common.h>
+#include <MPC.h>
+#include <Winch.h>
 
 // Define WISPR VEEPROM Parameters for use
-#ifdef WISPR
 extern WISPRParameters WISP;
 int DutyCycleTicks;
 extern float WISPRFreeSpace;
-#endif
 
 // Define IRIDIUM VEEPROM Parameters for use
-#ifdef IRIDIUM
 extern IridiumParameters IRID;
-#endif
-// Define SEAGLIDER VEEPROM Parameters
-#ifdef SEAGLIDER
-extern SeagliderParameters SEAG;
-#endif
-// If using Linkquest UWM2000 Acoustic Modem
-#ifdef ACOUSTICMODEM
 extern AMODEMParameters AMDM;
-#endif
 
-#ifdef POWERLOGGING
 extern PowerParameters ADS;
-#endif
-#ifdef CTDSENSOR
 extern CTDParameters CTD;
-#endif
-#ifdef NIGKWINCH
-#include <Winch.h>
 extern WINCHParameters NIGK;
-#endif
 
 // LOCAL VARIABLES
 int DetectionInt;

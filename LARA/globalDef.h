@@ -1,12 +1,14 @@
-// DEFINE THE TYPE OF PLATFORM
+// PLATFORM.h - common things
 #define PLATFORM LARA
-// the DEBUG's each turn on a macro named DBG()
-// blocks of code
+#define PROG_VERSION 4.0
+
+// the DEBUG's each turn on a macro named DBGx()
+// - blocks of code
 #define DEBUG
 // 0 print func names
 #define DEBUG0
 // 1 print more interesting things
-// #define DEBUG1
+#undef DEBUG1
 // 2 print details
 #define DEBUG2
 // debug related to wispr
@@ -45,63 +47,15 @@
 #define WISPR_PWR_OFF 42
 #define BUOYBAUD 9600L
 #define IRIDBAUD 9600L
-//#define IRIDBAUD 19200L
-
-// DEVA=AntennaModule, DEVB=BuoyCTD
-#define DEVX 0
-#define DEVA 1
-#define DEVB 2
-
-// This structure is primarily for system diagnostics logging. Keeping track of
-// phase, alarms, system statuses
-typedef struct {
-
-  short PHASE; // 1=AUH, 2=Ascent Profile, 3=Surface Communitcation, 4= Descent
-               // Profile
-  bool ON;       // While "ON", continue running program
-  bool DATA;     // Data is triggered true when the timing interval goes off.
-  bool SURFACED; // Set to true when Antenna is estimated to be protruding from
-                 // water
-  short BUOYMODE;  // 0=stopped 1=ascend 2=descend 3=careful ascent
-  float DEPTH;     // Most recent depth measurement from CTD
-  float MOORDEPTH; // Depth confirmation at beginning of LARA.PHASE==1. Averaged
-                   // Samples
-  short TDEPTH; //
-  float TOPDEPTH;
-  float AVGVEL;
-  float PAYOUT;
-  short ASCENTTIME;
-  short DESCENTTIME;
-  short STATUS;
-  short CTDSAMPLES;
-  bool LOWPOWER;
-  bool RESTART;
-} SystemStatus;
-char *PrintSystemStatus(void);
-int Incoming_Data();
-void LARA_Recovery();
-
-//#define PLATFORM AUH
-//#define PLATFORM SeaGlider
-//#define RAOT
-//#define RAOB
-
-// LARA PROGRAM
-#define PROG_VERSION 3.40 // Keep this up to date!!!
 
 #define POWERLOGGING
 #define SYSTEMDIAGNOSTICS
 #define WISPR
 #define IRIDIUM
 #define CTDSENSOR
-//#define SEAGLIDER
-//#define TIMING
-//#define ACOUSTICMODEM
-//#define BLUETOOTH
 #define CONSOLEINPUT
 #define REALTIME
 #define NIGKWINCH
-//#define LARASIM
 
 #define MAX_GPS_CHANGE 1.0
 #define MAX_UPLOAD 30000 // bytes
@@ -212,4 +166,7 @@ void LARA_Recovery();
 #define PWR(X)
 #endif
 
-void SystemTest();
+#define Delayms(X) RTCDelayMicroSeconds((long) 1000 * (long) X)
+
+// shared buffers, defined in common.c
+#define BUFSZ 1024

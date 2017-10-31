@@ -1,24 +1,5 @@
-#include <cfxbios.h> // Persistor BIOS and I/O Definitions
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <fcntl.h>
-#include <stat.h>    // PicoDOS POSIX-like File Status Definitions
-#include <termios.h> // PicoDOS POSIX-like Terminal I/O Definitions
-#include <unistd.h>
-
-#include <MPC_Global.h>
+#include <common.h>
 #include <Winch.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <CTD.h>
-#include <GPSIRID.h>
-#include <PLATFORM.h>
-#include <Settings.h>
 
 WINCHParameters NIGK;
 TUPort *NIGKPort;
