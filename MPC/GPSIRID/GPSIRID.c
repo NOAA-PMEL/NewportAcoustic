@@ -16,39 +16,8 @@ of commands
  *
  ******************************************************************************/
 
-#include <cfxbios.h> // Persistor BIOS and I/O Definitions
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-#include <errno.h>
-#include <float.h>
-#include <stdarg.h>
-#include <stddef.h>
-
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <errno.h>
-#include <fcntl.h> // PicoDOS POSIX-like File Access Definitions
-#include <stat.h>  // PicoDOS POSIX-like File Status Definitions
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h> // PicoDOS POSIX-like Terminal I/O Definitions
-#include <unistd.h>  // PicoDOS POSIX-like UNIX Function Definitions
-
-#include <PLATFORM.h>
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <fcntl.h>    // PicoDOS POSIX-like File Access Definitions
-#include <stat.h>     // PicoDOS POSIX-like File Status Definitions
-#include <termios.h>  // PicoDOS POSIX-like Terminal I/O Definitions
-#include <unistd.h>   // PicoDOS POSIX-like UNIX Function Definitions
-
-#include <ADS.h>
+#include <common.h>
 #include <GPSIRID.h>
-
-#include <MPC_Global.h>
-#include <Settings.h>
 
 #define HANDSHAKE 3
 #define ANTSWPIN 1 // Antenna swith pin number
@@ -56,18 +25,17 @@ of commands
 #define NUMCOM 7 // Number of commmands can be receive per telemetry
 #define MAX_RESENT 3
 #define GPS_TRIES 10 // num of tries to get min GPS sat
-#define BUFSZ 1024
 #define RUDICSBLOCK 2000
-// #define RUDICSBLOCK 2000
+
+extern volatile clock_t start_clock;
+extern volatile clock_t stop_clock;
 
 IridiumParameters IRID;
-extern SystemParameters MPC;
 
 bool SatComOpen = false;
 bool LostConnect = false;
 short Max_No_SigQ_Chk = 7;
 
-// int BlkLength = 2000; // Irid file block size. 1kB to 2kB, 1024-2048
 int BlkLength = RUDICSBLOCK; 
 short IRIDWarm = 27;  // Irid Modem warm-up. 45 IS NORMAL, 1 FOR TESTING ///
 short MinSQ;
@@ -116,17 +84,13 @@ void StatusCheck();
 bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
-int GetStringWait(char *str, int wait);
+int GetStringWait(TUPort port, char *str, int wait);
 // bool GPSstartup();
 // int DevSelect(int);
 // int AntMode(char);
 // int GPSIRID_Init();
 // short IRIDGPS();
 // void GetIRIDIUMSettings();
-
-TUPort *devicePort;
-int deviceID=0; // 0=off, 1=buoy, 2=antenna
-static char first[BUFSZ], stringin[BUFSZ], scratch[BUFSZ];
 
 /* */
 
@@ -271,37 +235,6 @@ int AntMode(char r) {
   return 0;
 } //AntMode
 
-/*
- * int DevSelect(DEVA);
- * DEVX=0 = off, DEVA=1 = antenna, DEVB=2 = buoy
- */
-int DevSelect(int dev) {
-  // global devicePort
-  // use a stronger tests for open??
-  if (dev==deviceID && devicePort) return 0; // already selected
-  DBG2(flogf("\n\t|DevSelect(%d)", dev);)
-
-  switch (dev) {
-  case DEVA: // antenna module dev
-    deviceID=DEVA;
-    PIOSet(DEVICECOM); 
-    // deva devb may share the port
-    if (PIOTestAssertClear(ANTMODPWR)) { // ant module is off
-      PIOSet(ANTMODPWR);
-      Delay_AD_Log(5); // power up delay
-    }
-    AntMode('S'); // default in antmod, but set our state
-    break;
-  case DEVX: // power off antenna, port closed
-    PIOClear(ANTMODPWR); // antMod power off
-    // devb is always on, select devb
-  case DEVB: // buoy sbe
-    deviceID=DEVB;
-    PIOClear(DEVICECOM); // talk to local port // do not turn off ant module
-    break;
-  } //switch
-  return 0;
-} //DevSelect
 
 /*
  * Connect_SendFile_RecCmd
@@ -2023,28 +1956,27 @@ void ConsoleIrid() {
 void DelayTX(int ch) { RTCDelayMicroSeconds((long) ch * 3333L); }
 
 /*
- * GetStringWait(stringin, 5) reads devicePort, up to BUFSZ
- *  delay up to wait seconds for first char, finished after charDelay ms
+ * GetStringWait(port, stringin, 5) 
+ *  delay up to 5 seconds for first char, return length
  */
-int GetStringWait(char *str, int wait) {
+int GetStringWait(TUPort port, char *str, int wait) {
   // global devicePort
   int len;
-  char ch;
-  short charDelay=500; // up to half second between chars
-  TickleSWSR(); // another reprieve
-  // long wait
-  ch = TURxGetByteWithTimeout(devicePort, (short) wait*1000);
-  if (ch<0) {
+  short charDelay=50; // up to .05 second between chars, normally .001
+
+  str[0] = TURxGetByteWithTimeout(devicePort, (short) wait*1000);
+  TickleSWSR(); // could have been a long wait
+  if (str[0]<0) {
     DBG1(flogf("\n\t|GetStringWait() timeout");)
     str[0]=0;
     return 0;
   }
-  str[0] = ch;
-  TickleSWSR(); // another reprieve
   for (len=1; len<BUFSZ; len++) {
     str[len] = TURxGetByteWithTimeout(devicePort, charDelay);
-    if (str[len]<0) break;
+    if (str[len]<0) {
+      str[len]=0;
+      break;
+    }
   }
-  str[len]=0;
   return len;
 }

@@ -14,38 +14,14 @@
 \******************************************************************************/
 #define PD_CMD_BUILD_LINKS // this must be at the top of the file !!!
 
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-
-#include <MPC_Global.h>
-#include <PLATFORM.h>
+#include <common.h>
 #include <Settings.h>
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <fcntl.h>    // PicoDOS POSIX-like File Access Definitions
-#include <limits.h>
-#include <stat.h> // PicoDOS POSIX-like File Status Definitions
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h> // PicoDOS POSIX-like UNIX Function Definitions
-#ifdef ACOUSTICMODEM
-#include <AMODEM.h>
-#endif
-#ifdef CTDSENSOR
-#include <CTD.h>
-#endif
-#ifdef POWERLOGGING
-#include <ADS.h>
-#endif
-#ifdef IRIDIUM
-#include <GPSIRID.h>
-#endif
-#ifdef BLUETOOTH
-#include <BT.h>
-#endif
-#ifdef WISPR
-#include <WISPR.h>
-#endif
+
+// #include <AMODEM.h>
+// #include <CTD.h>
+// #include <ADS.h>
+// #include <GPSIRID.h>
+// #include <WISPR.h>
 
 bool ModifyPermission = true; // gets updated when password entered
 char CFXNum[6];               // 5 digits + terminating zero

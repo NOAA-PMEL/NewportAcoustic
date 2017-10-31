@@ -42,47 +42,17 @@ transfer into the real power write time.
 
 
 ****************************************************************************************************/
-
-#include <cfxbios.h> // Persistor BIOS and I/O Definitions
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-
-#include <ADExamples.h>
+#include <common.h>
 #include <ADS.h>
-#include <MPC_Global.h>
-#include <PLATFORM.h>
 #include <Settings.h>
-#include <assert.h>
-#include <cfxad.h>
-#include <ctype.h>
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <errno.h>
-#include <fcntl.h>
-#include <float.h>
-#include <float.h>
-#include <float.h>
-#include <limits.h>
-#include <locale.h>
-#include <math.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <stat.h> // PicoDOS POSIX-like File Status Definitions
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h> // PicoDOS POSIX-like Terminal I/O Definitions
-#include <time.h>
-#include <unistd.h>
-
-void Setup_Acquisition(ushort);
-void AD_Write(ushort *);
-void AD_Log(void);
-ushort GetSystemTimeInt();
 
 IEV_C_PROTO(ADTimingRuptHandler);
 IEV_C_PROTO(ADSamplingRuptHandler);
+
+extern volatile clock_t start_clock;
+extern volatile clock_t stop_clock;
+extern bool data;
+extern int ADCounter;
 
 // Total Number of samples per ADSTIME. Defined by BITSHIFT and sampling
 // frequency

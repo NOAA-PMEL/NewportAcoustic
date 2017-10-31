@@ -1,5 +1,8 @@
 LARA/LARA.c
-LARA/PLATFORM.h
+LARA/Lara.h
+LARA/global.h
+LARA/global.c
+LARA/common.h
 MPC/ADS/ADS.c
 MPC/ADS/ADS.h
 MPC/CTD/CTD.c
