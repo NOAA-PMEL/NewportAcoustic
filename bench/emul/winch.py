@@ -25,8 +25,7 @@ def info():
 
 def init(portSel=portSelect):
     "set global vars to defaults"
-    global go, ser, cableLen, motorRunState, motorOn, buffOut 
-    buffOut = ''
+    global go, ser, cableLen, motorRunState, motorOn
     cableLen = 0
     # motorRunState off, down, up
     motorRunState = 'off' 
@@ -38,36 +37,30 @@ def init(portSel=portSelect):
         ser = Serial(port=port,baudrate=baudrate,name=name)
     except:
         print "no serial for %s" % name
+        ser = None
 
 def start():
-    "start I/O thread"
-    global go, serThreadObj, motorThreadObj, name
+    "start serial and reader thread"
+    global go, ser, buffOut
+    buffOut = ''
     # threads run while go is set
     go.set()
-    serThreadObj = Thread(target=serThread)
-    serThreadObj.daemon = True
-    serThreadObj.name = name + "I/O"
-    serThreadObj.start()
-    motorThreadObj = Thread(target=motorThread)
-    motorThreadObj.daemon = True
-    motorThreadObj.name = name + "Motor"
-    motorThreadObj.start()
+    # during test, we may be running with no serial
+    Thread(target=serThread).start()
+    Thread(target=motorThread).start()
 
 def stop():
-    global go, motorThreadObj, serThreadObj
-    "stop threads"
+    global go, motorOn
+    "stop threads, close serial"
     if go: go.clear()
-    # wait until thread ends, allows daemon to close clean
-    serThreadObj.join(3.0)
-    motorThreadObj.join(3.0)
-    if serThreadObj.is_alive():
-        print "stop(): fail on %s" % serThreadObj.name
-    if motorThreadObj.is_alive():
-        print "stop(): fail on %s" % motorThreadObj.name
+    if not motorOn.isSet(): 
+        # release motor thread, if motor is off
+        motorOn.set()
+        motorOn.clear()
 
 def serThread():
     "thread: looks for serial input, output; sleeps to simulate amodDelay"
-    global ser, go, buffOut
+    global ser, go
     if not ser.is_open: ser.open()
     try:
         while go.isSet():
@@ -81,6 +74,7 @@ def serThread():
         print "IOError on serial, calling stop() ..."
         stop()
     if ser.is_open: ser.close()
+
 
 def amodInput():
     "process input at serial, sleeps to simulate amodDelay"
@@ -157,24 +151,24 @@ def motorThread():
     global ser, go, cableLen, motorRunState, motorOn
     # motor could be on when emulation starts
     while go.isSet(): 
-        if motorOn.isSet():
-            motorLastTime = time()
-            sleep(.1)
-            # up
-            if motorRunState=='up':
-                cableLen += (time() - motorLastTime) * .331
-                if slack():
-                    ser.log( "surfaced" )
-                    motor('off')
-                    amodPut("#S,%s,00%s" % (buoyID, ser.eol))
-            # down
-            if motorRunState=='down':
-                cableLen -= (time() - motorLastTime) * .2
-                if docked():
-                    ser.log( "docked" )
-                    cableLen=0
-                    motor('off')
-                    amodPut("#S,%s,00%s" % (buoyID, ser.eol))
+        motorOn.wait()
+        motorLastTime = time()
+        sleep(.1)
+        # up
+        if motorRunState=='up':
+            cableLen += (time() - motorLastTime) * .331
+            if slack():
+                ser.log( "surfaced" )
+                motor('off')
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
+        # down
+        if motorRunState=='down':
+            cableLen -= (time() - motorLastTime) * .2
+            if docked():
+                ser.log( "docked" )
+                cableLen=0
+                motor('off')
+                amodPut("#S,%s,00%s" % (buoyID, ser.eol))
 
 def slack():
     "determine if the cableLen is slack"
