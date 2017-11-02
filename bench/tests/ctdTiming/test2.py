@@ -10,10 +10,10 @@ if args>1 and 'h' in sys.argv[1]:
     sys.exit(-1)
 #
 if args>1:  port = '/dev/ttyS%s' % sys.argv[1]
-else:       port = '/dev/ttyS3'
-baudrate = 19200
+else:       port = '/dev/ttyS2'
+baudrate = 9600
 echo = False
-devEol = '\r'
+devEol = '\r\n'
 outputL = 70
 
 def init():
@@ -55,7 +55,6 @@ def serThread():
 def stampPrint(buf):
     "print chars and timestamps"
     line = ''
-    tLast = tLong = diff = 0.0
     # 
     if len(buf) == 0:
         print "buf is empty"
@@ -74,20 +73,15 @@ def stampPrint(buf):
         else:
             out += "%02X" % d
         out += " %.3f) " % (t-timer)
-        if tLast>=timer: 
-            diff = t-tLast
-            if diff>tLong:
-                tLong = diff
-        tLast = t
         # add to line
         outL = len(out)
         lineL = len(line)
         if lineL+outL>outputL:
             sys.stdout.write(line + '\n')
+            sys.stdout.flush()
             line = ''
         line += out
     sys.stdout.write(line + '\n')
-    sys.stdout.write("Longest = %.3f\n" % tLong)
     sys.stdout.flush()
 
 #
@@ -96,8 +90,7 @@ init()
 start()
 
 while 1:
-    # take \n off end of readline
-    con = sys.stdin.readline()[0:-1]
+    con = sys.stdin.readline()
     if 'show' in con:
         stampPrint(buf)
         buf = []
