@@ -36,9 +36,7 @@ def init(portSel=portSelect):
         port = comports()[portSel].device
         ser = Serial(port=port,baudrate=baudrate,name=name)
     except:
-        import sys
-        print "no serial for %s\n%s\n%s\n" % (name, 
-            sys.exc_info()[0], sys.exc_info()[1])
+        print "no serial for %s" % name
         ser = None
 
 def start():

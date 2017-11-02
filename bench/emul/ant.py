@@ -35,16 +35,23 @@ def init(portSel=portSelect):
         ser = None
 
 def start():
-    "start reader thread"
-    global go
+    "start I/O thread"
+    global go, serThreadObj, name
     # threads run while go is set
     go.set()
-    Thread(target=serThread).start()
+    serThreadObj = Thread(target=serThread)
+    serThreadObj.daemon = True
+    serThreadObj.name = name
+    serThreadObj.start()
 
 def stop():
-    global go
-    "stop threads, close serial"
+    global go, serThreadObj
+    "stop threads"
     if go: go.clear()
+    # wait until thread ends, allows daemon to close clean
+    serThreadObj.join(3.0)
+    if serThreadObj.is_alive(): 
+        print "stop(): fail on %s" % serThreadObj.name
 
 def serThread():
     "thread: loop looks for serial input; to stop set sergo=0"
