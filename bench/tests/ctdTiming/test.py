@@ -11,7 +11,8 @@ if args>1 and 'h' in sys.argv[1]:
 #
 if args>1:  port = '/dev/ttyS%s' % sys.argv[1]
 else:       port = '/dev/ttyS3'
-baudrate = 19200
+if args>2:  baudrate = int(sys.argv[2])
+else:       baudrate = 9600
 echo = False
 devEol = '\r'
 outputL = 70
@@ -74,7 +75,7 @@ def stampPrint(buf):
         else:
             out += "%02X" % d
         out += " %.3f) " % (t-timer)
-        if tLast>=timer: 
+        if tLast>timer: 
             diff = t-tLast
             if diff>tLong:
                 tLong = diff

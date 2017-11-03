@@ -1,9 +1,16 @@
-2 crlf \r\n\r\n to get prompt
-inconsistent return but .1 sec from start to end of output
+\r input, not echo'd. \r\n before prompt.
+wakeup takes 1.045s, echo extra line "SBE 16plus"
 
 $ kahn@gorda 05:30:26 ~/NewportAcoustic/bench/tests/ctdTiming $
  python test.py
 
+
+SBE 16plus
+S>show
+(S 1.045) (B 1.046) (E 1.047) (_ 1.048) (1 1.049) (6 1.050) (p 1.051)
+(l 1.052) (u 1.053) (s 1.053) (\r 1.054) (\n 1.055) (S 1.056)
+(> 1.057)
+Longest = 0.001
 
 S>
 

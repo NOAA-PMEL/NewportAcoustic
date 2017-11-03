@@ -71,13 +71,14 @@ void CTD_DateTime() {
 /*
  * CTD_GetPrompt - poke buoy CTD, look for prompt
  */
-bool CTD_GetPrompt(char *str) {
+bool CTD_GetPrompt() {
+  static char str[32];
   bool r = false;
+  // looking for S>
   TURxFlush(ctd.port);
   TUTxPutByte(ctd.port, '\r', true);
-  GetStringWait(ctd.port, str, 6);
+  GetStringWait(ctd.port, 6, str);
   if (strstr(str, ">") != NULL) r=true;
-  // repeat?
   return r;
 }
 
