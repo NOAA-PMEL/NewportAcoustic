@@ -59,39 +59,8 @@
 **
 \******************************************************************************/
 
-#include <cfxpico.h> // Persistor PicoDOS Definitions
-
-#include <assert.h>
-#include <ctype.h>
-#include <errno.h>
-
-#include <limits.h>
-#include <locale.h>
-#include <math.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include <dirent.h>   // PicoDOS POSIX-like Directory Access Defines
-#include <dosdrive.h> // PicoDOS DOS Drive and Directory Definitions
-#include <fcntl.h>    // PicoDOS POSIX-like File Access Definitions
-#include <stat.h>     // PicoDOS POSIX-like File Status Definitions
-#include <termios.h>  // PicoDOS POSIX-like Terminal I/O Definitions
-#include <unistd.h>   // PicoDOS POSIX-like UNIX Function Definitions
-
-#include <ADS.h>
-#include <CTD.h>
-#include <GPSIRID.h>
-#include <MPC_Global.h>
-#include <PLATFORM.h>
-#include <Settings.h> // For VEEPROM settings definitions
-#include <WISPR.h>
-#include <Winch.h>
+#include <common.h>
+#include <Lara.h> 
 
 #define CUSTOM_SYPCR CustomSYPCR // Enable watch dog  HM 3/6/2014
 // WDT Watch Dog Timer definition
@@ -102,7 +71,7 @@ short CustomSYPCR = WDT105s | HaltMonEnable | BusMonEnable | BMT32;
 //power mode
 
 // VEEPROM Parameter Structures
-SystemParameters MPC;
+extern SystemParameters MPC;
 #ifdef WISPR
 extern WISPRParameters WISP;
 extern bool WISPR_On;
@@ -123,7 +92,7 @@ extern CTDParameters CTD;
 
 IEV_C_PROTO(ExtFinishPulseRuptHandler);
 
-SystemStatus LARA;
+extern SystemStatus LARA;
 ulong PwrOff, PwrOn;
 
 // Define unused pins here
@@ -291,11 +260,7 @@ void InitializeLARA(ulong *PwrOn) {
 
   // must init GPSIRID first
   GPSIRID_Init();
-  CTD_Init();
-  // open ports, power on ?? should these be powered on now?
-  CTD_Start_Up(DEVA, true);
-  CTD_Start_Up(DEVB, true);
-  DevSelect(DEVX); // turn antmod off // ??
+  CTD_Init(); // buoy sbe
 
   // If initializing after reboot... Write previous WriteFile for upload
   if (MPC.STARTUPS > 0) {

@@ -20,8 +20,4 @@ int AntMode(char);
 int GPSIRID_Init();
 bool GPSstartup();
 short IRIDGPS();
-int GetStringWait(char *str, int wait);
 
-// defines for pins moved to platform.h
-
-extern TUPort *devicePort;

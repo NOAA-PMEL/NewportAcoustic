@@ -1,3 +1,9 @@
+Mon, Nov 06, 2017  2:36:02 PM
+looking at cflow.rev, only call into Settings.c is PreRun call to Settings
+do not need Settings.c
+
+---
+
 alex: winch blast of nulls
 alex: power .8A
 alex: batt cap current, new

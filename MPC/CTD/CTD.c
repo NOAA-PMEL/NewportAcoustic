@@ -1,99 +1,52 @@
-/** handling CTD in buoy, seabird SBE 16plus
+/* handling CTD in buoy, seabird SBE 16plus
  * general note: ctd wants \r only for input
  * Bug:! TUTxPrint translates \n into \r\n, which sorta kinda works if lucky
  */
-#include <Lara.h> // meta
+#include <common.h>
 #include <CTD.h>
-
-time_t CTD_VertVel(time_t);
-int Sea_Ice_Algorithm(); 
+#include <AntMod.h>
 
 extern SystemParameters MPC;
 extern SystemStatus LARA;
-CTDParameters CTD;
-bool SyncMode;
-extern TUPort *devicePort; // MPC_Global
-int sbeID=DEVB;  // DEVA:antenna DEVB:buoy
-float SummedVelocity;
-short CTDSamples;
-char CTDLogFile[] = "c:00000000.ctd";
-static char stringin[BUFSZ], stringout[BUFSZ];
+struct CTDParameters{
+  bool syncMode;
+  short delay;          //Delay in seconds between polled samples
+  TUPort port;
+} ctd;
 
-// simulation variables: #ifdef LARASIM
-float descentRate = 0.1923; // m/s
-float ascentRate = 0.26;
 
 /* 
- * CTD_Init() initialize file
  */
-int CTD_Init() {
-  // global char *stringin, *stringout;  // used by CTD.c
-  return 0;
-}
+bool CTD_Init() {
+  DBG0( flogf("\n\t|. CTD_Init"); )
 
-/*****************************************************************************\
-** CTD_Start_Up()
-* open port if needed, send break, get prompt, flush; opt settime
-\*****************************************************************************/
-bool CTD_Start_Up(int sbe, bool settime) {
-  // global int sbeID;
-  bool returnval = false;
-  DBG1( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
-  DBG1( flogf("\n\t|. CTD_Start_Up(%d, %d) ", sbe, settime); )
-
-  CTD_Select(sbe);
-
-  // CTD_CreateFile(sbe, MPC.FILENUM);  // called from lara.c
-  // leave sync mode
   CTD_SampleBreak();
-  if (!CTD_GetPrompt()) {
-    flogf(" fail start getprompt");
+  if (!CTD_GetPrompt(stringin)) {
+    DBG2(flogf(" fail start getprompt");)
     CTD_SampleBreak();
     DevSelect(sbe);
     Delay_AD_Log(3);
-    if (!CTD_GetPrompt()) {
-      flogf(" fail start1 getprompt");
+    if (!CTD_GetPrompt(stringin)) {
+      DBG2(flogf(" fail start1 getprompt");)
       if (sbe==DEVA) DevSelect(DEVX);
       Delay_AD_Log(1);
       DevSelect(sbe);
       CTD_SampleBreak();
       Delay_AD_Log(3);
-      if (!CTD_GetPrompt()) {
-        flogf(" fail start2 getprompt");
+      if (!CTD_GetPrompt(stringin)) {
+        DBG2(flogf(" fail start2 getprompt");)
       }
     } 
   }
-  if (settime)
-    CTD_DateTime();
+  CTD_DateTime();
   // CTD_SyncMode();
   return true;
-} //_____ CTD_Start_Up() _____//
+} // CTD_Init
 
-void CTD_Select(int sbe) {
-  DevSelect(sbe);
-  if (sbe==DEVA) AntMode('S');
-  sbeID=sbe;
-} // CTD_Select
 
-/******************************************************************************\
-** CTD_CreateFile()
-\******************************************************************************/
-void CTD_CreateFile(long filenum) {
-  int filehandle;
-  sprintf(&CTDLogFile[2], "%08ld.ctd", filenum);
-  filehandle = open(CTDLogFile, O_RDWR | O_CREAT | O_TRUNC);
-  Delayms(50);
-  if (filehandle < 0) {
-    flogf("\nERROR  |CTD_CreateFile() errno: %d", errno);
-  }
-  if (close(filehandle) < 0)
-    flogf("\nERROR  |CTD_CreateFile(): %s close errno: %d", CTDLogFile, errno);
-  Delayms(10);
-} //____ CTD_CreateFile() _____//
 
-/********************************************************************************\
-** CTD_DateTime()
-\********************************************************************************/
+/*
+ */
 void CTD_DateTime() {
 
   time_t rawtime;
@@ -109,245 +62,92 @@ void CTD_DateTime() {
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 
-  TUTxPrintf(devicePort, "DATETIME=%s\r", buffer);
+  TUTxPrintf(ctd.port, "DATETIME=%s\r", buffer);
   Delayms(250);
-  while (tgetq(devicePort))
-    cprintf("%c", TURxGetByte(devicePort, true));
+  while (tgetq(ctd.port))
+    cprintf("%c", TURxGetByte(ctd.port, true));
 
-} //_____ CTD_DateTime() ____//
+} // CTD_DateTime() 
 
-/********************************************************************************\
-** CTD_GetPrompt()
-\********************************************************************************/
+// sbe16
+// \r input, echos input.  \r\n before next output.
+// pause 0.33s between \rn and s> prompt.
+// wakeup takes 1.045s, writes extra output "SBE 16plus\r\nS>"
+// pause between ts\r\n and result, 4.32s
+
+/*
+ * CTD_GetPrompt - poke buoy CTD, look for prompt
+ */
 bool CTD_GetPrompt() {
-  bool r;
-  // global char *stringin;
-  TURxFlush(devicePort);
-  TUTxPutByte(devicePort, '\r', true);
-  GetStringWait(stringin, 10);
-  if (strstr(stringin, ">") != NULL) r=true;
-  else {
-    r=false;
-    DBG2(flogf("\n\t|CTD_GetPrompt()->%s", stringin);)
-  }
-  return r;
+  static char str[32];
+  TURxFlush(ctd.port);
+  TUTxPutByte(ctd.port, '\r', true);
+  GetStringWait(ctd.port, 2, str);
+  // looking for S>
+  if (strstr(str, "S>") != NULL) return true;
+  else return false;
 }
 
-/********************************************************************************\
-** CTD_Sample()
-\********************************************************************************/
+/*
+ */
 void CTD_Sample() {
   char ch;
   DBG1( flogf("\n . CTD_Sample"); )
   //if (SyncMode) {
-    //TUTxPrintf(devicePort, "+\r");
+    //TUTxPrintf(ctd.port, "+\r");
     //Delayms(20);
-    //TURxFlush(devicePort);
+    //TURxFlush(ctd.port);
   //} else {
-  // TUTxPrintf(devicePort, "TS\r");
-  TUTxPutByte(devicePort, 'T', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  TUTxPutByte(devicePort, 'S', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  // TUTxPrintf(ctd.port, "TS\r");
+  TUTxPutByte(ctd.port, 'T', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  TUTxPutByte(ctd.port, 'S', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  TUTxPutByte(ctd.port, '\r', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
   //}
 } //____ CTD_Sample() ____//
 
-/********************************************************************************\
-** CTD_SampleSleep()
-\********************************************************************************/
+/*
+ */
 void CTD_SyncMode() {
   DBG0(flogf("\n\t|CTD_SyncMode()");)
-  // CTD_SampleBreak();
-  TUTxPrintf(devicePort, "Syncmode=y\r");
+  CTD_SampleBreak();
+  TUTxPrintf(ctd.port, "Syncmode=y\r");
   Delayms(500);
-  TUTxPrintf(devicePort, "QS\r");
+  TUTxPrintf(ctd.port, "QS\r");
   Delayms(500);
   SyncMode = true;
-  TURxFlush(devicePort);
-} //____ CTD_Sample() ____//
+  TURxFlush(ctd.port);
+} 
 
-/********************************************************************************\
-** CTD_Sample()
-\********************************************************************************/
+/*
+ */
 void CTD_SampleBreak() {
-  TUTxBreak(devicePort, 5000);
+  TUTxBreak(ctd.port, 5000);
   SyncMode = false;
-} //____ CTD_Sample() ____//
-
-/************************************************************************************\
-** void Sea_Ice_Algorithm(void)
-** The sea ice algorthim starts a careful ascent when the buoy reaches the
-threshold depth
-** When first leaving winch, grab initial temperature and salinity.
-** When the depth threshold is passed:
-**    1. if change in temperature and salinity are less than given amount, stop
-**    2. if temp is warmer than min temp: careful ascent, less than min: descend
-**    3.
-** if (t_change of <.5 && Sal_change <.5). stop. change to continuous sampling,
-ascend
-** if TEMP @10-20m <-1.5 stop, and descend
-** Water Temperature at Mooring M8(The influence of sea ice... Sullivan et. al)
-** can be as low as -1.8
-**
-\************************************************************************************/
-// Returns reason: 
-// 1: Stop, should be at surface and ready to send.
-// 2: Stop due to low Temp or other reason
-// 3: Ascend2, careful ascent
-// 4: Descend, definitely ice
-// 5: Stop due to little change in salinity
-// CTDParameters CTD;
-int Sea_Ice_Algorithm() {
-  static int ice;
-  static float temp_change, current_temp, next_temp;
-  static float sal_change, current_sal, next_sal;
-  /*
-   //Do this only one time for each Buoy Ascent
-   if(CTD_Docked==true){
-   cprintf("\nSetting initial Temp and Sal in SIA");
-   ice=0;
-   current_temp=Initial_Temp;
-   current_sal=Initial_Sal;
-   temp_change=0;
-   sal_change=0;
-   CTD_Docked=false;
-   }
-
-   if(sim==true){    //Only if Simulation is true
-   next_temp=SimTemp;
-   next_sal=SimSal;
-   }
-   else{
-   next_temp=temp;
-   next_sal=salinity;
-   }
-
-   temp_change=(temp_change+ (next_temp-current_temp)); //Calculate TEMP change
-   sal_change=(sal_change+ (next_sal-current_sal));    //Calculate salinity
-  change
-
-   flogf("\ndT: %f, dS: %f", temp_change, sal_change);
-
-   current_sal=next_sal;
-   current_temp=next_temp;
+}
 
 
-
-
-   //Simulation Mode
-   if(sim==true){
-      if(SimDepth<=Depth_Threshold&&BuoyMode==1){  cprintf("\nSIA: Depth
-  Threshold Reached");
-
-         if(temp_change<=0.5&&(abs(sal_change)<=0.5)){
-            cprintf("\nSIA: Small variation between TEMP and sal ");
-            CommandWinch("\#S,01,00", true);   Delayms(2000);
-  //try get command to get reult back? so no delay needed
-            if(temp<=Temp_Threshold){ CommandWinch("\#F,01,00", true);
-               Delayms(2000);       cprintf("\nSIA: Minimum
-  Temperature Recognized ");
-               ice=4; }
-            else if(temp>Temp_Threshold&&BuoyMode==0){
-  cprintf("\nSIA: Careful Ascent ");
-               ice=3;              CommandWinch("\#R,01,02", true);
-  Delayms(2000);     }
-         }
-         else if(SimDepth<=Min_Depth){
-            CommandWinch("\#S,01,00", true);
-            //Surfaced=true; ice=1;
-         }
-
-
-      }
-      else if(BuoyMode==3){  if(abs(sal_change)<0.4){//salinity becomes less at
-  buoy ascends
-            cprintf("\nSIA: Continuing Careful Ascent ");   ice=3;    }
-         else if(abs(sal_change)<0.4){  cprintf("\nSIA: Temp:OK, Sal Change: Bad
-  ");
-            ice=5;   CommandWinch("\#S,01,00", true);
-  Delayms(2000);
-            CommandWinch("\#F,01,00", true);  return ice;   }
-         if(current_temp<Temp_Threshold){   cprintf("\nSIA: Temp: Too Low ");
-  ice=2;
-            CommandWinch("\#S,01,00", true);  Delayms(2000);
-            CommandWinch("\#F,01,00", true);  return ice;   }
-         if(PRES<=Min_Depth){   CommandWinch("\#S,01,00", true);
-            Delayms(2000);      cprintf("\nSIA: Reached Minimum
-  Depth ");
-            //Surfaced=true;
-            ice=1;  }
-      }
-   }
-
-
-
-
-   //Real Dive Sea Ice Algorithm Mode
-   else if(pres<=Depth_Threshold&&BuoyMode==1){          //Depth threshold
-  reached
-      if(temp_change<0.5&&sal_change<0.5){               //if change in ctd
-  readings is small
-         CommandWinch("\#S,01,00", true);                     //Stop winch
-         if(temp<=Temp_Threshold){                       //if temp is below
-  threshold
-            CommandWinch("\#F,01,00", true);                  //descend
-            cprintf("SIA: Minimum Temperature Recognized ");
-            ice=4;        }
-            else if(temp>Temp_Threshold&&BuoyMode==0){   //if temp is above
-  threshold
-            CommandWinch("\#R,01,02", true);                  //put in careful
-  ascent mode
-            cprintf("SIA: Careful Ascent ");
-            ice=3;   }}
-      else if(pres<=Min_Depth){                          //if change in ctd
-  readings is large, and buoy reaches minimum depth
-         CommandWinch("\#S,01,00", true);                     //stop buoy
-         cprintf("SIA: Minimum Depth Reached ");
-        // Surfaced=true;
-        }   }                           //surfaced = true. go to iridium
-
-  else if(BuoyMode==3){                                  //careful ascent mode
-      if(current_temp>Temp_Threshold){                   //temperatures reads ok
-         cprintf("\nSIA: Continuing Careful Ascent ");
-         ice=3; }                                        //no ice
-      else if(abs(sal_change)<0.4){                           //change in
-  salinity is too small
-         CommandWinch("\#S,01,00", true);                     //stop
-         ice=2;                                          //sal change bad
-         CommandWinch("\#F,01,00", true);  }                  //descend
-      else if(pres<=Min_Depth){                          //buoy reached minimum
-  depth
-         CommandWinch("\#S,01,00", true);                     //Should it ascend
-  more if still no signal? depends on our iridium float attached to the buoy
-        // Surfaced=true;                                  //surfaced =true go
-  to iridium
-         ice=1;}
-  }
-  */
-  return ice;
-} //____ bool Sea_Ice_Algorithm(void) ____/
-
-/******************************************************************************\
-** void CTD_data()
-* CTD with fluro, par
-* Temp, conductivity, depth, fluromtr, PAR, salinity, time
-* 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
-* The response is approximately 2 sec.
-* FLS and PAR data in between the depth and salinity. Ignore the conductivity.
-* !! too many functions here
-* !! sets lara.depth lara.temp
-* !! CTD_vertvel
-* !! log scientific
-* waits up to 8 seconds - best called after tgetq()
-\******************************************************************************/
+/*
+ * bool CTD_Data() 
+ * Temp, conductivity, depth, fluromtr, PAR, salinity, time
+ * 16.7301,  0.00832,    0.243, 0.0098, 0.0106,   0.0495, 14 May 2017 23:18:20
+ * The response is approximately 2 sec.
+ * FLS and PAR data in between the depth and salinity. Ignore the conductivity.
+ * !! too many functions here
+ * !! sets lara.depth lara.temp
+ * !! CTD_vertvel
+ * !! log scientific
+ * waits up to 8 seconds - best called after tgetq()
+ */
 bool CTD_Data() {
   // global stringin CTDLogFile
   char *strin;  // pointer into stringin
   int filehandle;
-  int i = 0, byteswritten, month;
+  int i=0;
+  int byteswritten, month;
   long len;
   char *split_temp, *split_cond, *split_pres;
   char *split_flu, *split_par, *split_sal;
@@ -356,17 +156,14 @@ bool CTD_Data() {
   struct tm info;
   time_t secs = 0;
 
-  DBG1( flogf("\n. CTD_Data()"); )
+  DBG0( flogf("\n. CTD_Data()"); )
   memset(stringin, 0, BUFSZ);
 
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
-  DBG2( printsafe(len, stringin);)
-#ifdef DEBUG3
-  printsafe(len, stringin);
-#endif
+  DBG( printsafe(len, stringin);)
 
-  TURxFlush(devicePort);
+  TURxFlush(ctd.port);
   strin=stringin;
 
   memset(stringout, 0, BUFSZ);
@@ -477,106 +274,3 @@ bool CTD_Data() {
   return true;
 } //____ CTD_Data() _____//
 
-/******************************************************************************\
-** void CTD_VertVel()
-\******************************************************************************/
-time_t CTD_VertVel(time_t seconds) {
-  static ulong pastTime = 0;
-  static float pastDepth = 0;
-  float vel = 0.0;
-  ulong timechange = 0;
-
-  timechange = seconds - pastTime;
-  if (timechange > 180 || pastTime == 0) {
-    pastTime = seconds;
-    pastDepth = LARA.DEPTH;
-    DBG1(flogf("\n\t|CTD_VertVel: No previous recent measurements, reinitialize");)
-    return 0;
-  } else {
-    pastTime = seconds;
-    vel = (float)((LARA.DEPTH - pastDepth) / (float)timechange);
-    SummedVelocity += vel;
-    CTDSamples++;
-    // flogf("\n\t|time change: %lu", timechange);
-    flogf(", %4.2f m/s", vel);
-    pastDepth = LARA.DEPTH;
-  }
-  return timechange;
-} //____ CTD_VertVel() ____//
-
-
-/******************************************************************************\
-** void CTD_GetSettings();
-\******************************************************************************/
-void CTD_GetSettings() {
-  char *p;
-
-  p = VEEFetchData(CTDUPLOADFILE_NAME).str;
-  CTD.UPLOAD = atoi(p ? p : CTDUPLOADFILE_DEFAULT);
-  DBG2(flogf("CTD.UPLOAD=%u (%s)\n", CTD.UPLOAD, p ? "vee" : "def");)
-
-} //____ CTD_GetSettings() ____//
-
-/******************************************************************************\
-** float CTD_AverageDepth(int)
-        -Usually Called while waiting for Winch Response.
-        @Param1: int i, number of CTD Samples to average
-        @Param2: float* to current average velocity
-        @Return: Average Position from this sampling
-\******************************************************************************/
-float CTD_AverageDepth(int i, float *velocity) {
-  int j;
-  float first, last, diff, vel;
-  ulong dur, starttime = 0, stoptime = 0;
-
-  DBG1( flogf("\n . CTD_AverageDepth"); )
-  CTD_Select(DEVA);
-  TURxFlush(devicePort);
-
-  for (j = 0; j < i; j++) {
-    CTD_Sample();
-    if (!CTD_Data()) return 0.0; // waits up to 8 sec
-    if (j==0) {
-      starttime = RTCGetTime(NULL, NULL);
-      first = LARA.DEPTH;
-    }
-  } // for j
-  stoptime = RTCGetTime(NULL, NULL);
-  last = LARA.DEPTH;
-  diff = first - last;
-  // Very basic velocity calculation
-  flogf("\nDepthChange: %5.2f over %d samples", diff, i);
-  dur = stoptime-starttime;
-  vel = diff / (float) dur;
-  *velocity = vel;
-  // if movement of more than 1 meter in 6s
-  if (dur<6) 
-    flogf("\n\t|not enough sample time to profile buoy movement");
-  else
-    if (abs(diff) < 1.0) {
-      flogf("\n\t|Profiling Buoy Stationary at %5.2f, %5.2fm/s", last, vel);
-      LARA.BUOYMODE=0;
-    } else {
-      flogf("\n\t|Profiling Buoy Moving currently at %5.2f, %5.2fm/s", last, vel);
-      if (vel>0) LARA.BUOYMODE=1;
-      else LARA.BUOYMODE=2;
-    }
-  return last;
-}
-
-/******************************************************************************\
-** float CTD_CalculateVelocity()
-        -Called at end of Ascent or Descent
-        @Return: Calculated Velocity since previous calculation.
-\******************************************************************************/
-float CTD_CalculateVelocity() {
-  float vel;
-  vel = (SummedVelocity / (float)CTDSamples);
-  // if(vel<0) vel=vel*-1.0;
-  flogf("\nSummedVel: %5.2f, samples: %d", SummedVelocity, CTDSamples);
-  // if(vel<=0.0) return 0.0;
-  flogf("\n\t|CTD_CalculatedVelocity(): %3.2f", vel);
-  SummedVelocity = 0.0;
-  CTDSamples = 0;
-  return vel;
-}

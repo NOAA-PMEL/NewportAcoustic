@@ -1,3 +1,22 @@
+v4
+monitor on|off  := start/stop loop reading CTD; alert on ice, targetD
+call on|off     := iridium call and upload
+ice on|off    := set ice alert during monitor
+target ##     := set target depth during monitor
+drift on|off  := check gps for drift during call
+average := return last velocity average 
+depth   := return last depth value (read now if not monitor or call)
+temp    := return last temp value (read now if not monitor or call)
+gps     := return last gps values (read now if not monitor or call)
+file name size  := load file to antmod
+delete name     := delete file
+dir   := list files stored
+log   := files transferred, waiting
+
+v3
+^A - ^F as v2, ^G as v4 (partial)
+
+v2
 Serial interface program to control and 
  communicate with SBE and Iridium/GPS.
 Buoy is connected to com4 at 9600 BAUD
