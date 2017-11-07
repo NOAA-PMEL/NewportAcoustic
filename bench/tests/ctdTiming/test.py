@@ -1,6 +1,7 @@
 # test char delays in response
 
 from serial import Serial
+from serial.tools.list_ports import comports
 from threading import Thread, Event
 import time, sys
 
@@ -21,9 +22,17 @@ def init():
     "set up globals"
     global buf, ser, go, timer
     buf = []
-    ser = Serial(port=port,baudrate=baudrate)
-    timer = time.time()
     go = Event()
+    timer = time.time()
+    global port, baudrate
+    try:
+        ser = Serial(port=port,baudrate=baudrate)
+    except:
+        print "no serial on %s" % port
+        print sys.exc_info()[1]
+        for i in comports(): print i[0]
+        ser = None
+        sys.exit()
 
 def start():
     "start reader thread"
