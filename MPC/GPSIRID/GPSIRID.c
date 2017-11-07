@@ -85,11 +85,11 @@ bool CompareCoordinates(char *, char *);
 void ConsoleIrid(); // check console for interrupt, redirect 
 void DelayTX(int ch);
 int GetStringWait(TUPort port, char *str, int wait);
-// bool GPSstartup();
-// int DevSelect(int);
+bool GPSstartup();
+int DevSelect(int);
 // int AntMode(char);
-// int GPSIRID_Init();
-// short IRIDGPS();
+int GPSIRID_Init();
+short IRIDGPS();
 // void GetIRIDIUMSettings();
 
 /* */

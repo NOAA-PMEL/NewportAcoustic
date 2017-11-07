@@ -13,7 +13,7 @@ int ReadLine(TUPort *port, char *in) {
   for (len=1; len<BUFSZ; len++) {
     in[len] = TURxGetByteWithTimeout(port, CHARDELAY);
     if (in[len]<0) {
-      // error, we should not get a timeout
+      // timeout is an error, we use this routine to capture echo of commands
       in[len]=0;
       len = -len;
     if (in[len]=='\n') {

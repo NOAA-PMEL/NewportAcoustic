@@ -24,8 +24,8 @@
 #include <time.h>
 #include <unistd.h> // PicoDOS POSIX-like UNIX Function Definitions
 
-#include <globalDef.h> // common defines
-#include <globalExt.h> // common externals
+#include <define.h> // common defines
+#include <global.h> // common externals
 #include <MPC_Global.h> // pins and HW
 #include <MPC.h> // shared procs, HW
 #include <utils.h> // shared procs, SW
