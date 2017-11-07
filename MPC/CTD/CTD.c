@@ -4,6 +4,7 @@
  */
 #include <common.h>
 #include <CTD.h>
+#include <AntMod.h>
 
 extern SystemParameters MPC;
 extern SystemStatus LARA;
