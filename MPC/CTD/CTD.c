@@ -61,25 +61,30 @@ void CTD_DateTime() {
           info->tm_year + 1900, info->tm_hour, info->tm_min, info->tm_sec);
   printf("\nCTD_DateTime(): %s\n");
 
-  TUTxPrintf(devicePort, "DATETIME=%s\r", buffer);
+  TUTxPrintf(ctd.port, "DATETIME=%s\r", buffer);
   Delayms(250);
-  while (tgetq(devicePort))
-    cprintf("%c", TURxGetByte(devicePort, true));
+  while (tgetq(ctd.port))
+    cprintf("%c", TURxGetByte(ctd.port, true));
 
 } // CTD_DateTime() 
+
+// sbe16
+// \r input, echos input.  \r\n before next output.
+// pause 0.33s between \rn and s> prompt.
+// wakeup takes 1.045s, writes extra output "SBE 16plus\r\nS>"
+// pause between ts\r\n and result, 4.32s
 
 /*
  * CTD_GetPrompt - poke buoy CTD, look for prompt
  */
 bool CTD_GetPrompt() {
   static char str[32];
-  bool r = false;
-  // looking for S>
   TURxFlush(ctd.port);
   TUTxPutByte(ctd.port, '\r', true);
-  GetStringWait(ctd.port, 6, str);
-  if (strstr(str, ">") != NULL) r=true;
-  return r;
+  GetStringWait(ctd.port, 2, str);
+  // looking for S>
+  if (strstr(str, "S>") != NULL) return true;
+  else return false;
 }
 
 /*
@@ -88,18 +93,18 @@ void CTD_Sample() {
   char ch;
   DBG1( flogf("\n . CTD_Sample"); )
   //if (SyncMode) {
-    //TUTxPrintf(devicePort, "+\r");
+    //TUTxPrintf(ctd.port, "+\r");
     //Delayms(20);
-    //TURxFlush(devicePort);
+    //TURxFlush(ctd.port);
   //} else {
-  // TUTxPrintf(devicePort, "TS\r");
-  TUTxPutByte(devicePort, 'T', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  TUTxPutByte(devicePort, 'S', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  TUTxPutByte(devicePort, '\r', true);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
-  ch=TURxGetByteWithTimeout(devicePort, 10);
+  // TUTxPrintf(ctd.port, "TS\r");
+  TUTxPutByte(ctd.port, 'T', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  TUTxPutByte(ctd.port, 'S', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  TUTxPutByte(ctd.port, '\r', true);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
+  ch=TURxGetByteWithTimeout(ctd.port, 10);
   //}
 } //____ CTD_Sample() ____//
 
@@ -107,19 +112,19 @@ void CTD_Sample() {
  */
 void CTD_SyncMode() {
   DBG0(flogf("\n\t|CTD_SyncMode()");)
-  // CTD_SampleBreak();
-  TUTxPrintf(devicePort, "Syncmode=y\r");
+  CTD_SampleBreak();
+  TUTxPrintf(ctd.port, "Syncmode=y\r");
   Delayms(500);
-  TUTxPrintf(devicePort, "QS\r");
+  TUTxPrintf(ctd.port, "QS\r");
   Delayms(500);
   SyncMode = true;
-  TURxFlush(devicePort);
+  TURxFlush(ctd.port);
 } 
 
 /*
  */
 void CTD_SampleBreak() {
-  TUTxBreak(devicePort, 5000);
+  TUTxBreak(ctd.port, 5000);
   SyncMode = false;
 }
 
@@ -155,12 +160,9 @@ bool CTD_Data() {
 
   // waits up to 8 seconds - best called after tgetq()
   len = GetStringWait(stringin, (short) 8000);
-  DBG2( printsafe(len, stringin);)
-#ifdef DEBUG3
-  printsafe(len, stringin);
-#endif
+  DBG( printsafe(len, stringin);)
 
-  TURxFlush(devicePort);
+  TURxFlush(ctd.port);
   strin=stringin;
 
   memset(stringout, 0, BUFSZ);

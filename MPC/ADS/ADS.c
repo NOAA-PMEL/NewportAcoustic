@@ -1,4 +1,4 @@
-/*****************************************************************************************************
+/*
 ADS Version for Seaglider version 3.0
 
 Updates from ADS.c version 2.0
@@ -38,10 +38,7 @@ averaged.
 
    C) ADSTIME will be saved as a "ushort" and can be divided by "10.0" to
 transfer into the real power write time.
-
-
-
-****************************************************************************************************/
+ */
 #include <common.h>
 #include <ADS.h>
 #include <Settings.h>
@@ -83,7 +80,7 @@ float Voltage = 0.0;
 
 bool data;
 int ADCounter = 0;
-PowerParameters ADS;
+extern PowerParameters ADS;
 static char ADAvgFileName[] = "c:00000000.pwr";
 
 int ADSFileHandle;

@@ -71,7 +71,7 @@ short CustomSYPCR = WDT105s | HaltMonEnable | BusMonEnable | BMT32;
 //power mode
 
 // VEEPROM Parameter Structures
-SystemParameters MPC;
+extern SystemParameters MPC;
 #ifdef WISPR
 extern WISPRParameters WISP;
 extern bool WISPR_On;
@@ -92,7 +92,7 @@ extern CTDParameters CTD;
 
 IEV_C_PROTO(ExtFinishPulseRuptHandler);
 
-SystemStatus LARA;
+extern SystemStatus LARA;
 ulong PwrOff, PwrOn;
 
 // Define unused pins here

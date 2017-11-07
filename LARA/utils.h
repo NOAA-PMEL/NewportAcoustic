@@ -1,2 +1,5 @@
-int GetStringWait(TUPort port, int wait, char *str);
-void GetResponse(TUPort port, char *in, int wait, char *out);
+void DelayTX(int ch);
+int ReadLine(TUPort *port, char *in);
+void WriteLine(TUPort *port, char *out);
+int GetStringWait(TUPort port, int wait, char *in);
+int GetResponse(TUPort port, char *out, int wait, char *in);

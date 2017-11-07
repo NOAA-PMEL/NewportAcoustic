@@ -5,10 +5,11 @@ may pause between \r .. \r\n, e.g. +csq paused 4.41 seconds
 sbe16:
 \r input, echos input.  \r\n before next output.
 pause 0.33s between \rn and s> prompt.
-wakeup takes 1.045s, writes extra output "SBE 16plus"
+wakeup takes 1.045s, writes extra output "SBE 16plus\r\nS>"
 pause between ts\r\n and result, 4.32s
 
 sbe39:
 \r input, echos input.  \r\n before next output.
 no pause between \rn and "<Executed/>\r\n" prompt.
+wakdeup is fast. \r wakes, but no output. second \r gets prompt.
 pause between ts\r\n and result, 0.52s

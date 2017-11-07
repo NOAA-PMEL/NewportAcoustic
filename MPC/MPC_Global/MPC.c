@@ -81,7 +81,8 @@ void PreRun(void) {
 
   QRchar("\nWhat next?(P=PicoDOS, S=Settings)", "%c", false, &c, "PS", true);
   if (c == 'S') {
-    settings();
+    flogf( "\nNo settings, sorry.");
+    // settings();
 
   }
 

@@ -14,40 +14,6 @@
 // debug related to wispr
 #define DEBUGWISPR
 
-// pins on MPC board
-/*
- * WISPR.h:#define WISPRONE 29
- * WISPR.h:#define WISPRTWO 30
- * WISPR.h:#define WISPRTHREE 24
- * WISPR.h:#define WISPRFOUR 25
- * WISPR.h:#define WISPR_PWR_ON 37
- * WISPR.h:#define WISPR_PWR_OFF 42
- * Winch.h:#define AMODEMPWR 21
- * Winch.h:#define AMODEMRX 33
- * Winch.h:#define AMODEMTX 35
- * GPSIRID.h:#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
- * GPSIRID.h:#define ANTMODCOM 23 // com1 shared, must match CTD.h#TDCOM
- * GPSIRID.h:#define ANTMODRX 32
- * GPSIRID.h:#define ANTMODTX 31
- */
-
-#define AMODEMPWR 21
-#define ANTMODPWR 22 // Iridium Power pin (1=ON, 0=OFF)
-#define DEVICECOM 23 // set ANTMOD (device), clear BUOY (sbe)
-#define WISPRTHREE 24
-#define WISPRFOUR 25
-#define DIFARPWR 26
-#define WISPRONE 29
-#define WISPRTWO 30
-#define DEVICETX 31
-#define DEVICERX 32
-#define AMODEMRX 33
-#define AMODEMTX 35
-#define WISPR_PWR_ON 37
-#define WISPR_PWR_OFF 42
-#define BUOYBAUD 9600L
-#define IRIDBAUD 9600L
-
 #define POWERLOGGING
 #define SYSTEMDIAGNOSTICS
 #define WISPR
@@ -66,9 +32,6 @@
 #define MIN_DATAX_INTERVAL 30
 #define MAX_DATAX_INTERVAL 2880
 
-#define WTMODE nsStdSmallBusAdj // choose: nsMotoSpecAdj or nsStdSmallBusAdj
-#define SYSCLK 16000 // Clock speed: 2000 works 160-32000 kHz Default: 16000
-
 #ifdef DEBUGWISPR
 #define WISPRNUMBER 0
 #else
@@ -80,11 +43,6 @@
 #define MIN_FREESPACE 1.0 // represents the cutoff percentage for WISPR
                           // recording
 
-#ifdef SEAGLIDER
-#define MIN_OFF_DEPTH 50
-#define MIN_ON_DEPTH 25
-#endif
-
 // Enabling REALTIME mode will initiate the call land protocol to transfer
 // realtime data.
 // It will also use a filenumber based .log system rather than activity log
@@ -95,8 +53,7 @@
 #define RTS(X)
 #endif
 
-// two levels of debug
-// DEBUG
+// levels of debug
 #ifdef DEBUG
 #define DBG(X) X
 #else
