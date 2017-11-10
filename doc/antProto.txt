@@ -1,17 +1,27 @@
 v4
-monitor on|off  := start/stop loop reading CTD; alert on ice, targetD
-call on|off     := iridium call and upload
-ice on|off    := set ice alert during monitor
-target ##     := set target depth during monitor
-drift on|off  := check gps for drift during call
-average := return last velocity average 
-depth   := return last depth value (read now if not monitor or call)
-temp    := return last temp value (read now if not monitor or call)
-gps     := return last gps values (read now if not monitor or call)
+<--> commands, response is "cmd [#]"
+phase #   := 1 wispr, 2 ascend, 3 surface, 4 descend
+target #.#      := set target depth for ascend
+velocity #      := return avg next # depth / time readings
+depth     := return next depth value
+temp      := return next temp value
 file name size  := load file to antmod
-delete name     := delete file
-dir   := list files stored
-log   := files transferred, waiting
+
+status    := "phase #, depth #.#, temp #.#"
+set setting val := set setting, same format as .ini file
+pico x x  := response from dos, then "pico"
+
+<-- async alerts, not in direct response to query
+ice #.#       := detected low temp, suggesting winch stop
+target #.#    := depth < target set by buoy request
+surfaced #.#  := depth < ant.surface setting
+gps #.# #.#   := acquired GPS location
+signal #      := csq 5
+connected     := sending data
+sent #/# #    := sent # of # files, # bytes (ready to descend)
+failed        := tried to connect, giving up (ready to descend)
+descend       := done with surface
+
 
 v3
 ^A - ^F as v2, ^G as v4 (partial)

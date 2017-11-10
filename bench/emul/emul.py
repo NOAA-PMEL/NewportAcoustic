@@ -1,30 +1,30 @@
 # emulator. v3
-import winch, buoy, ant, floats
+import winch, sbe16, sbe39, floats
 from design import mooring
 
 def init():
     "init all"
-    buoy.init()
+    sbe16.init()
     winch.init()
-    ant.init()
+    sbe39.init()
 
 def start():
     "start all"
-    buoy.start()
+    sbe16.start()
     winch.start()
-    ant.start()
+    sbe39.start()
 
 def stop():
     "stop all"
-    buoy.stop()
+    sbe16.stop()
     winch.stop()
-    ant.stop()
+    sbe39.stop()
 
 def info():
     "info all"
-    buoy.info()
+    sbe16.info()
     winch.info()
-    ant.info()
+    sbe39.info()
     
 def restart():
     "stop init start"
@@ -47,5 +47,5 @@ atexit.register(stop)
 if __name__=='__main__': 
     start()
 else: 
-    print "start() stop() restart() buoy.info() mooring=30 winch.cable(0)"
+    print "start() stop() restart() sbe16.info() mooring=30 winch.cable(0)"
     info()
