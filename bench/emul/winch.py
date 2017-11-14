@@ -16,6 +16,7 @@ eol = '\n'
 portSelect = 3
 
 amodDelay = 5.5
+serThreadObj = None
 
 def info():
     global go, cableLen, motorRunState
@@ -23,14 +24,22 @@ def info():
     print "(go:%s)   motor('%s')   cableLen=%.2f" % \
         (go.isSet(), motorRunState, cableLen)
 
-def init(portSel=portSelect):
+def init():
     "set global vars to defaults"
-    global go, ser, cableLen, motorRunState, motorOn
+    global go, cableLen, motorRunState, motorOn
     cableLen = 0
     # motorRunState off, down, up
     motorRunState = 'off' 
     motorOn = Event()
     go = Event()
+
+def start(portSel=portSelect):
+    "start serial and reader thread"
+    global go, ser, buffOut, serThreadObj
+    buffOut = ''
+    # threads run while go is set
+    go.set()
+    motorOn.clear()
     try:
         # select port 0-n of multiport serial
         port = comports()[portSel].device
@@ -38,25 +47,27 @@ def init(portSel=portSelect):
     except:
         print "no serial for %s" % name
         ser = None
-
-def start():
-    "start serial and reader thread"
-    global go, ser, buffOut
-    buffOut = ''
-    # threads run while go is set
-    go.set()
-    # during test, we may be running with no serial
-    Thread(target=serThread).start()
-    Thread(target=motorThread).start()
+        return
+    obj = Thread(target=motorThread)
+    obj.daemon = True
+    obj.name = 'motor'
+    obj.start()
+    serThreadObj = Thread(target=serThread)
+    serThreadObj.daemon = True
+    serThreadObj.name = name
+    serThreadObj.start()
 
 def stop():
-    global go, motorOn
+    global go, motorOn, serThreadObj
     "stop threads, close serial"
-    if go: go.clear()
-    if not motorOn.isSet(): 
-        # release motor thread, if motor is off
-        motorOn.set()
-        motorOn.clear()
+    if not serThreadObj: return
+    go.clear()
+    # motorOn thread is in wait()
+    motorOn.set()
+    # wait until thread ends, allows daemon to close clean
+    serThreadObj.join(3.0)
+    if serThreadObj.is_alive():
+        print "stop(): fail on %s" % serThreadObj.name
 
 def serThread():
     "thread: looks for serial input, output; sleeps to simulate amodDelay"

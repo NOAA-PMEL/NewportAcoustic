@@ -1,5 +1,6 @@
 # emulate antenna sbe39 v3
 import time
+from random import random
 from laraSer import Serial
 from serial.tools.list_ports import comports
 from threading import Thread, Event
@@ -15,17 +16,25 @@ baudrate = 9600
 CTD_DELAY = 0.53
 CTD_WAKE = 0.78
 
+serThreadObj = None
+
 def info():
     "globals which may be externally set"
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
         (go.isSet(), syncMode, syncModePending, sleepMode)
 
-def init(portSel=portSelect):
+def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode, syncModePending, timeOff
+    global go, sleepMode, syncMode, syncModePending, timeOff
     sleepMode = syncMode = syncModePending = False
     timeOff = 0
     go = Event()
+
+def start(portSel=portSelect):
+    "start I/O thread"
+    global go, serThreadObj, name, ser
+    # threads run while go is set
+    go.set()
     try:
         # select port 0-n of multiport serial
         port = comports()[portSel].device
@@ -33,12 +42,7 @@ def init(portSel=portSelect):
     except: 
         print "no serial for %s" % name
         ser = None
-
-def start():
-    "start I/O thread"
-    global go, serThreadObj, name
-    # threads run while go is set
-    go.set()
+        return
     serThreadObj = Thread(target=serThread)
     serThreadObj.daemon = True
     serThreadObj.name = name
@@ -47,7 +51,8 @@ def start():
 def stop():
     global go, serThreadObj
     "stop threads"
-    if go: go.clear()
+    if not serThreadObj: return
+    go.clear()
     # wait until thread ends, allows daemon to close clean
     serThreadObj.join(3.0)
     if serThreadObj.is_alive(): 
@@ -163,8 +168,11 @@ def ctdOut():
 def depth():
     "mooring-(cable+buoyL+floatsL+antL), but always below surface"
     dep=mooring - (winch.cable()+buoyLine+floatsLine+antLine)
-    if dep<antCTDpos: return antCTDpos
-    else: return dep
+    if dep>antCTDpos: 
+        return dep
+    else: # at surface
+        wave = (.8 * random()) - .4
+        return antCTDpos + wave
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"

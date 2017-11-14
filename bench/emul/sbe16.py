@@ -16,17 +16,25 @@ baudrate = 9600
 CTD_DELAY = 4.3     # delay readings from sbe16
 CTD_WAKE = 0.78
 
+serThreadObj = None
+
 def info():
     "globals which may be externally set"
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
         (go.isSet(), syncMode, syncModePending, sleepMode)
 
-def init(portSel=portSelect):
+def init():
     "set globals to defaults"
-    global ser, go, sleepMode, syncMode, syncModePending, timeOff
+    global go, sleepMode, syncMode, syncModePending, timeOff
     sleepMode = syncMode = syncModePending = False
     timeOff = 0
     go = Event()
+
+def start(portSel=portSelect):
+    "start I/O thread"
+    global go, serThreadObj, name, ser
+    # threads run while go is set
+    go.set()
     try:
         # select port 0-n of multiport serial
         port = comports()[portSel].device
@@ -34,12 +42,6 @@ def init(portSel=portSelect):
     except:
         print "no serial for %s" % name
         ser = None
-
-def start():
-    "start I/O thread"
-    global go, serThreadObj, name
-    # threads run while go is set
-    go.set()
     serThreadObj = Thread(target=serThread)
     serThreadObj.daemon = True
     serThreadObj.name = name
@@ -48,7 +50,8 @@ def start():
 def stop():
     global go, serThreadObj
     "stop threads"
-    if go: go.clear()
+    if not serThreadObj: return
+    go.clear()
     # wait until thread ends, allows daemon to close clean
     serThreadObj.join(3.0)
     if serThreadObj.is_alive():

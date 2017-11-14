@@ -56,7 +56,7 @@ class Serial(serial.Serial):
 
     def getline(self, echo=0):
         "Get full lines from serial, keep eol; partial to self.buff"
-        # returns a full line or ''
+        # returns a full line, partial returns '', no input returns None
         eol = self.eol
         eol_out = self.eol_out
         # read chars

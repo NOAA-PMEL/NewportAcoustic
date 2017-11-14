@@ -1,12 +1,12 @@
 # emulator. v3
-import winch, sbe16, sbe39, floats
-from design import mooring
+import winch, sbe16, sbe39, floats, antmod
 
 def init():
     "init all"
     sbe16.init()
     winch.init()
     sbe39.init()
+    antmod.init()
 
 def start():
     "start all"
@@ -19,6 +19,7 @@ def stop():
     sbe16.stop()
     winch.stop()
     sbe39.stop()
+    antmod.stop()
 
 def info():
     "info all"
@@ -32,20 +33,8 @@ def restart():
     init()
     start()
 
-#import sys
-#def my_except_hook(exctype, value, traceback):
-#    if exctype == KeyboardInterrupt:
-#        print "stopping..."
-#        stop()
-#    else:
-#        sys.__excepthook__(exctype, value, traceback)
-#sys.excepthook = my_except_hook
-
 import atexit
 atexit.register(stop)
 
-if __name__=='__main__': 
-    start()
-else: 
-    print "start() stop() restart() sbe16.info() mooring=30 winch.cable(0)"
-    info()
+print "start() stop() restart() sbe16.info() winch.cable(0)"
+info()

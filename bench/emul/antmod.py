@@ -2,7 +2,7 @@
 import time
 from laraSer import Serial
 from serial.tools.list_ports import comports
-from threading import Thread, Event
+from threading import Thread, Event, Timer
 from design import *
 import winch
 
@@ -18,29 +18,28 @@ baudrate = 9600
 CTD_DELAY = 0.53
 CTD_WAKE = 0.78
 
-stamp = time.time()
+sbe = {}
+flag = {}
+setting = {}
+serThreadObj = None
 
 def info():
     "globals which may be externally set"
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
         (go.isSet(), syncMode, syncModePending, sleepMode)
 
-def init(portSel=portSelect):
+def init():
     "set globals to defaults"
     global mooring__line, mooring, buoyLine, floatsLine, antLine
     mooring__line = mooring-(buoyLine+floatsLine+antLine)
-    global ser, go
+    global go
     go = Event()
     flagInit()
     settingInit()
     sbe_init()
-    try:
-        # select port 0-n of multiport serial
-        port = comports()[portSel].device
-        ser = Serial(port=port,baudrate=baudrate,name=name)
-    except: 
-        print "no serial for %s" % name
-        ser = None
+
+def parseIni(x):
+    "read antmod.ini for settings"
 
 def flagInit():
     global flag
@@ -62,11 +61,18 @@ def settingInit():
         }
     parseIni('setting')
 
-def start():
+def start(portSel=portSelect):
     "start I/O thread"
-    global go, serThreadObj, name
+    global go, serThreadObj, name, ser
     # threads run while go is set
     go.set()
+    try:
+        # select port 0-n of multiport serial
+        port = comports()[portSel].device
+        ser = Serial(port=port,baudrate=baudrate,name=name)
+    except: 
+        print "no serial for %s" % name
+        ser = None
     serThreadObj = Thread(target=serThread)
     serThreadObj.daemon = True
     serThreadObj.name = name
@@ -75,7 +81,8 @@ def start():
 def stop():
     global go, serThreadObj
     "stop threads"
-    if go: go.clear()
+    if not serThreadObj: return
+    go.clear()
     # wait until thread ends, allows daemon to close clean
     serThreadObj.join(3.0)
     if serThreadObj.is_alive(): 
@@ -86,17 +93,18 @@ def serThread():
     global go, sbe, ser
     if not ser.is_open: ser.open()
     ser.buff = ''
-    try:
+    #try:
+    if True:
         while go.isSet():
             if sbe['event'].isSet(): 
                 sbe['event'].clear()
                 sbe_process()
             l = ser.getline()
-            if l != '': buoyProcess(l)
-        # while go:
-    except:
-        print "Error, stop()"
-        stop()
+            # getline returns None, '', or 'chars\r'
+            if l: buoyProcess(l)
+    #except:
+    #    print "Error, stop()"
+    #    stop()
     if ser.is_open: ser.close()
 #end def serThread():
 
@@ -145,8 +153,10 @@ def sbe_process():
 
 def buoyProcess(l):
     "process serial input (from buoy)"
+    # 'chars\r'
     global flag, setting, phase
     ls = l.split()
+    if len(ls)==0: return
     cmd = ls[0]
     if 'phase'==cmd:
         phase = int(ls[1])
@@ -174,7 +184,7 @@ def velocity(d):
     "process sbe reading for velocity"
     global velTime, velDepth # static vars in C
     global flag, setting
-    if !velTime:
+    if not velTime:
         # first reading, set start time depth
         velTime = time.time()
         velDepth = d
@@ -204,17 +214,17 @@ def phase(p):
     flagInit()
     #
     if p==1:        # docked
-        # ser.log("docked. sleeping.")
-    if p==2:        # ascend
+        ser.log("docked. sleeping.")
+    elif p==2:        # ascend
         k = setting.keys()
         for i in ('ice', 'surface', 'log'):
             if i in k: flag[i] = True
         if flag['log']: sbe_req()
-    if p==3:        # surface
+    elif p==3:        # surface
         ser.putline("surfaced %.2f" % sbe.depth)
         gpsIrid()
         ser.putline("descend")
-    if p==4:        # descend
+    elif p==4:        # descend
         k = setting.keys()
         for i in ('log'):
             if i in k: flag[i] = True
@@ -235,7 +245,7 @@ def sbe_req():
     global sbe, flag
     if sbe['pending']: return
     sbe['pending'] = True
-    threading.Timer(sbe['ctdDelay'], sbe['event'].set)
+    Timer(sbe['ctdDelay'], sbe['event'].set)
 
 def gpsIrid():
     "pretend to send files"
