@@ -15,7 +15,6 @@ baudrate = 9600
 CTD_DELAY = 0.53
 CTD_WAKE = 0.78
 
-sbe = {}
 flags = {}           # watch sbe depth/temp
 value = {}          # depth/temp
 setting = {}        # algorithm settings
@@ -24,14 +23,10 @@ serThreadObj = None
 flagsSet = [
     (), # p0
     (), # p1
-    ('log', 'surface'), # p2
+    ('surface'), # p2
     (), # p3
-    (), # p4
+    ('log'), # p4
     ]
-
-sbeInit = {
-    'depth': 0,
-    }
 
 flagsInit = { 
     'depth': False,
@@ -48,14 +43,6 @@ valueInit ={
     'surface': 1.5,
     }
 
-sbeInit={
-    'ctdDelay': CTD_DELAY,
-    'pending': False,
-    'depth': 0.0,
-    'temp': 0.0,
-    'timer': None,
-    }
-
 def info():
     "globals which may be externally set"
     print "(go:%s)   syncMode=%s   syncModePending=%s   sleepMode=%s" % \
@@ -65,12 +52,14 @@ def init():
     "set globals to defaults"
     global mooring__line, mooring, buoyLine, floatsLine, antLine
     mooring__line = mooring-(buoyLine+floatsLine+antLine)
-    global go, phase, flags, value, sbe
+    global go, phase, flags, value
     go = Event()
-    phase = 2
     flags = flagsInit.copy()
     value = valueInit.copy()
-    sbe = sbeInit.copy()
+    phase = 2
+    print "phase %s flags %s" % (phase, flagsSet[phase])
+    for k in flagsSet[phase]:        # flags for this phase
+        flags[k] = True
 
 def start(portSel=portSelect):
     "start I/O thread"
@@ -101,15 +90,15 @@ def stop():
 
 def serThread():
     "thread: loop looks for serial input; to stop set sergo=0"
-    global go, sbe, ser
+    global go, ser
     if not ser.is_open: ser.open()
     ser.buff = ''
     #try:
     if True:
         while go.isSet():
-            #if sbe['event'].isSet(): 
-            #    sbe['event'].clear()
-            #    sbe_process()
+            #if sbe.event.isSet(): 
+            #    sbe.event.clear()
+            #    sbe.process()
             l = ser.getline()
             # getline returns None, '', or 'chars\r'
             if l: buoyProcess(l)
@@ -118,42 +107,6 @@ def serThread():
     #    stop()
     if ser.is_open: ser.close()
 #end def serThread():
-
-def sbe_process():
-    "called when sbe['event'].isSet(), consume pseudo-data from sbe"
-    global ser, sbe, value, flags, phase
-    sbe['pending'] = False  # set True in sbe_req()
-    sbe['depth'] = d = depth()
-    sbe['temp'] = t = temp()
-    #
-    if flags['log']:
-        ser.log("d %f.2, t %f.2") # log to file in antmod.c
-    if flags['velocity']:
-        velocity(0)         # calls sbe_req() if not done
-    #
-    if flags['depth']:
-        flags['depth'] = False
-        ser.putline("depth %.2f" % d)
-    if flags['temp']:
-        flags['temp'] = False
-        ser.putline("temp %.2f" % d)
-    # 
-    if flags['target']:
-        if d<value['target']:
-            flags['target'] = False
-            ser.putline("target %.2f" % d)
-    if flags['ice']:
-        if t<value['ice']:
-            flags['ice'] = False
-            ser.putline("ice %.2f" % d)
-    if flags['surface']:
-        if d<=value['surface']:
-            flags['surface'] = False
-            ser.putline("surfaced %.2f" % sbe['depth'])
-            phaseChange(3)
-    if any( flags.values() ):
-        sbe_req()
-#end def sbe_process():
 
 def buoyProcess(l):
     "process serial input (from buoy)"
@@ -169,30 +122,30 @@ def buoyProcess(l):
         loadFile(name=ls[1], size=ls[2])
     elif 'depth'==cmd:
         flags[cmd] = True
-        sbe_req()
+        sbe.req()
     elif 'temp'==cmd:    
         flags[cmd] = True
-        sbe_req()
+        sbe.req()
     elif 'target'==cmd:
         value[cmd] = float(ls[1])
         flags[cmd] = True
-        sbe_req()
+        sbe.req()
     elif 'velocity'==cmd:
         velocity( int(ls[1]) )
         flags[cmd] = True
-        sbe_req()
+        sbe.req()
 #end def buoyProcess(l):
 
 def velocity(c=0):
     "c>0 start average, c<0 end average, else continue average"
-    global flags, sbe
-    d = sbe['depth']
+    global flags
+    d = sbe.depth
     if c>0:
         # start average
         velocity.time = time.time()
         velocity.depth = d
         velocity.count = c-1
-        sbe_req()
+        sbe.req()
     elif c<0 or velocity.count==0:
         # done. down is positive velocity, increasing depth
         v = (d - velocity.depth) / (time.time() - velocity.time)
@@ -201,7 +154,7 @@ def velocity(c=0):
     else:
         # more data
         velocity.count -= 1
-        sbe_req()
+        sbe.req()
 # static var
 velocity.time=0
 velocity.depth=0
@@ -231,16 +184,64 @@ def phaseChange(p):
     elif p==4:        # descend
         None
     if any( flags.values() ):
-        sbe_req()
+        sbe.req()
 #end def phaseChange(p):
 
-def sbe_req():
-    "poke sbe to return data after a little time"
-    global sbe, flags
-    if sbe['pending']: return
-    sbe['pending'] = True
-    sbe['timer'] = Timer(sbe['ctdDelay'], sbe_process)
-    sbe['timer'].start()
+class sbe():
+    "used as a collection, not a class"
+
+    ctdDelay = CTD_DELAY
+    pending = False
+    depth = 0.0
+    temp = 0.0
+    timer = None
+
+    @staticmethod
+    def req():
+        "poke sbe to return data after a little time"
+        global flags
+        if sbe.pending: return
+        sbe.pending = True
+        sbe.timer = Timer(sbe.ctdDelay, sbe.process)
+        sbe.timer.start()
+
+    @staticmethod
+    def process():
+        "called when sbe.event.isSet(), consume pseudo-data from sbe"
+        global ser, value, flags, phase
+        sbe.pending = False  # set True in sbe.req()
+        sbe.depth = d = depth()
+        sbe.temp = t = temp()
+        #
+        if flags['log']:
+            ser.log("d %.2f, t %.2f" % (d, t)) # log to file in antmod.c
+        if flags['velocity']:
+            velocity(0)         # calls sbe.req() if not done
+        #
+        if flags['depth']:
+            flags['depth'] = False
+            ser.putline("depth %.2f" % d)
+        if flags['temp']:
+            flags['temp'] = False
+            ser.putline("temp %.2f" % d)
+        # 
+        if flags['target']:
+            if d<value['target']:
+                flags['target'] = False
+                ser.putline("target %.2f" % d)
+        if flags['ice']:
+            if t<value['ice']:
+                flags['ice'] = False
+                ser.putline("ice %.2f" % d)
+        if flags['surface']:
+            if d<=value['surface']:
+                flags['surface'] = False
+                ser.putline("surfaced %.2f" % sbe.depth)
+                phaseChange(3)
+        if any( flags.values() ):
+            sbe.req()
+    #end def sbe.process():
+#end class sbe():
 
 from datetime import datetime
 def gpsIrid():
@@ -249,10 +250,15 @@ def gpsIrid():
     t=datetime.now()
     s=t.strftime("gps %H:%M:%S.%f")
     ser.putline(s[:-3])
+    time.sleep(1)
     ser.putline("signal 5")
+    time.sleep(1)
     ser.putline("connected")
+    time.sleep(1)
     ser.putline("sent %d/%d %d" % (4,6,12345))
+    time.sleep(1)
     ser.putline("done")
+    time.sleep(1)
 
 def depth():
     "mooring-(cable+buoyL+floatsL+antL). always below surface, max antSBEpos"
