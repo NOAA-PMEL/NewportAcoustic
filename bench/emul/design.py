@@ -8,4 +8,4 @@ buoyLine = 10
 floatsLine = 10
 antLine = 6
 # depth of ant sbe39 floating at surface
-antCTDpos = 1.5
+antSBEpos = 1.5

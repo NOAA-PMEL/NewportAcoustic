@@ -168,11 +168,11 @@ def ctdOut():
 def depth():
     "mooring-(cable+buoyL+floatsL+antL), but always below surface"
     dep=mooring - (winch.cable()+buoyLine+floatsLine+antLine)
-    if dep>antCTDpos: 
+    if dep>antSBEpos: 
         return dep
     else: # at surface
         wave = (.8 * random()) - .4
-        return antCTDpos + wave
+        return antSBEpos + wave
 
 def temper():
     "return 20.1 unless we emulate ice at a certain depth"

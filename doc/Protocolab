@@ -1,26 +1,27 @@
 v4
 <--> commands, response is "cmd [#]"
-phase #   := 1 wispr, 2 ascend, 3 surface, 4 descend
+phase #         := 1 wispr, 2 ascend, 3 surface, 4 descend
 target #.#      := set target depth for ascend
 velocity #      := return avg next # depth / time readings
-depth     := return next depth value
-temp      := return next temp value
+depth           := return next depth value
+temp            := return next temp value
 file name size  := load file to antmod
 
-status    := "phase #, depth #.#, temp #.#"
-set setting val := set setting, same format as .ini file
-pico x x  := response from dos, then "pico"
+status          := "status P#, sent #/# #, errors string"
+set string      := set setting, same format as irid download
+pico x x        := response from dos, then "pico"
 
 <-- async alerts, not in direct response to query
-ice #.#       := detected low temp, suggesting winch stop
-target #.#    := depth < target set by buoy request
-surfaced #.#  := depth < ant.surface setting
-gps #.# #.#   := acquired GPS location
-signal #      := csq 5
-connected     := sending data
-sent #/# #    := sent # of # files, # bytes (ready to descend)
-failed        := tried to connect, giving up (ready to descend)
-descend       := done with surface
+ice #.#         := detected low temp, suggesting winch stop
+target #.#      := depth < target set by buoy request
+surfaced #.#    := depth < ant.surface setting
+gps #:#:#.#     := acquired GPS time
+signal #        := csq 5
+connected       := sending data
+sent #/# #      := sent # of # files, # bytes (ready to descend)
+failed          := tried to connect, giving up (ready to descend)
+done            := done with surface
+set string      := settings down from irid
 
 
 v3
